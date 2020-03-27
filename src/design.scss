@@ -1,0 +1,40 @@
+$base-color: #d0e4f5;
+
+body {
+}
+
+a,
+a:hover {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+#root {
+    margin-bottom: 20px;
+}
+
+.MuiPaper-root {
+    margin: 2em 0;
+    .MuiToolbar-root:not(.MuiTablePagination-toolbar) {
+        background-color: $base-color;
+    }
+    .MuiIconButton-label svg {
+        margin: 0 0.5em;
+    }
+    .MuiButton-label svg {
+        margin-right: 0.8em;
+    }
+    .MuiButton-root {
+        margin-left: 1em;
+    }
+    .MuiIconButton-root {
+        padding: 0;
+        padding-left: 5px;
+        &:hover {
+            background: none !important;
+        }
+    }
+    // .MuiTableHead-root {
+    //     height: 10px !important;
+    // }
+}

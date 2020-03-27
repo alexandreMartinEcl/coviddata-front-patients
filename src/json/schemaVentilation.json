@@ -1,0 +1,137 @@
+{
+    "title": "Informations générales du patient",
+    "description": "Informations générales du patient",
+    "type": "object",
+    "required": [
+        "patient",
+        "volume",
+        "respiratory_freq",
+        "tv_pause_duration",
+        "positive_expiratory_pressure",
+        "curare",
+        "NO",
+        "clinical_situation",
+        "pa",
+        "temperature",
+        "saturation_o2",
+        "score_respiration_pao2_fio2",
+        "score_coagulation",
+        "score_hepatique",
+        "score_cardiovasculaire",
+        "score_neurologique",
+        "score_renal_creatine",
+        "score_renal_diurese"
+    ],
+    "properties": {
+        "id": { "type": "integer", "title": "id" },
+        "patient": { "type": "string", "title": "Patient" },
+        "day": { "type": "string", "title": "Date", "format": "date-time" },
+        "volume": { "type": "number", "title": "Volume (mL/kg)" },
+        "respiratory_freq": {
+            "type": "number",
+            "title": "Fréquence respiratoire",
+            "python_minimum": 0,
+            "python_maximum": 80
+        },
+        "teleinspiratory_ventilatory_pause": {
+            "type": "boolean",
+            "title": "Pause ventilatoire téléinspiratoire",
+            "default": false
+        },
+        "tv_pause_duration": {
+            "type": "number",
+            "title": "Durée pause téléinspiratoire"
+        },
+        "positive_expiratory_pressure": {
+            "type": "number",
+            "title": "Pression expiratoire positive",
+            "python_minimum": 0,
+            "python_maximum": 15
+        },
+        "ventral_decubitis": {
+            "type": "boolean",
+            "title": "Positionnement en décubitis ventral",
+            "default": false
+        },
+        "curare": { "type": "number", "title": "Curare" },
+        "NO": { "type": "number", "title": "NO" },
+        "clinical_situation": {
+            "type": "integer",
+            "title": "Évolution clinique",
+            "enum": [0, 1, 2, 4, 5],
+            "enumNames": [
+                "stable",
+                "amélioration",
+                "dégradation",
+                "décès",
+                "extubation (sortie de réa)"
+            ]
+        },
+        "pa": { "type": "number", "title": "PA" },
+        "temperature": {
+            "type": "number",
+            "title": "Temperature",
+            "python_minimum": 34,
+            "python_maximum": 45
+        },
+        "saturation_o2": {
+            "type": "number",
+            "title": "Saturation O2",
+            "python_minimum": 50,
+            "python_maximum": 100
+        },
+        "score_respiration_pao2_fio2": {
+            "type": "number",
+            "title": "Respiration PaO2/FiO2",
+            "python_minimum": 0,
+            "python_maximum": 500
+        },
+        "ventilation_artificielle": {
+            "type": "boolean",
+            "title": "Ventilation artificielle",
+            "default": false
+        },
+        "score_coagulation": {
+            "type": "number",
+            "title": "Coagulation mm3",
+            "python_minimum": 0,
+            "python_maximum": 200
+        },
+        "score_hepatique": {
+            "type": "number",
+            "title": "Hépatique µmol/L",
+            "python_minimum": 0,
+            "python_maximum": 250
+        },
+        "score_cardiovasculaire": {
+            "type": "integer",
+            "title": "",
+            "enum": [0, 1, 2, 3, 4],
+            "enumNames": [
+                "Absence d'hypotension",
+                "PAmoy < 70 mmHg  sans drogue vasoactive",
+                "Utilisation Dopamine (< 5µg/kg/mn) ou Dobutamine",
+                "Utilisation Dopamine (> 5µg/kg/mn) ou Noradrénaline/Adrénaline (< 0.1 µg/kg/mn)",
+                "Utilisation Dopamine (> 15 µg/kg/mn) ou Noradrénaline/Adrénaline (> 0.1 µg/kg/mn)"
+            ]
+        },
+        "score_neurologique": {
+            "type": "integer",
+            "title": "Score de Glasgow",
+            "python_minimum": 0,
+            "python_maximum": 15
+        },
+        "score_renal_creatine": {
+            "type": "number",
+            "title": "Taux de creatine µmol/L",
+            "python_minimum": 0,
+            "python_maximum": 500
+        },
+        "score_renal_diurese": {
+            "type": "number",
+            "title": "Diurèse mL/24h",
+            "python_minimum": 0,
+            "python_maximum": 1000
+        }
+    }
+}
