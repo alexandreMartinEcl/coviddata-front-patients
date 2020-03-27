@@ -19,7 +19,7 @@ function VentilationEdit({ id, patient, data = {} }) {
         data.patient = patient;
     }
 
-    initSchema(properties, data);
+    initSchema(schema.properties, data);
 
     schema.title += ` ${patient}`;
 

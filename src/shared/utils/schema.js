@@ -28,16 +28,22 @@ export function getType(obj) {
 }
 
 export function initSchema(properties, initialData) {
-    Object.entries(initialData).forEach(([key, value]) => {
-        switch (getType(properties[key])) {
-            case "string":
-                properties[key].default = String(value);
-                return;
-            case "data-url":
-                if (value) properties[key].default = value;
-                return;
-            default:
-                properties[key].default = value;
+    Object.entries(properties).forEach(([key, value]) => {
+        if (value.properties) initSchema(value.properties, initialData);
+        else {
+            const defaultValue = initialData[key];
+            if (defaultValue) {
+                switch (getType(properties[key])) {
+                    case "string":
+                        properties[key].default = String(defaultValue);
+                        return;
+                    case "data-url":
+                        properties[key].default = defaultValue;
+                        return;
+                    default:
+                        properties[key].default = defaultValue;
+                }
+            }
         }
     });
 }

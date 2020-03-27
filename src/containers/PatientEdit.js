@@ -20,7 +20,7 @@ function PatientEdit({ id, data = {} }) {
         dateFields.forEach(e => (data[e] = moment().format("YYYY-MM-DD")));
     }
 
-    initSchema(properties, data);
+    initSchema(schema.properties, data);
 
     function onSubmit(data) {
         const formData = new FormData();
