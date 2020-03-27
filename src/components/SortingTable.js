@@ -63,6 +63,7 @@ function SortingTable({ tile = "Table", options = {}, ...props }) {
                 exportFileName: `${props.title.toLowerCase()}_${moment().format(
                     "DD-MM-YYYY"
                 )}`,
+                exportDelimiter: ";",
                 ...options
             }}
             components={{
