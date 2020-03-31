@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import useAxios from "axios-hooks";
+import ErrorTemplate from "../../templates/Error";
 import * as _ from "lodash";
 
 function withDataFromFetch(Component, { url, config = {} }) {
@@ -17,7 +18,7 @@ function withDataFromFetch(Component, { url, config = {} }) {
         }, [fetch]);
 
         if (!data || loading) return <></>;
-        if (error) return <p>Erreur côté serveur</p>;
+        if (error) return <ErrorTemplate />;
 
         return <Component data={_.cloneDeep(data)} {...props} />;
     };

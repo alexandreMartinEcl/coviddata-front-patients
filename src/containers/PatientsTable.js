@@ -8,16 +8,12 @@ import { getColumns, transformFields } from "../shared/utils/table";
 import { global } from "../config";
 
 function PatientsTable({ data, ...props }) {
-    const [columns, setColumns] = useState([]);
+    const properties = global.properties.patient;
+    const columns = getColumns(properties, ["id"]);
 
-    useEffect(() => {
-        const properties = global.properties.patient;
-        setColumns(getColumns(properties, ["id"]));
-
-        data.results.forEach(e => {
-            transformFields(e, properties);
-        });
-    }, [data]);
+    data.results.forEach(e => {
+        transformFields(e, properties);
+    });
 
     const [page, setPage] = useState();
 
@@ -40,8 +36,8 @@ function PatientsTable({ data, ...props }) {
                             onClick={() => setPage("/patient/add")}
                             variant="contained"
                             color="primary"
+                            startIcon={<FaPlus />}
                         >
-                            <FaPlus />
                             Ajouter un patient
                         </Button>
                     ),

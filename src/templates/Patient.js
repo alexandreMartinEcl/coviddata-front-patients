@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { withStyles } from "@material-ui/core/styles";
 import {
     Grid,
     ExpansionPanel,
@@ -36,11 +35,6 @@ const useStyles = makeStyles(theme => ({
 export default function PatientTemplate({ components }) {
     const { PatientContent, VentilationTable, Ventilation, Plot } = components;
     const classes = useStyles();
-    const [expanded, setExpanded] = React.useState(false);
-
-    const handleChange = panel => (event, isExpanded) => {
-        setExpanded(isExpanded ? panel : false);
-    };
 
     return (
         <Grid container spacing={2}>

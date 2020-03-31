@@ -20,7 +20,7 @@ function PatientEdit({ id, data = {} }) {
         dateFields.forEach(e => (data[e] = moment().format("YYYY-MM-DD")));
     }
 
-    initSchema(schema.properties, data);
+    initSchema(properties, data);
 
     function onSubmit(data) {
         const formData = new FormData();
@@ -30,14 +30,17 @@ function PatientEdit({ id, data = {} }) {
         }
 
         const url = config.path.patient + (id ? `${id}/` : "");
-        axios
-            .post(url, formData, {
-                ...config.axios,
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    "Access-Control-Allow-Origin": "*"
-                }
-            })
+
+        axios({
+            method: id ? "put" : "post",
+            url,
+            data: formData,
+            ...config.axios,
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "Access-Control-Allow-Origin": "*"
+            }
+        })
             .then(res => {
                 console.log(res);
                 setPage(`/patient`);

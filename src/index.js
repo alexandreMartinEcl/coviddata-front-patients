@@ -3,9 +3,9 @@ import ReactDOM from "react-dom";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { frFR } from "@material-ui/core/locale";
 import Routes from "./components/Routes";
-import ErrorTemplate from "./templates/ErrorTemplate";
+import ErrorTemplate from "./templates/Error";
 import useMultipleAxios from "./shared/hooks/useMultipleAxios";
-import { flattenProperties } from "./shared/utils/table";
+import { collectProperties } from "./shared/utils/table";
 import config, { global } from "./config";
 import "./design.scss";
 
@@ -21,8 +21,8 @@ function Loading({ children }) {
 
     global.schema = { patient, ventilation };
     global.properties = {
-        patient: flattenProperties(patient.properties),
-        ventilation: flattenProperties(ventilation.properties)
+        patient: collectProperties(patient),
+        ventilation: collectProperties(ventilation)
     };
 
     return children;

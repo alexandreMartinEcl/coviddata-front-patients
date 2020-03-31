@@ -1,11 +1,12 @@
 import React from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import components from "../containers/Components";
+import config from "../config";
 
 function Routes(props) {
     const { PatientsTable, Patient, PatientEdit } = components;
     return (
-        <Router>
+        <Router basename={config.basename}>
             <Switch>
                 <Route path="/patient/add">
                     <PatientEdit />

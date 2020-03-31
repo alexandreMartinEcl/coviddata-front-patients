@@ -18,12 +18,6 @@ a:hover {
     .MuiToolbar-root:not(.MuiTablePagination-toolbar) {
         background-color: $base-color;
     }
-    .MuiIconButton-label svg {
-        margin: 0 0.5em;
-    }
-    .MuiButton-label svg {
-        margin-right: 0.8em;
-    }
     .MuiButton-root {
         margin-left: 1em;
     }
@@ -34,7 +28,4 @@ a:hover {
             background: none !important;
         }
     }
-    // .MuiTableHead-root {
-    //     height: 10px !important;
-    // }
 }

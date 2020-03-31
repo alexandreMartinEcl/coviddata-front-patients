@@ -6,20 +6,14 @@ import getSOFAfromData, { color } from "../shared/utils/sofaScore";
 import { global } from "../config";
 
 function VentilationsTable({ id, data, setVentilation, ...props }) {
-    const [columns, setColumns] = useState([]);
-    const refSOFA = useRef([]);
+    const properties = global.properties.ventilation;
+    const columns = getColumns(properties, ["id", "patient"]);
 
-    useEffect(() => {
-        const properties = global.properties.ventilation;
-        setColumns(getColumns(properties, ["id", "patient"]));
-
-        const SOFA = [];
-        data.results.forEach(e => {
-            SOFA.push(getSOFAfromData(e));
-            transformFields(e, properties);
-            refSOFA.current = SOFA;
-        });
-    }, [data]);
+    const SOFA = [];
+    data.results.forEach(e => {
+        SOFA.push(getSOFAfromData(e));
+        transformFields(e, properties);
+    });
 
     if (!columns.length) return <></>;
 
@@ -30,7 +24,7 @@ function VentilationsTable({ id, data, setVentilation, ...props }) {
             data={data.results}
             options={{
                 rowStyle: rowData => ({
-                    backgroundColor: color(refSOFA.current[rowData.id])
+                    backgroundColor: color(SOFA[rowData.id])
                 })
             }}
             actions={[

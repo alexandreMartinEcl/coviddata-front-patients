@@ -19,7 +19,7 @@ function VentilationEdit({ id, patient, data = {} }) {
         data.patient = patient;
     }
 
-    initSchema(schema.properties, data);
+    initSchema(properties, data);
 
     schema.title += ` ${patient}`;
 
@@ -30,14 +30,16 @@ function VentilationEdit({ id, patient, data = {} }) {
         }
         const url = config.path.ventilation + (id ? `${id}/` : "");
 
-        axios
-            .post(url, formData, {
-                ...config.axios,
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    "Access-Control-Allow-Origin": "*"
-                }
-            })
+        axios({
+            method: id ? "put" : "post",
+            url,
+            data: formData,
+            ...config.axios,
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "Access-Control-Allow-Origin": "*"
+            }
+        })
             .then(res => {
                 console.log(res);
                 setPage(`/patient/${patient}`);

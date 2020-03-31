@@ -1,6 +1,4 @@
-/* eslint-disable no-unused-vars */
 import Checkbox from "@material-ui/core/Checkbox";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
 import IconButton from "@material-ui/core/IconButton";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import Menu from "@material-ui/core/Menu";
@@ -13,9 +11,10 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import { lighten } from "@material-ui/core/styles/colorManipulator";
 import classNames from "classnames";
 import { CsvBuilder } from "filefy";
-import PropTypes, { oneOf } from "prop-types";
+import PropTypes from "prop-types";
 import * as React from "react";
-/* eslint-enable no-unused-vars */
+import Button from "@material-ui/core/Button";
+import { FaFileExcel } from "react-icons/fa";
 
 export class MTableToolbar extends React.Component {
     constructor(props) {
@@ -198,33 +197,18 @@ export class MTableToolbar extends React.Component {
                     </span>
                 )}
                 {this.props.exportButton && (
-                    <span>
-                        <Tooltip title={localization.exportTitle}>
-                            <IconButton
-                                color="inherit"
-                                onClick={event =>
-                                    this.setState({
-                                        exportButtonAnchorEl:
-                                            event.currentTarget
-                                    })
-                                }
-                                aria-label={localization.exportAriaLabel}
-                            >
-                                <this.props.icons.Export />
-                            </IconButton>
-                        </Tooltip>
-                        <Menu
-                            anchorEl={this.state.exportButtonAnchorEl}
-                            open={Boolean(this.state.exportButtonAnchorEl)}
-                            onClose={() =>
-                                this.setState({ exportButtonAnchorEl: null })
-                            }
+                    <Tooltip title={localization.exportName}>
+                        <Button
+                            style={{
+                                backgroundColor: "#1f7144",
+                                color: "white"
+                            }}
+                            variant="contained"
+                            onClick={this.exportCsv}
                         >
-                            <MenuItem key="export-csv" onClick={this.exportCsv}>
-                                {localization.exportName}
-                            </MenuItem>
-                        </Menu>
-                    </span>
+                            <FaFileExcel size={25} />
+                        </Button>
+                    </Tooltip>
                 )}
                 <span>
                     {/* remove extra button tag */}
