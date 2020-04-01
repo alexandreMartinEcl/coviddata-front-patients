@@ -21,6 +21,7 @@ function PatientEdit({ id, data = {} }) {
     }
 
     initSchema(properties, data);
+    schema.properties = properties;
 
     function onSubmit(data) {
         const formData = new FormData();
