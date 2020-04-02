@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import SortingTable from "../components/SortingTable";
 import { FaPencilAlt } from "react-icons/fa";
 import { getColumns, transformFields } from "../shared/utils/table";

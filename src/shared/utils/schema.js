@@ -37,3 +37,12 @@ export function initSchema(properties, initialData) {
         }
     }
 }
+
+export function flat(data, collect = {}) {
+    for (const key in data) {
+        const value = data[key];
+        if (typeof value === "object") flat(value, collect);
+        else collect[key] = value;
+    }
+    return collect;
+}

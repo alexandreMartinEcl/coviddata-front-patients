@@ -11,7 +11,7 @@ function PatientContent({ id, data }) {
 
     const listByCategory = {};
     list.forEach(e => {
-        if (e.category === "") e.category = "default";
+        if (!e.category) return;
         if (!listByCategory[e.category]) listByCategory[e.category] = [];
         listByCategory[e.category].push({ title: e.title, content: e.content });
     });

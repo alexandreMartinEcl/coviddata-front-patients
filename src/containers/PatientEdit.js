@@ -5,7 +5,7 @@ import moment from "moment";
 import Form from "../components/Form";
 import PatientEditTemplate from "../templates/PatientEdit";
 import { getFieldsFromType } from "../shared/utils/table";
-import { initSchema, cloneSchema } from "../shared/utils/schema";
+import { initSchema, cloneSchema, flat } from "../shared/utils/schema";
 import config, { global } from "../config";
 import uiSchema from "../json/uiSchemaPatient.json";
 
@@ -21,9 +21,9 @@ function PatientEdit({ id, data = {} }) {
     }
 
     initSchema(properties, data);
-    schema.properties = properties;
 
-    function onSubmit(data) {
+    function onSubmit(initialData) {
+        const data = flat(initialData);
         const formData = new FormData();
 
         for (let [key, value] of Object.entries(data)) {
