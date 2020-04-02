@@ -21,6 +21,8 @@ function PatientEdit({ id, data = {} }) {
     }
 
     initSchema(properties, data);
+    console.log(schema);
+    console.log(properties);
 
     function onSubmit(initialData) {
         const data = flat(initialData);

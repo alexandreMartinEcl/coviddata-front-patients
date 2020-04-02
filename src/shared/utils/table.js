@@ -10,8 +10,8 @@ export function collectProperties(obj, collect = {}, parent) {
             const value = properties[field];
             if (value.type === "object")
                 collectProperties(value, collect, field);
-            else if (parent) collect[field] = { ...value, parent };
-            else collect[field] = value;
+            else if (parent) value.parent = parent;
+            collect[field] = value;
         }
         return collect;
     }
