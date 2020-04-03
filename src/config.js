@@ -5,6 +5,7 @@ export default {
     basename: "/",
     path: {
         patient: "patients/",
+        bed: "beds/",
         ventilation: "ventilations/",
         ventilation_patient: "history/"
     },
@@ -22,4 +23,11 @@ export const translate = {
     }
 };
 
-export const global = {};
+export const global = {
+    bed: {
+        columnField: {
+            title: "columnTitle",
+            hidden: false,
+        }
+    }
+};

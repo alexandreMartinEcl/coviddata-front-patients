@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
+import BedsA from "../containers/Beds";
 import PatientA from "../containers/Patient";
 import PatientsTableA from "../containers/PatientsTable";
 import PatientContentA from "../containers/PatientContent";
@@ -48,6 +49,8 @@ export const VentilationEdit = props => {
         <VentilationEditA id={id} {...props} />
     );
 };
+export const BedsB = props =>
+    withData(BedsA, props, config.path.bed);
 
 export default {
     PatientsTable: props => (
@@ -64,5 +67,10 @@ export default {
         <Container>
             <PatientEditB {...props} />
         </Container>
-    )
+    ),
+    Beds: props => (
+        <Container>
+            <BedsA {...props} />
+        </Container>
+    ),
 };

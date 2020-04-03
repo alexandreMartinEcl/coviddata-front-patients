@@ -1,0 +1,40 @@
+{
+    "title": "Ajout de patient",
+    "description": "Informations de base pour le patient",
+    "type": "object",
+    "required": [
+        "nipId"
+    ],
+    "properties": {
+        "nipId": { "type": "string", "title": "Identifiant NIP" },
+        "name": {
+            "type": "string",
+            "title": "Nom"
+        },
+        "firstName": {
+            "type": "string",
+            "title": "Prénom"
+        },
+        "birthDate": {
+            "type": "string",
+            "format": "date",
+            "title": "Date de naissance"
+        },
+        "sex": {
+            "title": "Sexe",
+            "type": "integer",
+            "enumNames": ["Homme", "Femme"],
+            "enum": [0, 1]
+        },
+        "weight": {
+            "title": "Poids",
+            "type": "number",
+            "python_minimum": 0
+        },
+        "height": {
+            "title": "Taille (cm)",
+            "type": "integer",
+            "python_minimum": 0
+        }
+    }
+}

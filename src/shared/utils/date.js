@@ -9,3 +9,11 @@ export function dateTimeToString(value) {
         })
     );
 }
+
+/**
+ * Returns how many days spent between value and now, under the format 'Jxx'
+ * @param {Date} value 
+ */
+export function dateToDayStep(value) {
+    return `J${Math.floor(( Date.now() - Date(value) ) / 86400000) + 1}`;
+}
