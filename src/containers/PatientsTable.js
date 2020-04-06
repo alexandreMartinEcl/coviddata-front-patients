@@ -8,57 +8,56 @@ import { getColumns, transformFields } from "../shared/utils/table";
 import { global } from "../config";
 
 function PatientsTable({ data, ...props }) {
-    const properties = global.properties.patient;
-    const columns = getColumns(properties, ["id"]);
+  const properties = global.properties.patient;
+  const columns = getColumns(properties, ["id"]);
 
-    data.results.forEach(e => {
-        transformFields(e, properties);
-    });
+  data.results.forEach((e) => {
+    transformFields(e, properties);
+  });
 
-    const [page, setPage] = useState();
+  const [page, setPage] = useState();
 
-    if (!columns.length) return <></>;
+  if (!columns.length) return <></>;
 
-    return page ? (
-        <Redirect push to={page} />
-    ) : (
-        <SortingTable
-            title="Liste des patients"
-            columns={columns}
-            data={data.results}
-            options={{
-                pageSize: 10
-            }}
-            actions={[
-                {
-                    icon: () => (
-                        <Button
-                            onClick={() => setPage("/patient/add")}
-                            variant="contained"
-                            color="primary"
-                            startIcon={<FaPlus />}
-                        >
-                            Ajouter un patient
-                        </Button>
-                    ),
-                    onClick: () => {},
-                    isFreeAction: true
-                },
-                {
-                    icon: () => <FaEye />,
-                    onClick: (e, rowData) => setPage(`/patient/${rowData.id}`),
-                    tooltip: "Visualiser"
-                },
-                {
-                    icon: () => <FaPencilAlt />,
-                    onClick: (e, rowData) =>
-                        setPage(`/patient/edit/${rowData.id}`),
-                    tooltip: "Éditer"
-                }
-            ]}
-            {...props}
-        />
-    );
+  return page ? (
+    <Redirect push to={page} />
+  ) : (
+    <SortingTable
+      title="Liste des patients"
+      columns={columns}
+      data={data.results}
+      options={{
+        pageSize: 10,
+      }}
+      actions={[
+        {
+          icon: () => (
+            <Button
+              onClick={() => setPage("/patient/add")}
+              variant="contained"
+              color="primary"
+              startIcon={<FaPlus />}
+            >
+              Ajouter un patient
+            </Button>
+          ),
+          onClick: () => {},
+          isFreeAction: true,
+        },
+        {
+          icon: () => <FaEye />,
+          onClick: (e, rowData) => setPage(`/patient/${rowData.id}`),
+          tooltip: "Visualiser",
+        },
+        {
+          icon: () => <FaPencilAlt />,
+          onClick: (e, rowData) => setPage(`/patient/edit/${rowData.id}`),
+          tooltip: "Éditer",
+        },
+      ]}
+      {...props}
+    />
+  );
 }
 
 export default PatientsTable;

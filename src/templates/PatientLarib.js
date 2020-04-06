@@ -1,15 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import {
-  Grid,
-  ExpansionPanel,
-  ExpansionPanelSummary,
-  ExpansionPanelDetails,
-  Typography,
-  Card,
-  CardContent,
-} from "@material-ui/core";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import { Grid, Card, CardContent } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 
@@ -33,7 +24,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function PatientTemplate({ components }) {
-  const { PatientContent, VentilationTable, Ventilation, Plot } = components;
+  const {
+    PatientInfos,
+    Depistages,
+    Antecedents,
+    Allergies,
+    RecentDiseaseHistory,
+    Evolution,
+    TodoList,
+    MeasuresTable,
+  } = components;
   const classes = useStyles();
 
   return (
@@ -47,37 +47,41 @@ export default function PatientTemplate({ components }) {
         <Grid item xs={12} md={4}>
           <Card>
             <CardContent>
-              <PatientContent />
+              <PatientInfos />
             </CardContent>
           </Card>
         </Grid>
         <Grid item container xs={12} md={8} spacing={1}>
           <Grid xs={12} item pb={1}>
-            <VentilationTable />
+            <Depistages />
           </Grid>
-          <Grid xs={12} item pt={1}>
-            <ExpansionPanel>
-              <ExpansionPanelSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1bh-content"
-                id="panel1bh-header"
-              >
-                <Typography className={classes.secondaryHeading}>
-                  Ajouter une nouvelle donnée de ventilation
-                </Typography>
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails>
-                <Ventilation />
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
+          Antecedents
+          <Grid xs={12} item pb={1}>
+            <Antecedents />
           </Grid>
-          <Grid xs={12} item>
-            <Card>
-              <CardContent>
-                <Plot />
-              </CardContent>
-            </Card>
+          <Grid xs={12} item pb={1}>
+            <Allergies />
           </Grid>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Card>
+            <CardContent>
+              <RecentDiseaseHistory />
+            </CardContent>
+            <CardContent>
+              <Evolution />
+            </CardContent>
+            <CardContent>
+              <TodoList />
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Card>
+            <CardContent>
+              <MeasuresTable />
+            </CardContent>
+          </Card>
         </Grid>
       </Grid>
     </Grid>

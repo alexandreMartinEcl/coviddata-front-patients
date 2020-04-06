@@ -8,39 +8,40 @@ import useMultipleAxios from "./shared/hooks/useMultipleAxios";
 import { collectProperties } from "./shared/utils/table";
 import config, { global } from "./config";
 import "./design.scss";
+import theme from "./theme";
 
 function Loading({ children }) {
-    const {
-        data: [patient, ventilation],
-        loading,
-        error
-    } = useMultipleAxios(config.schema_list, config.axios);
+  // // const {
+  // //     data: [patient, ventilation],
+  // //     loading,
+  // //     error
+  // // } = useMultipleAxios(config.schema_list, config.axios);
 
-    if (loading) return <></>;
-    if (error) return <ErrorTemplate />;
+  // if (loading) return <></>;
+  // if (error) return <ErrorTemplate />;
 
-    global.schema = { patient, ventilation };
-    global.properties = {
-        patient: collectProperties(patient),
-        ventilation: collectProperties(ventilation)
-    };
+  // global.schema = { patient, ventilation };
+  // global.properties = {
+  //     patient: collectProperties(patient),
+  //     ventilation: collectProperties(ventilation)
+  // };
 
-    return children;
+  return children;
 }
 
 function Init(props) {
-    const theme = createMuiTheme({}, frFR);
+  // const theme = createMuiTheme({}, frFR);
 
-    return (
-        <ThemeProvider theme={theme}>
-            <Routes />
-        </ThemeProvider>
-    );
+  return (
+    <ThemeProvider theme={theme}>
+      <Routes />
+    </ThemeProvider>
+  );
 }
 
 ReactDOM.render(
-    <Loading>
-        <Init />
-    </Loading>,
-    document.getElementById("root")
+  <Loading>
+    <Init />
+  </Loading>,
+  document.getElementById("root")
 );

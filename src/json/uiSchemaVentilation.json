@@ -1,5 +1,5 @@
 {
-    "id": { "ui:widget": "hidden" },
-    "day": { "ui:widget": "hidden" },
-    "patient": { "ui:widget": "hidden" }
+  "id": { "ui:widget": "hidden" },
+  "day": { "ui:widget": "hidden" },
+  "patient": { "ui:widget": "hidden" }
 }

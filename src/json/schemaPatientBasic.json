@@ -1,40 +1,48 @@
 {
-    "title": "Ajout de patient",
-    "description": "Informations de base pour le patient",
-    "type": "object",
-    "required": [
-        "nipId"
-    ],
-    "properties": {
-        "nipId": { "type": "string", "title": "Identifiant NIP" },
-        "name": {
-            "type": "string",
-            "title": "Nom"
-        },
-        "firstName": {
-            "type": "string",
-            "title": "Prénom"
-        },
-        "birthDate": {
-            "type": "string",
-            "format": "date",
-            "title": "Date de naissance"
-        },
-        "sex": {
-            "title": "Sexe",
-            "type": "integer",
-            "enumNames": ["Homme", "Femme"],
-            "enum": [0, 1]
-        },
-        "weight": {
-            "title": "Poids",
-            "type": "number",
-            "python_minimum": 0
-        },
-        "height": {
-            "title": "Taille (cm)",
-            "type": "integer",
-            "python_minimum": 0
-        }
+  "title": "Ajout de patient",
+  "description": "Informations de base pour le patient",
+  "type": "object",
+  "required": ["NIP_id"],
+  "properties": {
+    "NIP_id": {
+      "type": "string",
+      "title": "Identifiant NIP"
+    },
+    "family_name": {
+      "type": "string",
+      "title": "Nom"
+    },
+    "first_name": {
+      "type": "string",
+      "title": "Prénom"
+    },
+    "birth_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Date de naissance"
+    },
+    "sex": {
+      "title": "Sexe",
+      "type": "string",
+      "enumNames": ["Homme", "Femme"],
+      "enum": ["H", "F"]
+    },
+    "severity": {
+      "title": "Gravité (",
+      "type": "number",
+      "default": 2,
+      "enumNames": ["A risques", "Instable", "Stable"],
+      "enum": [0, 1, 2]
+    },
+    "weight_kg": {
+      "title": "Poids",
+      "type": "number",
+      "python_minimum": 0
+    },
+    "size_cm": {
+      "title": "Taille (cm)",
+      "type": "integer",
+      "python_minimum": 0
     }
+  }
 }
