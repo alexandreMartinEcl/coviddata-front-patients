@@ -14,9 +14,18 @@ const theme = createMuiTheme({
             dark: '#194180',
             contrastText: '#f5f0f6'
         },
-        danger : {
+        danger: {
             main: '#DC3444',
-            light: '#E4A636'
+            light: "#F98590",
+            // main: "#C28416",
+            // light: '#E4A636',
+        }
+    },
+    overrides: {
+        MuiTypography: {
+            body2: {
+                fontSize: "0.7rem",
+            }
         }
     }
 }, frFR);

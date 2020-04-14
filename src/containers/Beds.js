@@ -29,19 +29,29 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import Paper from '@material-ui/core/Paper';
-import { Typography } from "@material-ui/core";
+import { Typography, useMediaQuery } from "@material-ui/core";
 import Divider from '@material-ui/core/Divider';
-import theme from "../theme";
+import { useTheme } from "@material-ui/styles";
+// import theme from "../theme";
 
 const useStyles = makeStyles((theme) => ({
   root: {},
   unitTitle: {
     marginRight: "100px"
   },
-  listItem: {
+  bedItem: {
     height: "60px",
     fontSize: 15,
-    // backgroundColor: theme.palette.primary.light
+  },
+  bedItemSeverityHigh: {
+    height: "60px",
+    fontSize: "10rem",
+    backgroundColor: theme.palette.danger.main
+  },
+  bedItemSeverityMiddle: {
+    height: "60px",
+    fontSize: 15,
+    backgroundColor: theme.palette.danger.light
   },
   bedIndex: {
     width: "20%",
@@ -91,6 +101,24 @@ function Beds({ data, ...props }) {
   }).schema;
 
   const bedStatusInterface = ["Utilisable", "Inutilisable"];
+  const severityInterface = ['A risque', 'Instable', 'Stable']
+
+  const getBedSeverityClass = (severity) => {
+    switch (severityInterface[severity]) {
+      case "A risque":
+        return classes.bedItemSeverityHigh;
+      case "Instable":
+        return classes.bedItemSeverityMiddle;
+      case "Stable":
+        return classes.bedItem;
+      default:
+        return classes.bedItem;
+    }
+  }
+
+  const th = useTheme();
+  const isUpSm = useMediaQuery(th.breakpoints.up('sm'));
+  const variantForBedItem = isUpSm ? "body1" : "body2";
 
   const handlePatientClick = (idPatient) => {
     if (idPatient) {
@@ -264,7 +292,6 @@ function Beds({ data, ...props }) {
   );
 
   const displayName = (firstName, lastName) => {
-    // return `"HELLOOOO"`;
     return `${firstName} ${lastName}`;
   };
 
@@ -278,18 +305,20 @@ function Beds({ data, ...props }) {
       birth_date,
       severity,
       nbDefaillance,
+      sex
     } = patient ? patient : {};
     const idPatient = patient ? patient.id : {};
     return current_stay ? (
-      <ListItem key={bed.id} button divider className={classes.listItem} onClick={() => handlePatientClick(idPatient)}>
-        <ListItemText id={`bedIndex-${unit_index}`} primary={unit_index} className={classes.bedIndex}/>
+      <ListItem key={bed.id} button divider className={getBedSeverityClass(severity)} onClick={() => handlePatientClick(idPatient)}>
+        <ListItemText id={`bedIndex-${unit_index}`} primary={unit_index} className={classes.bedIndex} />
 
         <ListItemText
           id={`patientDetails-${idPatient}`}
-          primary={displayName(first_name, family_name)}
+          primary={displayName(first_name, family_name) + (sex ? ` (${sex})` : "")}
           secondary={birth_date ? `${getAge(birth_date)} ans` : ""}
-          // onClick={() => handlePatientClick(idPatient)}
           className={classes.patientDetails}
+          primaryTypographyProps={{variant: variantForBedItem}}
+          secondaryTypographyProps={{variant: variantForBedItem}}
         />
         <ListItemText
           id={`otherDetails-${idPatient}`}
@@ -297,44 +326,26 @@ function Beds({ data, ...props }) {
             start_date
           )}`}
           secondary={"Covid"}
-          // onClick={() => handlePatientClick(idPatient)}
           className={classes.otherDetails}
+          primaryTypographyProps={{variant: variantForBedItem}}
+          secondaryTypographyProps={{variant: variantForBedItem}}
         />
         <ListItemSecondaryAction className={classes.listItemSecAction}>
-          {/* <Button
-            variant="contained"
-            color="primary"
-            className={classes.secActionButton}
-            startIcon={<RemoveIcon />}
-            onClick={() =>
-              handleRemoveOpen(idStay, displayName(first_name, family_name))
-            }
-          >
-            Retirer le patient
-              </Button> */}
-              <RemoveIcon color="primary" onClick={() => handleRemoveOpen(idStay, displayName(first_name, family_name))}/>
+          <RemoveIcon color="primary" onClick={() => handleRemoveOpen(idStay, displayName(first_name, family_name))} />
         </ListItemSecondaryAction>
       </ListItem>
     ) : (
-        <ListItem key={bed.id} role={undefined} button divider className={classes.listItem} onClick={() => handleAddPatientOpen(bed.id)}>
+        <ListItem key={bed.id} role={undefined} button divider className={classes.bedItem} onClick={() => handleAddPatientOpen(bed.id)}>
           <ListItemText id={`bedIndex-${unit_index}`} primary={unit_index} className={classes.bedIndex} />
           <ListItemText
             id={`dispo-${bed.id}`}
             primary={Number(status) === 0 ? "Libre" : "Indisponible"}
             className={classes.patientDetails}
+            primaryTypographyProps={{variant: variantForBedItem}}
             />
           <ListItemText id={`space-${bed.id}`} primary={""} className={classes.otherDetails} />
-          <ListItemSecondaryAction  className={classes.listItemSecAction}>
-            {/* <Button
-              variant="contained"
-              color="secondary"
-              className={classes.secActionButton}
-              startIcon={<AddIcon />}
-              onClick={() => handleAddPatientOpen(bed.id)}
-            >
-              Ajouter un patient
-              </Button> */}
-              <AddIcon color="secondary" onClick={() => handleAddPatientOpen(bed.id)}/>
+          <ListItemSecondaryAction className={classes.listItemSecAction}>
+            <AddIcon color="secondary" onClick={() => handleAddPatientOpen(bed.id)} />
           </ListItemSecondaryAction>
         </ListItem>
       )

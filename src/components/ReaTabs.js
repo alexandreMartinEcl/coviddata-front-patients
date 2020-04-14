@@ -45,6 +45,10 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     backgroundColor: theme.palette.background.paper,
   },
+  button: {
+    fontSize: "0.8rem",
+    whiteSpace: "normal"
+  }
 }));
 
 export default function ReaTabs({ labels, contents, onTabChange, onAddRea }) {

@@ -1,7 +1,7 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import AddIcon from "@material-ui/icons/FormatListNumbered";
+import AddIcon from "@material-ui/icons/AddCircle";
 import RemoveIcon from "@material-ui/icons/RemoveCircle";
 import axios from "axios";
 import config from "../config";
@@ -20,42 +20,19 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import * as _ from "lodash";
+import { Card, CardContent, CardActions } from "@material-ui/core";
+import theme from "../theme";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-    width: "100%",
-    backgroundColor: theme.palette.background.paper,
+  label: {
+    height: "30%",
+    paddingTop: 1,
+    paddingBottom: 1,
+    // backgroundColor: theme.palette.primary.light
   },
-  heading: {
-    fontSize: theme.typography.pxToRem(15),
-  },
-  secondaryHeading: {
-    fontSize: theme.typography.pxToRem(15),
-    color: theme.palette.text.secondary,
-  },
-  icon: {
-    verticalAlign: "bottom",
-    height: 20,
-    width: 20,
-  },
-  details: {
-    alignItems: "center",
-  },
-  column: {
-    flexBasis: "33.33%",
-  },
-  helper: {
-    borderLeft: `2px solid ${theme.palette.divider}`,
-    padding: theme.spacing(1, 2),
-  },
-  link: {
-    color: theme.palette.primary.main,
-    textDecoration: "none",
-    "&:hover": {
-      textDecoration: "underline",
-    },
-  },
+  labelTitle: {
+    verticalAlign: "center"
+  }
 }));
 
 export default function ListLabels({
@@ -181,91 +158,104 @@ export default function ListLabels({
 
   const labelComponent = (item, i) => {
     return doubleInfoElseSingle ? (
-      <Grid>
-        <Paper>
-          <Typography>{item.title}</Typography>
-          <Divider vertical />
-          <Typography>{item.value}</Typography>
-        </Paper>
+      <Grid item container xs={4} spacing={1} justify={"flex-start"} className={classes.label}>
+          <Grid item>
+            <Typography >{item.title}: </Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography >{item.value}</Typography>
+          </Grid>
       </Grid>
     ) : (
-      <Grid>
-        <Paper>
+        <Grid item xs={4} className={classes.label}>
           <Typography>{item}</Typography>
-        </Paper>
-      </Grid>
-    );
+        </Grid>
+      );
   };
 
   const editableLabelComponent = (item, i) => {
     return doubleInfoElseSingle ? (
       <Grid>
-        <Paper>
-          <div>
-            <TextField
-              id={buildId("title", i)}
-              onChange={onChangeLabels}
-              type="text"
-              value={item.title}
-            />
-            <Divider vertical />
-            <TextField
-              id={buildId("value", i)}
-              onChange={onChangeLabels}
-              type="text"
-              multiline
-              value={item.value}
-            />
-            <Button
-              variant="contained"
-              color="secondary"
-              className={classes.button}
-              startIcon={<RemoveIcon />}
-              onClick={() => removeEditedLabel(i)}
-            >
-              Retirer
+        <TextField
+          id={buildId("title", i)}
+          onChange={onChangeLabels}
+          type="text"
+          value={item.title}
+        />
+        <TextField
+          id={buildId("value", i)}
+          onChange={onChangeLabels}
+          type="text"
+          multiline
+          value={item.value}
+        />
+        <Button
+          variant="contained"
+          color="secondary"
+          className={classes.button}
+          startIcon={<RemoveIcon />}
+          onClick={() => removeEditedLabel(i)}
+        >
+          Retirer
             </Button>
-          </div>
-        </Paper>
+        <Divider vertical />
       </Grid>
     ) : (
-      <Grid>
-        <Paper>
-          <div>
-            <TextField
-              id={buildId("item", i)}
-              onChange={onChangeLabels}
-              type="text"
-              multiline
-              value={item}
-            />
-            <Button
-              variant="contained"
-              color="secondary"
-              className={classes.button}
-              startIcon={<RemoveIcon />}
-              onClick={() => removeEditedLabel(i)}
-            >
-              Retirer
+        <Grid>
+          <TextField
+            id={buildId("item", i)}
+            onChange={onChangeLabels}
+            type="text"
+            multiline
+            value={item}
+          />
+          <Button
+            variant="contained"
+            color="secondary"
+            className={classes.button}
+            startIcon={<RemoveIcon />}
+            onClick={() => removeEditedLabel(i)}
+          >
+            Retirer
             </Button>
-          </div>
-        </Paper>
-      </Grid>
-    );
+          <Divider vertical />
+        </Grid>
+      );
   };
 
   return (
-    <div className={classes.root}>
-      {dataCopy.map(labelComponent)}
-      <Button
-        variant="contained"
-        color="secondary"
-        className={classes.button}
-        startIcon={<AddIcon />}
-        onClick={openEditDial}
-      >
-        Modifier
-      </Button>
+    <Card>
+      <CardContent>
+    <Grid container spacing={2} className={classes.root} justify={"flex-start"} alignItems={"center"}>
+      <Grid item xs={2}>
+        <Typography className={classes.labelTitle}>{title}</Typography>
+      </Grid>
+      <Grid item container xs={10} spacing={2} justify={"flex-start"} alignItems={"center"}>
+        {dataCopy.map(labelComponent)}
+        <Grid item xs={4}>
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            startIcon={<AddIcon />}
+            onClick={openEditDial}
+          >
+            Modifier
+            </Button>
+        </Grid>
+      </Grid>
+        {/* <CardActions>
+        <Button
+            variant="contained"
+            color="secondary"
+            className={classes.button}
+            startIcon={<AddIcon />}
+            onClick={openEditDial}
+          >
+            Modifier
+            </Button>
+        </CardActions> */}
+
       <Dialog
         open={editDial}
         onClose={closeEditDial}
@@ -312,6 +302,8 @@ export default function ListLabels({
           La requête a échoué {errMsg}
         </MuiAlert>
       </Snackbar>
-    </div>
+    </Grid>
+    </CardContent>
+    </Card>
   );
 }

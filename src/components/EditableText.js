@@ -105,10 +105,6 @@ export default function EditableText({
   };
 
   const onSubmitTodoList = () => {
-    setSavedText(text);
-    let d = dateTimeToStr(new Date());
-    setLastEdited(d);
-
     setLoadingUpdateText(true);
 
     const formData = new FormData();
@@ -129,6 +125,9 @@ export default function EditableText({
       .then((res) => {
         console.log(res);
         setLoadingUpdateText(false);
+        setSavedText(text);
+        let d = dateTimeToStr(new Date());
+        setLastEdited(d);
         closeEditDial();
       })
       .catch((err) => {
@@ -141,7 +140,7 @@ export default function EditableText({
 
   return extensibleElseDial ? (
     <div className={classes.root}>
-      <ExpansionPanel defaultExpanded>
+      <ExpansionPanel defaultExpanded={false}>
         <ExpansionPanelSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1c-content"

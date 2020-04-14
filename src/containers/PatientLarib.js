@@ -10,82 +10,6 @@ import {
 } from "./Components";
 import { object } from "prop-types";
 
-const dataMoc = {
-  id: 5,
-  bed: null,
-  current_unit_stay: {
-    id: 11,
-    is_finished: false,
-    start_date: "2020-04-01",
-    end_date: null,
-    created_by: "user1",
-    bed: 1,
-  },
-  status_measures: [
-    {
-      id: 2,
-      state_type: 2,
-      value: "truc",
-      created_date: "2020-04-06T00:00:00Z",
-      created_by: "user1",
-      patient: 5,
-      reanimation_service: 1,
-    },
-    {
-      id: 3,
-      state_type: 2,
-      value: "truc",
-      created_date: "2020-04-06T00:00:00Z",
-      created_by: "user2",
-      patient: 5,
-      reanimation_service: 1,
-    },
-  ],
-  unit_stays: [
-    {
-      id: 3,
-      is_finished: true,
-      start_date: "2020-04-04",
-      end_date: "2020-04-07",
-      created_by: "user1",
-      bed: 4,
-    },
-    {
-      id: 11,
-      is_finished: false,
-      start_date: "2020-04-01",
-      end_date: null,
-      created_by: "user1",
-      bed: 1,
-    },
-  ],
-  current_reanimation_service: {
-    id: 1,
-    name: "Rea1",
-    hospital: 1,
-  },
-  size_cm: null,
-  weight_kg: null,
-  NIP_id: "12345",
-  first_name: null,
-  family_name: null,
-  birth_date: null,
-  sex: null,
-  detection_covid: false,
-  detection_orlEntree: false,
-  detection_ERentree: false,
-  detection_ERpremierMardi: false,
-  detection_ERsecondMardi: false,
-  antecedents: null,
-  allergies: null,
-  severity: 2,
-  recent_disease_history: "",
-  evolution: "",
-  todo_list: "",
-  last_edited_todo_list: null,
-  assigned_caregivers: [],
-};
-
 function PatientLarib({ data = {} }) {
   const { id } = useParams();
 
@@ -128,7 +52,13 @@ function PatientLarib({ data = {} }) {
     detection_ERpremierMardi,
     detection_ERsecondMardi,
   };
-
+  const depistageInterface = {
+    detection_covid: "Détection Covid",
+    detection_orlEntree: "Détection Orl d'entrée",
+    detection_ERentree: "Détection ER d'entrée",
+    detection_ERpremierMardi: "Détection ER premier mardi",
+    detection_ERsecondMardi: "Détection ER second mardi",
+  }
   let allergies;
   if (data.allergies) {
     try {
@@ -191,6 +121,7 @@ function PatientLarib({ data = {} }) {
         patientId={id}
         title="Dépistages"
         data={{ checks: dataCheckList }}
+        dataInterface={depistageInterface}
         {...props}
       />
     ),

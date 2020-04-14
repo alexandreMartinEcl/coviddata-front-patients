@@ -323,18 +323,6 @@ function MeasuresTable({ patientId, data, setMeasuresId, ...props }) {
               onSubmitEdit(form.formData, setLoadingCb)
             }
           />
-
-          {/* {configOrderRows.map((row, i) => {
-            return (
-              <TextField
-                id={`textField-${i}`}
-                label={configOrderRows[i].name}
-                helper={configOrderRows[i].helper}
-                onChange={(e) => onTextFieldChange(e.target.value, i)}
-                value={formValues[i]}
-              ></TextField>
-            );
-          })} */}
         </DialogContent>
         <DialogActions>
           <Button onClick={cancelEditDial} color="primary">

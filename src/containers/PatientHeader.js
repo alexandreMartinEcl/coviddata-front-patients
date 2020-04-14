@@ -14,6 +14,7 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
+import AddIcon from "@material-ui/icons/AddCircle";
 
 import { initSchema, cloneSchema, flat } from "../shared/utils/schema";
 import Form from "../components/Form";
@@ -23,6 +24,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import * as _ from "lodash";
+import { Grid } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -100,32 +102,6 @@ export default function PatientHeader({ patientId, title, label, data = {} }) {
     setSnackbarOpen(false);
   };
 
-  const fieldTypes = {
-    first_name: "text",
-    family_name: "text",
-    birth_date: "date",
-    weight_kg: "number",
-    size_cm: "number",
-  };
-
-  const fieldEditable = {
-    bed: false,
-    NIP_id: false,
-    first_name: true,
-    family_name: true,
-    birth_date: true,
-    weight_kg: true,
-    size_cm: true,
-  };
-
-  const fieldLabels = {
-    first_name: "Prénom",
-    family_name: "Nom de famille",
-    birth_date: "Date de naissance",
-    weight_kg: "Poids (kg)",
-    size_cm: "Taille (cm)",
-  };
-
   const sexInterface = {
     H: "Homme",
     F: "Femme",
@@ -167,93 +143,119 @@ export default function PatientHeader({ patientId, title, label, data = {} }) {
       });
   }
 
-  // const onSubmitInfos = () => {
-  //   let tempInfos = _.cloneDeep(editedInfos);
-  //   setDataCopy(_.cloneDeep(tempInfos));
-  //   setEditedInfos(_.cloneDeep(tempInfos));
-  //   setSavedInfos([]);
-  //   setEditDial(false);
-  // };
-
   return (
-    <div className={classes.root}>
-      <Card className={classes.root} variant="outlined">
-        <CardContent>
+    <Card className={classes.patientCard} >
+      <CardContent>
+        <Grid container space={2}>
+
           {dataCopy.current_unit_stay ? (
+            <Grid item xs={12}>
+
+              <Typography
+                className={classes.title}
+                color="textSecondary"
+                gutterBottom
+              >
+                {dataCopy.current_unit_stay.bed_description}
+              </Typography>
+            </Grid>
+          ) : (
+              <></>
+            )}
+
+          <Grid item xs={3} container direction="column">
+            <Grid item>
+              <Typography
+                className={classes.title}
+                color="textSecondary"
+                gutterBottom
+              >
+                Patient n° {dataCopy.NIP_id}
+              </Typography>
+              </Grid>
+              <Grid item>
+              <Typography
+                className={classes.title}
+                color="textSecondary"
+                gutterBottom
+              >
+                Sévérité: {severityInterface[dataCopy.severity]}
+              </Typography>
+            </Grid>
+          </Grid>
+
+          <Grid item xs={3} container direction="column">
+            <Grid item>
+              <Typography
+                className={classes.title}
+                color="textSecondary"
+                gutterBottom>
+                {dataCopy.family_name ? dataCopy.family_name.toUpperCase() : "..."}
+                {" "}
+                {dataCopy.first_name || "..."}
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Typography
+                className={classes.title}
+                color="textSecondary"
+                gutterBottom
+              >
+                {dataCopy.sex ? sexInterface[dataCopy.sex] : "Sexe non mentionné"}
+              </Typography>
+            </Grid>
+          </Grid>
+
+          <Grid item xs={3}>
             <Typography
               className={classes.title}
               color="textSecondary"
               gutterBottom
             >
-              {dataCopy.current_unit_stay.bed_description}
+              {dataCopy.birth_date} ({getAge(dataCopy.birth_date)} ans)
+          </Typography>
+          </Grid>
+
+          <Grid item xs={3} container direction="column">
+            <Grid item>
+              <Typography
+                className={classes.title}
+                color="textSecondary"
+                gutterBottom>
+                Poids: {dataCopy.weight_kg}kg
+              </Typography>
+            </Grid>
+            <Grid item container direction="column">
+              <Typography
+                className={classes.title}
+                color="textSecondary"
+                gutterBottom>
+                Taille: {dataCopy.size_cm}cm
             </Typography>
-          ) : (
-            <></>
-          )}
-          <Typography
-            className={classes.title}
-            color="textSecondary"
-            gutterBottom
-          >
-            Patient n° {dataCopy.NIP_id}
-          </Typography>
-          <Typography
-            className={classes.title}
-            color="textSecondary"
-            gutterBottom
-          >
-            {dataCopy.family_name} {dataCopy.first_name}
-          </Typography>
-          <Typography
-            className={classes.title}
-            color="textSecondary"
-            gutterBottom
-          >
-            {dataCopy.birth_date} ({getAge(dataCopy.birth_date)}
-            ans)
-          </Typography>
-          <Typography
-            className={classes.title}
-            color="textSecondary"
-            gutterBottom
-          >
-            Poids: {dataCopy.weight_kg}kg
-          </Typography>
-          <Typography
-            className={classes.title}
-            color="textSecondary"
-            gutterBottom
-          >
-            Taille: {dataCopy.size_cm}cm
-          </Typography>
-          <Typography
-            className={classes.title}
-            color="textSecondary"
-            gutterBottom
-          >
-            (IMC: {dataCopy.weight_kg / (dataCopy.size_cm / 100) ** 2})
-          </Typography>
-          <Typography
-            className={classes.title}
-            color="textSecondary"
-            gutterBottom
-          >
-            {dataCopy.sex ? sexInterface[dataCopy.sex] : "Sexe non mentionné"}
-          </Typography>
-          <Typography
-            className={classes.title}
-            color="textSecondary"
-            gutterBottom
-          >
-            Sévérité: {severityInterface[dataCopy.severity]}
-          </Typography>
-        </CardContent>
-        <CardActions>
-          <Button size="small" onClick={openEditDial}>
-            Modifier
+            </Grid>
+            <Grid item>
+              <Typography
+                className={classes.title}
+                color="textSecondary"
+                gutterBottom
+              >
+                (IMC: {(dataCopy.weight_kg / (dataCopy.size_cm / 100) ** 2).toFixed(2)})
+            </Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+      </CardContent>
+      <CardActions>
+      <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            startIcon={<AddIcon />}
+            onClick={openEditDial}>
+          Modifier
           </Button>
-        </CardActions>
-      </Card>
+      </CardActions>
+
       <Dialog
         open={editDial}
         onClose={closeEditDial}
@@ -270,19 +272,6 @@ export default function PatientHeader({ patientId, title, label, data = {} }) {
               onSubmitInfos(form.formData, setLoadingCb)
             }
           />
-          {/* {Object.keys(editedInfos).map((k) => {
-            return fieldEditable[k] ? (
-              <TextField
-                id={k}
-                onChange={onChangeInfos}
-                label={fieldLabels[k]}
-                type={fieldTypes[k]}
-                value={editedInfos[k]}
-              />
-            ) : (
-                <></>
-              );
-          })} */}
         </DialogContent>
         <DialogActions>
           <Button onClick={cancelEditDial} color="primary">
@@ -304,6 +293,6 @@ export default function PatientHeader({ patientId, title, label, data = {} }) {
           La requête a échoué {errMsg}
         </MuiAlert>
       </Snackbar>
-    </div>
+    </Card >
   );
 }

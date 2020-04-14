@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function PatientHeader({ patientId, title, label, data = {} }) {
+export default function PatientHeader({ patientId, title, label, dataInterface={}, data = {} }) {
   const classes = useStyles();
   const clone = (obj) => {
     return Object.assign({}, obj);
@@ -130,7 +130,7 @@ export default function PatientHeader({ patientId, title, label, data = {} }) {
   };
 
   return (
-    <div className={classes.root}>
+    <React.Fragment className={classes.root}>
       <Card className={classes.root} variant="outlined">
         <CardContent>
           <FormControl
@@ -150,7 +150,7 @@ export default function PatientHeader({ patientId, title, label, data = {} }) {
                         name={k}
                       />
                     }
-                    label={k}
+                    label={dataInterface[k]}
                   />
                 );
               })}
@@ -172,6 +172,7 @@ export default function PatientHeader({ patientId, title, label, data = {} }) {
           )}
         </CardActions>
       </Card>
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
@@ -186,6 +187,6 @@ export default function PatientHeader({ patientId, title, label, data = {} }) {
           La requête a échoué {errMsg}
         </MuiAlert>
       </Snackbar>
-    </div>
+    </React.Fragment>
   );
 }

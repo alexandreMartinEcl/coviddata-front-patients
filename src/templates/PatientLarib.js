@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Grid, Card, CardContent } from "@material-ui/core";
+import { Grid, Card, CardContent, Paper } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 
@@ -38,51 +38,54 @@ export default function PatientTemplate({ components }) {
 
   return (
     <Grid container spacing={2}>
+
       <Grid item xs={12}>
         <Link to="/">
           <Button variant="contained">Retour</Button>
         </Link>
       </Grid>
+
+      <Grid item xs={12} md={12}>
+        <PatientInfos />
+      </Grid>
+
       <Grid container item xs={12} spacing={2}>
-        <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <PatientInfos />
-            </CardContent>
-          </Card>
+        <Grid item container xs={8} md={8} spacing={1}>
+          <Grid xs={12} item>
+              <Antecedents />
+          </Grid>
+          <Grid xs={12} item>
+              <Allergies />
+          </Grid>
         </Grid>
-        <Grid item container xs={12} md={8} spacing={1}>
+
+        <Grid item xs={4} md={4}>
           <Grid xs={12} item pb={1}>
             <Depistages />
           </Grid>
-          Antecedents
-          <Grid xs={12} item pb={1}>
-            <Antecedents />
-          </Grid>
-          <Grid xs={12} item pb={1}>
-            <Allergies />
-          </Grid>
         </Grid>
-        <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
+      </Grid>
+
+      <Grid item container xs={12} md={12} spacing={3}>
+        <Grid xs={9} container item>
+          <Grid xs={12} item>
+            <Paper>
               <RecentDiseaseHistory />
-            </CardContent>
-            <CardContent>
+            </Paper>
+          </Grid>
+          <Grid xs={12} item>
+            <Paper>
               <Evolution />
-            </CardContent>
-            <CardContent>
-              <TodoList />
-            </CardContent>
-          </Card>
+            </Paper>
+          </Grid>
         </Grid>
-        <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <MeasuresTable />
-            </CardContent>
-          </Card>
+        <Grid xs={3} item>
+          <TodoList />
         </Grid>
+      </Grid>
+
+      <Grid item xs={12} md={12}>
+        <MeasuresTable />
       </Grid>
     </Grid>
   );
