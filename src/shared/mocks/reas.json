@@ -1,189 +1,188 @@
 {
-    "count": 1,
-    "next": null,
-    "previous": null,
-    "results": [
+  "count": 1,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 1,
+      "units": [
         {
-            "id": 1,
-            "units": [
-                {
+          "id": 1,
+          "beds": [
+            {
+              "id": 1,
+              "current_stay": {
+                "id": 1,
+                "patient": {
+                  "id": 1,
+                  "bed": null,
+                  "current_reanimation_service": {
                     "id": 1,
-                    "beds": [
-                        {
-                            "id": 1,
-                            "current_stay": {
-                                "id": 1,
-                                "patient": {
-                                    "id": 1,
-                                    "bed": null,
-                                    "current_reanimation_service": {
-                                        "id": 1,
-                                        "name": "Rea1",
-                                        "access_code": "codesecret",
-                                        "hospital": 1
-                                    },
-                                    "size_cm": null,
-                                    "weight_kg": null,
-                                    "NIP_id": "1234",
-                                    "first_name": "Francois",
-                                    "family_name": "Leduc",
-                                    "birth_date": null,
-                                    "sex": "H",
-                                    "severity": 1,
-                                    "last_edited_recent_disease_history": null,
-                                    "last_edited_evolution": null,
-                                    "todo_list": "Hello",
-                                    "last_edited_todo_list": "2020-04-11T18:33:29.985190Z",
-                                    "assigned_caregivers": []
-                                },
-                                "bed_description": "1 - Lit 1 - Unité Unité Sirrocco (Service de réanimation Rénimation Rea1 (Hôpital Lariboisiere)) - Réanimation Rénimation Rea1 (Hôpital Lariboisiere) (1234)",
-                                "start_date": "2020-04-11",
-                                "end_date": null,
-                                "created_by": "user1",
-                                "bed": 1
-                            },
-                            "unit_index": 1,
-                            "status": 0,
-                            "unit": 1
-                        },
-                        {
-                            "id": 2,
-                            "current_stay": {
-                                "id": 2,
-                                "patient": {
-                                    "id": 1,
-                                    "bed": null,
-                                    "current_reanimation_service": {
-                                        "id": 1,
-                                        "name": "Rea1",
-                                        "access_code": "codesecret",
-                                        "hospital": 1
-                                    },
-                                    "size_cm": null,
-                                    "weight_kg": null,
-                                    "NIP_id": "12345",
-                                    "first_name": "Achille",
-                                    "family_name": "Dupont",
-                                    "birth_date": "1990-04-11",
-                                    "sex": null,
-                                    "severity": 2,
-                                    "last_edited_recent_disease_history": null,
-                                    "last_edited_evolution": null,
-                                    "todo_list": "Hello",
-                                    "last_edited_todo_list": "2020-04-11T18:33:29.985190Z",
-                                    "assigned_caregivers": []
-                                },
-                                "bed_description": "1 - Lit 1 - Unité Unité Sirrocco (Service de réanimation Rénimation Rea1 (Hôpital Lariboisiere)) - Réanimation Rénimation Rea1 (Hôpital Lariboisiere) (1234)",
-                                "start_date": "2020-04-08",
-                                "end_date": null,
-                                "created_by": "user1",
-                                "bed": 1
-                            },
-                            "unit_index": 2,
-                            "status": 0,
-                            "unit": 1
-                        },
-                        {
-                            "id": 3,
-                            "current_stay": {
-                                "id": 1,
-                                "patient": {
-                                    "id": 3,
-                                    "bed": null,
-                                    "current_reanimation_service": {
-                                        "id": 1,
-                                        "name": "Rea1",
-                                        "access_code": "codesecret",
-                                        "hospital": 1
-                                    },
-                                    "size_cm": null,
-                                    "weight_kg": null,
-                                    "NIP_id": "12",
-                                    "first_name": "Philippe",
-                                    "family_name": "Deneuve",
-                                    "birth_date": null,
-                                    "sex": "F",
-                                    "severity": 0,
-                                    "last_edited_recent_disease_history": null,
-                                    "last_edited_evolution": null,
-                                    "todo_list": "Hello",
-                                    "last_edited_todo_list": "2020-04-11T18:33:29.985190Z",
-                                    "assigned_caregivers": []
-                                },
-                                "bed_description": "1 - Lit 1 - Unité Unité Sirrocco (Service de réanimation Rénimation Rea1 (Hôpital Lariboisiere)) - Réanimation Rénimation Rea1 (Hôpital Lariboisiere) (1234)",
-                                "start_date": "2020-04-01",
-                                "end_date": null,
-                                "created_by": "user1",
-                                "bed": 1
-                            },
-                            "unit_index": 3,
-                            "status": 0,
-                            "unit": 1
-                        }
-                    ],
-                    "name": "Sirrocco",
-                    "reanimation_service": 1
+                    "name": "Rea1",
+                    "access_code": "codesecret",
+                    "hospital": 1
+                  },
+                  "size_cm": null,
+                  "weight_kg": null,
+                  "NIP_id": "1234",
+                  "first_name": "Francois",
+                  "family_name": "Leduc",
+                  "birth_date": null,
+                  "sex": "H",
+                  "severity": 1,
+                  "last_edited_recent_disease_history": null,
+                  "last_edited_evolution": null,
+                  "todo_list": "Hello",
+                  "last_edited_todo_list": "2020-04-11T18:33:29.985190Z",
+                  "assigned_caregivers": []
                 },
-                {
-                    "id": 2,
-                    "beds": [
-                        {
-                            "id": 4,
-                            "current_stay": null,
-                            "unit_index": 1,
-                            "status": 0,
-                            "unit": 2
-                        },
-                        {
-                            "id": 5,
-                            "current_stay": null,
-                            "unit_index": 2,
-                            "status": 0,
-                            "unit": 2
-                        }
-                    ],
-                    "name": "Hergoa",
-                    "reanimation_service": 1
-                }
-            ],
-            "name": "Rea1",
-            "hospital": 1
+                "bed_description": "1 - Lit 1 - Unité Unité Sirrocco (Service de réanimation Rénimation Rea1 (Hôpital Lariboisiere)) - Réanimation Rénimation Rea1 (Hôpital Lariboisiere) (1234)",
+                "start_date": "2020-04-11",
+                "end_date": null,
+                "created_by": "user1",
+                "bed": 1
+              },
+              "unit_index": 1,
+              "status": 0,
+              "unit": 1
+            },
+            {
+              "id": 2,
+              "current_stay": {
+                "id": 2,
+                "patient": {
+                  "id": 1,
+                  "bed": null,
+                  "current_reanimation_service": {
+                    "id": 1,
+                    "name": "Rea1",
+                    "access_code": "codesecret",
+                    "hospital": 1
+                  },
+                  "size_cm": null,
+                  "weight_kg": null,
+                  "NIP_id": "12345",
+                  "first_name": "Achille",
+                  "family_name": "Dupont",
+                  "birth_date": "1990-04-11",
+                  "sex": null,
+                  "severity": 2,
+                  "last_edited_recent_disease_history": null,
+                  "last_edited_evolution": null,
+                  "todo_list": "Hello",
+                  "last_edited_todo_list": "2020-04-11T18:33:29.985190Z",
+                  "assigned_caregivers": []
+                },
+                "bed_description": "1 - Lit 1 - Unité Unité Sirrocco (Service de réanimation Rénimation Rea1 (Hôpital Lariboisiere)) - Réanimation Rénimation Rea1 (Hôpital Lariboisiere) (1234)",
+                "start_date": "2020-04-08",
+                "end_date": null,
+                "created_by": "user1",
+                "bed": 1
+              },
+              "unit_index": 2,
+              "status": 0,
+              "unit": 1
+            },
+            {
+              "id": 3,
+              "current_stay": {
+                "id": 1,
+                "patient": {
+                  "id": 3,
+                  "bed": null,
+                  "current_reanimation_service": {
+                    "id": 1,
+                    "name": "Rea1",
+                    "access_code": "codesecret",
+                    "hospital": 1
+                  },
+                  "size_cm": null,
+                  "weight_kg": null,
+                  "NIP_id": "12",
+                  "first_name": "Philippe",
+                  "family_name": "Deneuve",
+                  "birth_date": null,
+                  "sex": "F",
+                  "severity": 0,
+                  "last_edited_recent_disease_history": null,
+                  "last_edited_evolution": null,
+                  "todo_list": "Hello",
+                  "last_edited_todo_list": "2020-04-11T18:33:29.985190Z",
+                  "assigned_caregivers": []
+                },
+                "bed_description": "1 - Lit 1 - Unité Unité Sirrocco (Service de réanimation Rénimation Rea1 (Hôpital Lariboisiere)) - Réanimation Rénimation Rea1 (Hôpital Lariboisiere) (1234)",
+                "start_date": "2020-04-01",
+                "end_date": null,
+                "created_by": "user1",
+                "bed": 1
+              },
+              "unit_index": 3,
+              "status": 0,
+              "unit": 1
+            }
+          ],
+          "name": "Sirrocco",
+          "reanimation_service": 1
         },
         {
-            "id": 1,
-            "units": [
-                {
-                    "id": 1,
-                    "beds": [
-                        {
-                            "id": 1,
-                            "current_stay": null,
-                            "unit_index": 1,
-                            "status": 0,
-                            "unit": 1
-                        },
-                        {
-                            "id": 2,
-                            "current_stay": null,
-                            "unit_index": 2,
-                            "status": 0,
-                            "unit": 1
-                        },
-                        {
-                            "id": 3,
-                            "current_stay": null,
-                            "unit_index": 3,
-                            "status": 0,
-                            "unit": 1
-                        }
-                    ],
-                    "name": "Mistral",
-                    "reanimation_service": 1
-                }
-            ],
-            "name": "Rea2",
-            "hospital": 1
+          "id": 2,
+          "beds": [
+            {
+              "id": 4,
+              "current_stay": null,
+              "unit_index": 1,
+              "status": 0,
+              "unit": 2
+            },
+            {
+              "id": 5,
+              "current_stay": null,
+              "unit_index": 2,
+              "status": 0,
+              "unit": 2
+            }
+          ],
+          "name": "Hergoa",
+          "reanimation_service": 1
         }
-
-    ]
+      ],
+      "name": "Rea1",
+      "hospital": 1
+    },
+    {
+      "id": 1,
+      "units": [
+        {
+          "id": 1,
+          "beds": [
+            {
+              "id": 1,
+              "current_stay": null,
+              "unit_index": 1,
+              "status": 0,
+              "unit": 1
+            },
+            {
+              "id": 2,
+              "current_stay": null,
+              "unit_index": 2,
+              "status": 0,
+              "unit": 1
+            },
+            {
+              "id": 3,
+              "current_stay": null,
+              "unit_index": 3,
+              "status": 0,
+              "unit": 1
+            }
+          ],
+          "name": "Mistral",
+          "reanimation_service": 1
+        }
+      ],
+      "name": "Rea2",
+      "hospital": 1
+    }
+  ]
 }

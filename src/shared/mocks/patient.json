@@ -1,125 +1,125 @@
 {
+  "id": 1,
+  "current_unit_stay": {
     "id": 1,
-    "current_unit_stay": {
-        "id": 1,
-        "is_finished": false,
-        "bed_description": "1 - Lit 1 - Unité Unité Sirrocco (Service de réanimation Rénimation Rea1 (Hôpital Lariboisiere)) - Réanimation Rénimation Rea1 (Hôpital Lariboisiere) (1234)",
-        "start_date": "2020-04-11",
-        "end_date": null,
-        "created_by": "user1",
-        "bed": 1
+    "is_finished": false,
+    "bed_description": "1 - Lit 1 - Unité Sirrocco (Réanimation Rea1 - Hôpital Lariboisière) (1234)",
+    "start_date": "2020-04-11",
+    "end_date": null,
+    "created_by": "user1",
+    "bed": 1
+  },
+  "status_measures": [
+    {
+      "id": 1,
+      "status_type": 0,
+      "value": "2",
+      "created_date": "2020-04-11",
+      "created_by": "user1",
+      "patient": 1,
+      "reanimation_service": 1
     },
-    "status_measures": [
-        {
-            "id": 1,
-            "status_type": 0,
-            "value": "2",
-            "created_date": "2020-04-11",
-            "created_by": "user1",
-            "patient": 1,
-            "reanimation_service": 1
-        },
-        {
-            "id": 2,
-            "status_type": 1,
-            "value": "1.2",
-            "created_date": "2020-04-11",
-            "created_by": "user1",
-            "patient": 1,
-            "reanimation_service": 1
-        },
-        {
-            "id": 3,
-            "status_type": 2,
-            "value": "3",
-            "created_date": "2020-04-11",
-            "created_by": "user1",
-            "patient": 1,
-            "reanimation_service": 1
-        },
-        {
-            "id": 4,
-            "status_type": 3,
-            "value": "2.1",
-            "created_date": "2020-04-11",
-            "created_by": "user1",
-            "patient": 1,
-            "reanimation_service": 1
-        },
-        {
-            "id": 5,
-            "status_type": 4,
-            "value": "VPC",
-            "created_date": "2020-04-11",
-            "created_by": "user1",
-            "patient": 1,
-            "reanimation_service": 1
-        },
-        {
-            "id": 6,
-            "status_type": 5,
-            "value": "1",
-            "created_date": "2020-04-11",
-            "created_by": "user1",
-            "patient": 1,
-            "reanimation_service": 1
-        },
-        {
-            "id": 7,
-            "status_type": 6,
-            "value": "rien",
-            "created_date": "2020-04-11",
-            "created_by": "user1",
-            "patient": 1,
-            "reanimation_service": 1
-        },
-        {
-            "id": 8,
-            "status_type": 3,
-            "value": "2",
-            "created_date": "2020-04-11",
-            "created_by": "user1",
-            "patient": 1,
-            "reanimation_service": 1
-        }
-    ],
-    "unit_stays": [
-        {
-            "id": 1,
-            "is_finished": false,
-            "bed_description": "1 - Lit 1 - Unité Unité Sirrocco (Service de réanimation Rénimation Rea1 (Hôpital Lariboisiere)) - Réanimation Rénimation Rea1 (Hôpital Lariboisiere) (1234)",
-            "start_date": "2020-04-11",
-            "end_date": null,
-            "created_by": "user1",
-            "bed": 1
-        }
-    ],
-    "current_reanimation_service": {
-        "id": 1,
-        "name": "Rea1",
-        "access_code": "codesecret",
-        "hospital": 1
+    {
+      "id": 2,
+      "status_type": 1,
+      "value": "1.2",
+      "created_date": "2020-04-11",
+      "created_by": "user1",
+      "patient": 1,
+      "reanimation_service": 1
     },
-    "antecedents": "{\"Cardio\": \"Des trucs de coeurs\", \"Pneumo\": \"Trucs de poumons\", \"Rénale\": \"RAS\", \"Rénale2\": \"RAS\"}",
-    "size_cm": 180,
-    "weight_kg": 80.0,
-    "NIP_id": "1234",
-    "first_name": "Alex",
-    "family_name": "Martin",
-    "birth_date": "1990-01-01",
-    "sex": "H",
-    "detection_covid": false,
-    "detection_orlEntree": false,
-    "detection_ERentree": false,
-    "detection_ERpremierMardi": false,
-    "detection_ERsecondMardi": false,
-    "allergies": "[\"Pollen\", \"Chloroquine\"]",
-    "severity": 2,
-    "recent_disease_history": "",
-    "last_edited_recent_disease_history": null,
-    "evolution": "",
-    "last_edited_evolution": null,
-    "todo_list": "",
-    "last_edited_todo_list": null,
-    "assigned_caregivers": []
+    {
+      "id": 3,
+      "status_type": 2,
+      "value": "3",
+      "created_date": "2020-04-11",
+      "created_by": "user1",
+      "patient": 1,
+      "reanimation_service": 1
+    },
+    {
+      "id": 4,
+      "status_type": 3,
+      "value": "2.1",
+      "created_date": "2020-04-11",
+      "created_by": "user1",
+      "patient": 1,
+      "reanimation_service": 1
+    },
+    {
+      "id": 5,
+      "status_type": 4,
+      "value": "VPC",
+      "created_date": "2020-04-11",
+      "created_by": "user1",
+      "patient": 1,
+      "reanimation_service": 1
+    },
+    {
+      "id": 6,
+      "status_type": 5,
+      "value": "1",
+      "created_date": "2020-04-11",
+      "created_by": "user1",
+      "patient": 1,
+      "reanimation_service": 1
+    },
+    {
+      "id": 7,
+      "status_type": 6,
+      "value": "rien",
+      "created_date": "2020-04-11",
+      "created_by": "user1",
+      "patient": 1,
+      "reanimation_service": 1
+    },
+    {
+      "id": 8,
+      "status_type": 3,
+      "value": "2",
+      "created_date": "2020-04-11",
+      "created_by": "user1",
+      "patient": 1,
+      "reanimation_service": 1
+    }
+  ],
+  "unit_stays": [
+    {
+      "id": 1,
+      "is_finished": false,
+      "bed_description": "1 - Lit 1 - Unité Unité Sirrocco (Service de réanimation Rénimation Rea1 (Hôpital Lariboisiere)) - Réanimation Rénimation Rea1 (Hôpital Lariboisiere) (1234)",
+      "start_date": "2020-04-11",
+      "end_date": null,
+      "created_by": "user1",
+      "bed": 1
+    }
+  ],
+  "current_reanimation_service": {
+    "id": 1,
+    "name": "Rea1",
+    "access_code": "codesecret",
+    "hospital": 1
+  },
+  "antecedents": "{\"Cardio\": \"Des trucs de coeurs\", \"Pneumo\": \"Trucs de poumons\", \"Rénale\": \"RAS\", \"Rénale2\": \"RAS\"}",
+  "size_cm": 180,
+  "weight_kg": 80.0,
+  "NIP_id": "1234",
+  "first_name": "Alex",
+  "family_name": "Martin",
+  "birth_date": "1990-01-01",
+  "sex": "H",
+  "detection_covid": false,
+  "detection_orlEntree": false,
+  "detection_ERentree": false,
+  "detection_ERpremierMardi": false,
+  "detection_ERsecondMardi": false,
+  "allergies": "[\"Pollen\", \"Chloroquine\"]",
+  "severity": 2,
+  "recent_disease_history": "",
+  "last_edited_recent_disease_history": null,
+  "evolution": "",
+  "last_edited_evolution": null,
+  "todo_list": "",
+  "last_edited_todo_list": null,
+  "assigned_caregivers": []
 }
