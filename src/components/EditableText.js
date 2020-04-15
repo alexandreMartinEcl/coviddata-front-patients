@@ -34,15 +34,6 @@ const useStyles = makeStyles((theme) => ({
   heading: {
     fontSize: theme.typography.pxToRem(15),
   },
-  secondaryHeading: {
-    fontSize: theme.typography.pxToRem(15),
-    color: theme.palette.text.secondary,
-  },
-  icon: {
-    verticalAlign: "bottom",
-    height: 20,
-    width: 20,
-  },
   details: {
     alignItems: "center",
   },
@@ -69,6 +60,7 @@ export default function EditableText({
   label,
   data = {},
   field,
+  reFetch,
 }) {
   const classes = useStyles();
   const [editDial, setEditDial] = React.useState(false);
@@ -125,10 +117,11 @@ export default function EditableText({
       .then((res) => {
         console.log(res);
         setLoadingUpdateText(false);
-        setSavedText(text);
-        let d = dateTimeToStr(new Date());
-        setLastEdited(d);
+        // setSavedText(text);
+        // let d = dateTimeToStr(new Date());
+        // setLastEdited(d);
         closeEditDial();
+        reFetch();
       })
       .catch((err) => {
         console.log(err);
@@ -139,16 +132,14 @@ export default function EditableText({
   };
 
   return extensibleElseDial ? (
-    <div className={classes.root}>
+    <React.Fragment>
       <ExpansionPanel defaultExpanded={false}>
         <ExpansionPanelSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1c-content"
           id="panel1c-header"
         >
-          <div className={classes.column}>
-            <Typography className={classes.heading}>{title}</Typography>
-          </div>
+          <Typography className={classes.heading}>{title}</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails className={classes.details}>
           <TextField
@@ -192,11 +183,12 @@ export default function EditableText({
           La requête a échoué {errMsg}
         </MuiAlert>
       </Snackbar>
-    </div>
+    </React.Fragment>
   ) : (
-    <div className={classes.root}>
+    <React.Fragment>
       <Button
-        color="secondary"
+        color="primary"
+        variant="contained"
         onClick={openEditDial}
         startIcon={<FormatListNumberedIcon />}
       >
@@ -247,6 +239,6 @@ export default function EditableText({
           La requête a échoué {errMsg}
         </MuiAlert>
       </Snackbar>
-    </div>
+    </React.Fragment>
   );
 }

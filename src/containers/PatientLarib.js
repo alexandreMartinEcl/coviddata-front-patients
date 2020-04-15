@@ -10,7 +10,7 @@ import {
 } from "./Components";
 import { object } from "prop-types";
 
-function PatientLarib({ data = {} }) {
+function PatientLarib({ data = {}, reFetch }) {
   const { id } = useParams();
 
   const [measuresId, setMeasuresId] = useState();
@@ -58,7 +58,7 @@ function PatientLarib({ data = {} }) {
     detection_ERentree: "Détection ER d'entrée",
     detection_ERpremierMardi: "Détection ER premier mardi",
     detection_ERsecondMardi: "Détection ER second mardi",
-  }
+  };
   let allergies;
   if (data.allergies) {
     try {
@@ -111,10 +111,18 @@ function PatientLarib({ data = {} }) {
       ? null
       : new Date(Math.max(...unit_stays.map((s) => new Date(s.end_date))));
   }
+  if (data.weight_kg) {
+    dataMeasures.weight_kg = data.weight_kg;
+  }
 
   const components = {
     PatientInfos: (props) => (
-      <PatientHeader patientId={id} data={dataPatientInfo} {...props} />
+      <PatientHeader
+        patientId={id}
+        data={dataPatientInfo}
+        reFetch={reFetch}
+        {...props}
+      />
     ),
     Depistages: (props) => (
       <CheckList
@@ -132,6 +140,7 @@ function PatientLarib({ data = {} }) {
         field="antecedents"
         title="Antécédents"
         data={{ listItems: antecedents }}
+        reFetch={reFetch}
         {...props}
       />
     ),
@@ -142,6 +151,7 @@ function PatientLarib({ data = {} }) {
         field="allergies"
         title="Allergies"
         data={{ listItems: allergies }}
+        reFetch={reFetch}
         {...props}
       />
     ),
@@ -153,6 +163,7 @@ function PatientLarib({ data = {} }) {
         extensibleElseDial={true}
         data={dataRecDisHist}
         field="recent_disease_history"
+        reFetch={reFetch}
         {...props}
       />
     ),
@@ -164,6 +175,7 @@ function PatientLarib({ data = {} }) {
         extensibleElseDial={true}
         data={dataEvo}
         field="evolution"
+        reFetch={reFetch}
         {...props}
       />
     ),
@@ -175,6 +187,7 @@ function PatientLarib({ data = {} }) {
         extensibleElseDial={false}
         data={dataTodo}
         field="todo_list"
+        reFetch={reFetch}
         {...props}
       />
     ),
@@ -184,6 +197,7 @@ function PatientLarib({ data = {} }) {
         setMeasures={setMeasuresId}
         patient={id}
         data={dataMeasures}
+        reFetch={reFetch}
         {...props}
       />
     ),

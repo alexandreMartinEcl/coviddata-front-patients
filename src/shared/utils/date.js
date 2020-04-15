@@ -16,7 +16,11 @@ export function dateTimeToString(value) {
  */
 export function dateToDayStep(value) {
   value = new Date(value);
-  let actValue = new Date(value.getFullYear(), value.getMonth(), value.getDate());
+  let actValue = new Date(
+    value.getFullYear(),
+    value.getMonth(),
+    value.getDate()
+  );
   return `J${Math.floor((new Date() - new Date(actValue)) / 86400000) + 1}`;
 }
 

@@ -47,8 +47,8 @@ const useStyles = makeStyles((theme) => ({
   },
   button: {
     fontSize: "0.8rem",
-    whiteSpace: "normal"
-  }
+    whiteSpace: "normal",
+  },
 }));
 
 export default function ReaTabs({ labels, contents, onTabChange, onAddRea }) {

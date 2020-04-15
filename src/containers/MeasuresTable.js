@@ -13,7 +13,6 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 
-import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -29,7 +28,7 @@ import MuiAlert from "@material-ui/lab/Alert";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: theme.palette.common.black,
+    backgroundColor: theme.palette.primary.dark,
     color: theme.palette.common.white,
   },
   body: {
@@ -40,7 +39,7 @@ const StyledTableCell = withStyles((theme) => ({
 const StyledTableRow = withStyles((theme) => ({
   root: {
     "&:nth-of-type(odd)": {
-      backgroundColor: theme.palette.background.default,
+      backgroundColor: theme.palette.primary.veryLight,
     },
   },
 }))(TableRow);
@@ -51,17 +50,7 @@ const useStyles = makeStyles({
   },
 });
 
-const measuresMoc = [
-  {
-    createdBy: "",
-    patient: "",
-    stateType: 0,
-    measureDate: new Date().setDate(new Date().getDate() - 2),
-    value: "1.25",
-  },
-];
-
-function MeasuresTable({ patientId, data, setMeasuresId, ...props }) {
+function MeasuresTable({ patientId, data, setMeasuresId, reFetch, ...props }) {
   const classes = useStyles();
   const [openDialEdit, setOpenDialEdit] = React.useState(false);
   const [tableData, setTableData] = React.useState();
@@ -126,14 +115,14 @@ function MeasuresTable({ patientId, data, setMeasuresId, ...props }) {
       firstDate.getFullYear(),
       firstDate.getMonth(),
       firstDate.getDate() + col,
-      firstDate.getUTCHours()
+      10 //TODO later, see how to do this better.. but without this, will return the previous day at 23:00
     );
   };
 
   //TODO make these "interfaces" better
   const statusTypeInterface = [
     { name: "Ratio pression artérielle sur fraction inspirée", small: "P/F" },
-    { name: "Noradrénaline", small: "NAD" },
+    { name: "Noradrénaline", small: "NAD (mg/h)" },
     { name: "Créatinémie", small: "Creat" },
     { name: "Decubitus ventral", small: "DV" },
     { name: "Mode ventilatoire", small: "Mode Vent." },
@@ -176,6 +165,21 @@ function MeasuresTable({ patientId, data, setMeasuresId, ...props }) {
     setTableData(table);
   };
 
+  const measureAddedInfo = (rowTitle, measureValue) => {
+    switch (rowTitle) {
+      case "NAD (mg/h)":
+        if (Number(data.weight_kg) && Number(measureValue)) {
+          return `(${
+            Number(measureValue) / Number(data.weight_kg).toFixed(2)
+          } mg/kg/h)`;
+        } else {
+          return "";
+        }
+      default:
+        return "";
+    }
+  };
+
   const closeEditDial = () => {
     setOpenDialEdit(false);
   };
@@ -195,12 +199,11 @@ function MeasuresTable({ patientId, data, setMeasuresId, ...props }) {
       let temData = {};
       values.forEach((v, i) => {
         let statusType = configOrderRows[i].name;
-        temData[statusTypes.findIndex((i) => i === statusType)] = v;
+        let dbStatusType = statusTypes.findIndex((i) => i === statusType);
+        temData[dbStatusType] = isNaN(Number(v)) ? v : Number(v);
       });
       setFormData(_.cloneDeep(temData));
-
-      // setSavedValues(values.slice(0));
-      // setSelectedCol(col);
+      setSelectedCol(col);
     }
 
     setOpenDialEdit(true);
@@ -232,12 +235,13 @@ function MeasuresTable({ patientId, data, setMeasuresId, ...props }) {
     const data = flat(initialData);
 
     const jsonData = [];
+    let tDate = getDateFromColumn(selectedCol).toJSON().split("T")[0];
     Object.entries(data).forEach(([k, v]) => {
       jsonData.push({
-        created_date: getDateFromColumn(selectedCol).toJSON().split("T")[0],
+        created_date: tDate,
         id_patient: patientId,
         status_type: k,
-        value: v,
+        value: typeof v === "string" ? v.trim() : v,
       });
     });
     const url = config.path.measures;
@@ -258,6 +262,7 @@ function MeasuresTable({ patientId, data, setMeasuresId, ...props }) {
         console.log(res);
         setLoadingCb(false);
         setOpenDialEdit(false);
+        reFetch();
       })
       .catch((err) => {
         console.log(err);
@@ -265,8 +270,6 @@ function MeasuresTable({ patientId, data, setMeasuresId, ...props }) {
         setSnackbarOpen(true);
         setLoadingCb(false);
       });
-    // setTableData(tempTable);
-    // setSavedValues(formValues.slice(0));
   };
 
   columnTitles || buildColumnTitles();
@@ -297,12 +300,11 @@ function MeasuresTable({ patientId, data, setMeasuresId, ...props }) {
                 </StyledTableCell>
 
                 {row.map((cell, j) => (
-                  //                                <StyledTableCell align="center">{cell.value}</StyledTableCell>
                   <StyledTableCell
                     align="center"
                     onClick={() => openEditDial(j)}
                   >
-                    {cell}
+                    {cell} {measureAddedInfo(rowTitles[i], cell)}
                   </StyledTableCell>
                 ))}
               </StyledTableRow>
@@ -314,7 +316,9 @@ function MeasuresTable({ patientId, data, setMeasuresId, ...props }) {
         onClose={closeEditDial}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle id="form-dialog-title">Retrait d'un patient</DialogTitle>
+        <DialogTitle id="form-dialog-title">
+          Modification de la colonne J{selectedCol + 1}
+        </DialogTitle>
         <DialogContent>
           <Form
             schema={schemaAddMeasure}

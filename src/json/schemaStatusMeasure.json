@@ -8,8 +8,8 @@
       "type": "string",
       "enumNames": [
         "Ventilation Pressions Contrôlée",
-        "Ventilation Assistée COntrôlée",
-        "Ventilation Spontanée Aide Isnpiratoire",
+        "Ventilation Assistée Contrôlée",
+        "Ventilation Spontanée Aide Inspiratoire",
         "Ventilation Spontanée",
         "Optiflow",
         "Ventilation en Pression Positive Continue"
@@ -33,7 +33,7 @@
       "type": "string"
     },
     "1": {
-      "title": "Noradrénaline",
+      "title": "Noradrénaline (mg/h)",
       "type": "number"
     },
     "2": {

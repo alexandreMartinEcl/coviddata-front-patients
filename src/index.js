@@ -34,7 +34,7 @@ function Init(props) {
 
   return (
     <ThemeProvider theme={theme}>
-      <div style={{backgroundColor: theme.palette.secondary.light}}>
+      <div style={{ backgroundColor: theme.palette.secondary.light }}>
         <Routes />
       </div>
     </ThemeProvider>

@@ -11,6 +11,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Button from "@material-ui/core/Button";
 import AddIcon from "@material-ui/icons/AddCircle";
 import RemoveIcon from "@material-ui/icons/RemoveCircle";
+import IconButton from '@material-ui/core/IconButton';
 
 // import TextField from '@material-ui/core/TextField';
 import Dialog from "@material-ui/core/Dialog";
@@ -28,16 +29,16 @@ import addPatientBasicFormSchema from "../json/schemaPatientBasic.json";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
-import Paper from '@material-ui/core/Paper';
+import Paper from "@material-ui/core/Paper";
 import { Typography, useMediaQuery } from "@material-ui/core";
-import Divider from '@material-ui/core/Divider';
+import Divider from "@material-ui/core/Divider";
 import { useTheme } from "@material-ui/styles";
 // import theme from "../theme";
 
 const useStyles = makeStyles((theme) => ({
   root: {},
   unitTitle: {
-    marginRight: "100px"
+    marginRight: "100px",
   },
   bedItem: {
     height: "60px",
@@ -46,32 +47,30 @@ const useStyles = makeStyles((theme) => ({
   bedItemSeverityHigh: {
     height: "60px",
     fontSize: "10rem",
-    backgroundColor: theme.palette.danger.main
+    backgroundColor: theme.palette.danger.main,
   },
   bedItemSeverityMiddle: {
     height: "60px",
     fontSize: 15,
-    backgroundColor: theme.palette.danger.light
+    backgroundColor: theme.palette.danger.light,
   },
   bedIndex: {
     width: "20%",
   },
   patientDetails: {
-    width: "40%"
+    width: "40%",
   },
   otherDetails: {
     width: "20%",
     primary: {
-      fontSize: "1px"
-    }
+      fontSize: "1px",
+    },
   },
-  listItemSecAction: {
-  },
-  secActionButton: {
-  }
+  listItemSecAction: {},
+  secActionButton: {},
 }));
 
-function Beds({ data, ...props }) {
+function Beds({ data, reFetch, ...props }) {
   const classes = useStyles();
   const [page, setPage] = useState();
   const [openDialRea, setOpenDialRea] = React.useState(false);
@@ -81,8 +80,10 @@ function Beds({ data, ...props }) {
   const [currentStay, setCurrentStay] = React.useState();
   const [currentBed, setCurrentBed] = React.useState();
   const [currentPatientName, setCurrentPatientName] = React.useState();
+  const [formData, setFormData] = React.useState({});
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const [errMsg, setErrMsg] = React.useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = React.useState(false);
+  const [infoMsg, setInfoMsg] = React.useState("");
   const [loadingRemovePatient, setLoadingRemovePatient] = React.useState(false);
 
   const schemaAddPatient = cloneSchema(addPatientBasicFormSchema).schema;
@@ -101,7 +102,7 @@ function Beds({ data, ...props }) {
   }).schema;
 
   const bedStatusInterface = ["Utilisable", "Inutilisable"];
-  const severityInterface = ['A risque', 'Instable', 'Stable']
+  const severityInterface = ["A risque", "Instable", "Stable"];
 
   const getBedSeverityClass = (severity) => {
     switch (severityInterface[severity]) {
@@ -114,11 +115,22 @@ function Beds({ data, ...props }) {
       default:
         return classes.bedItem;
     }
-  }
+  };
 
   const th = useTheme();
-  const isUpSm = useMediaQuery(th.breakpoints.up('sm'));
+  const isUpSm = useMediaQuery(th.breakpoints.up("sm"));
   const variantForBedItem = isUpSm ? "body1" : "body2";
+
+  const uiInform = (msg, isInfoElseError) => {
+    setInfoMsg(msg);
+    setSnackbarSeverity(isInfoElseError ? "success" : "error");
+    setSnackbarOpen(true);
+  };
+
+  const closeSnackBar = (event, reason) => {
+    setSnackbarOpen(false);
+    setInfoMsg("");
+  };
 
   const handlePatientClick = (idPatient) => {
     if (idPatient) {
@@ -138,6 +150,8 @@ function Beds({ data, ...props }) {
 
   const handleAddPatientOpen = (idBed) => {
     setCurrentBed(idBed);
+    let currentDay = new Date().toISOString().split("T")[0];
+    setFormData({ stay_start_date: currentDay });
     setOpenDialPatient(true);
   };
 
@@ -156,77 +170,84 @@ function Beds({ data, ...props }) {
     setOpenDialPatient(false);
   };
 
+  const handleAddPatientCancel = () => {
+    setFormData({});
+    handleAddPatientClose();
+  };
+
   const handleRemoveClose = () => {
     setCurrentStay(null);
     setCurrentPatientName(null);
     setOpenDialRemove(false);
   };
 
-  const closeSnackBar = (event, reason) => {
-    setSnackbarOpen(false);
-  };
-
   const manageError = (err, setLoadingCb) => {
-    setErrMsg(err.toString());
-    setSnackbarOpen(true);
+    console.log(err);
+    uiInform(`La requête a échoué: ${err.toString()}`, false);
     setLoadingCb(false);
-  };
-
-  //TODO
-  const getUserId = () => {
-    // see how to get it from global state ?
-    return "";
   };
 
   function onSubmitAddRea(initialData, setLoadingCb) {
     setLoadingCb(true);
 
     const fData = flat(initialData);
-    const formData = new FormData();
-
+    const dataToSend = {};
     for (let [key, value] of Object.entries(fData)) {
-      formData.append(key, value);
+      dataToSend[key] = value;
     }
 
-    const url = `${config.path.users}${getUserId()}`;
+    const url = `${config.path.bed}`;
 
-    axios({
-      method: "patch",
-      url,
-      data: formData,
-      ...config.axios,
-      headers: {
-        "Content-Type": "multipart/form-data",
-        "Access-Control-Allow-Origin": "*",
-      },
-    })
+    axios
+      .get(url, {
+        params: dataToSend,
+        ...config.axios,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      })
       .then((res) => {
         console.log(res);
         setLoadingCb(false);
-        handleAddReaClose();
+        if (res.data.count === 0) {
+          uiInform("Aucune unité n'a été trouvée avec ce code", false);
+        } else {
+          handleAddReaClose();
+          localAddRea(res.data.results[0]);
+        }
       })
       .catch((err) => {
         manageError(err, setLoadingCb);
       });
   }
 
+  const localAddRea = (rea) => {
+    let reaNames = data.results.map((r) => r.name);
+    if (!reaNames.find((name) => rea.name === name)) {
+      data.results.push(rea);
+      uiInform(`L'unité de réanimation ${rea.name} a été récupérée`, true);
+    } else {
+      uiInform(`L'unité de réanimation ${rea.name} était déjà ajoutée`, false);
+    }
+  };
+
   function onSubmitAddPatient(initialData, setLoadingCb) {
     setLoadingCb(true);
 
     const data = flat(initialData);
-    const formData = new FormData();
+    const dataToSend = new FormData();
 
     for (let [key, value] of Object.entries(data)) {
-      formData.append(key, value);
+      dataToSend.append(key, value);
     }
-    formData.append("bed", currentBed);
+    dataToSend.append("bed", currentBed);
 
     const url = config.path.patient;
 
     axios({
       method: "post",
       url,
-      data: formData,
+      data: dataToSend,
       ...config.axios,
       headers: {
         "Content-Type": "multipart/form-data",
@@ -246,15 +267,15 @@ function Beds({ data, ...props }) {
 
   function onSubmitRemovePatient() {
     setLoadingRemovePatient(true);
-    const formData = new FormData();
+    const dataToSend = new FormData();
 
-    formData.append("terminate", true); // TODO add value stayId somewhere
+    dataToSend.append("terminate", true);
     const url = `${config.path.stay}${currentStay}/`;
 
     axios({
       method: "patch",
       url,
-      data: formData,
+      data: dataToSend,
       ...config.axios,
       headers: {
         "Content-Type": "multipart/form-data",
@@ -265,6 +286,7 @@ function Beds({ data, ...props }) {
         console.log(res);
         setLoadingRemovePatient(false);
         handleRemoveClose();
+        reFetch();
       })
       .catch((err) => {
         manageError(err, setLoadingRemovePatient);
@@ -274,7 +296,7 @@ function Beds({ data, ...props }) {
   const FormAddPatient = (props) => (
     <Form
       schema={schemaAddPatient}
-      // uiSchema={}
+      formData={formData}
       onSubmit={(form, setLoadingCb) =>
         onSubmitAddPatient(form.formData, setLoadingCb)
       }
@@ -305,20 +327,32 @@ function Beds({ data, ...props }) {
       birth_date,
       severity,
       nbDefaillance,
-      sex
+      sex,
     } = patient ? patient : {};
     const idPatient = patient ? patient.id : {};
     return current_stay ? (
-      <ListItem key={bed.id} button divider className={getBedSeverityClass(severity)} onClick={() => handlePatientClick(idPatient)}>
-        <ListItemText id={`bedIndex-${unit_index}`} primary={unit_index} className={classes.bedIndex} />
+      <ListItem
+        key={bed.id}
+        button
+        divider
+        className={getBedSeverityClass(severity)}
+        onClick={() => handlePatientClick(idPatient)}
+      >
+        <ListItemText
+          id={`bedIndex-${unit_index}`}
+          primary={unit_index}
+          className={classes.bedIndex}
+        />
 
         <ListItemText
           id={`patientDetails-${idPatient}`}
-          primary={displayName(first_name, family_name) + (sex ? ` (${sex})` : "")}
+          primary={
+            displayName(first_name, family_name) + (sex ? ` (${sex})` : "")
+          }
           secondary={birth_date ? `${getAge(birth_date)} ans` : ""}
           className={classes.patientDetails}
-          primaryTypographyProps={{variant: variantForBedItem}}
-          secondaryTypographyProps={{variant: variantForBedItem}}
+          primaryTypographyProps={{ variant: variantForBedItem }}
+          secondaryTypographyProps={{ variant: variantForBedItem }}
         />
         <ListItemText
           id={`otherDetails-${idPatient}`}
@@ -327,28 +361,59 @@ function Beds({ data, ...props }) {
           )}`}
           secondary={"Covid"}
           className={classes.otherDetails}
-          primaryTypographyProps={{variant: variantForBedItem}}
-          secondaryTypographyProps={{variant: variantForBedItem}}
+          primaryTypographyProps={{ variant: variantForBedItem }}
+          secondaryTypographyProps={{ variant: variantForBedItem }}
         />
         <ListItemSecondaryAction className={classes.listItemSecAction}>
-          <RemoveIcon color="primary" onClick={() => handleRemoveOpen(idStay, displayName(first_name, family_name))} />
+          <IconButton
+            onClick={() =>
+              handleRemoveOpen(idStay, displayName(first_name, family_name))
+            }
+            color="primary"
+            >
+            <RemoveIcon
+              fontSize="large"
+            />
+          </IconButton>
         </ListItemSecondaryAction>
       </ListItem>
     ) : (
-        <ListItem key={bed.id} role={undefined} button divider className={classes.bedItem} onClick={() => handleAddPatientOpen(bed.id)}>
-          <ListItemText id={`bedIndex-${unit_index}`} primary={unit_index} className={classes.bedIndex} />
+        <ListItem
+          key={bed.id}
+          role={undefined}
+          button
+          divider
+          className={classes.bedItem}
+          onClick={() => handleAddPatientOpen(bed.id)}
+        >
+          <ListItemText
+            id={`bedIndex-${unit_index}`}
+            primary={unit_index}
+            className={classes.bedIndex}
+          />
           <ListItemText
             id={`dispo-${bed.id}`}
             primary={Number(status) === 0 ? "Libre" : "Indisponible"}
             className={classes.patientDetails}
-            primaryTypographyProps={{variant: variantForBedItem}}
-            />
-          <ListItemText id={`space-${bed.id}`} primary={""} className={classes.otherDetails} />
+            primaryTypographyProps={{ variant: variantForBedItem }}
+          />
+          <ListItemText
+            id={`space-${bed.id}`}
+            primary={""}
+            className={classes.otherDetails}
+          />
           <ListItemSecondaryAction className={classes.listItemSecAction}>
-            <AddIcon color="secondary" onClick={() => handleAddPatientOpen(bed.id)} />
+            <IconButton
+              onClick={() => handleAddPatientOpen(bed.id)}
+              color="secondary"
+              >
+              <AddIcon
+                fontSize="large"
+              />
+            </IconButton>
           </ListItemSecondaryAction>
         </ListItem>
-      )
+      );
   };
 
   return page ? (
@@ -366,7 +431,9 @@ function Beds({ data, ...props }) {
                 <div>
                   {rea.units.map((unit) => (
                     <Paper>
-                      <Typography variant='h3' className={classes.unitTitle}>{unit.name}</Typography>
+                      <Typography variant="h3" className={classes.unitTitle}>
+                        {unit.name}
+                      </Typography>
                       <Divider />
                       <List className={classes.root}>
                         {unit.beds.map((bed) => bedItemList(bed, unit.name))}
@@ -408,7 +475,7 @@ function Beds({ data, ...props }) {
             <FormAddPatient />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleAddPatientClose} color="primary">
+            <Button onClick={handleAddPatientCancel} color="primary">
               Annuler
           </Button>
           </DialogActions>
@@ -444,9 +511,9 @@ function Beds({ data, ...props }) {
             elevation={6}
             variant="filled"
             onClose={closeSnackBar}
-            severity="error"
+            severity={snackbarSeverity}
           >
-            La requête a échoué {errMsg}
+            {infoMsg}
           </MuiAlert>
         </Snackbar>
       </div>

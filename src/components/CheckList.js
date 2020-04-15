@@ -57,7 +57,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function PatientHeader({ patientId, title, label, dataInterface={}, data = {} }) {
+export default function PatientHeader({
+  patientId,
+  title,
+  label,
+  dataInterface = {},
+  data = {},
+}) {
   const classes = useStyles();
   const clone = (obj) => {
     return Object.assign({}, obj);
@@ -156,15 +162,24 @@ export default function PatientHeader({ patientId, title, label, dataInterface={
               })}
             </FormGroup>
             <FormHelperText>
-              Pensez à sauvegarder si vous modifez
+              Pensez à enregistrer si vous modifez
             </FormHelperText>
           </FormControl>
         </CardContent>
         <CardActions>
-          <Button size="small" onClick={onCancel}>
+          <Button
+            size="small"
+            onClick={onCancel}
+            variant={errorCheck ? "outlined" : ""}
+          >
             Annuler les changements
           </Button>
-          <Button size="small" onClick={onSubmitInfos}>
+          <Button
+            size="small"
+            onClick={onSubmitInfos}
+            variant="outlined"
+            color={errorCheck ? "primary" : ""}
+          >
             Enregistrer
           </Button>
           {loadingUpdate && (

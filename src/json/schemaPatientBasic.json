@@ -8,6 +8,11 @@
       "type": "string",
       "title": "Identifiant NIP"
     },
+    "stay_start_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Premier jour de réanimation"
+    },
     "family_name": {
       "type": "string",
       "title": "Nom"

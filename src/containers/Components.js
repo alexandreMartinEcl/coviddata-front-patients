@@ -6,7 +6,7 @@ import PatientLaribA from "../containers/PatientLarib";
 import PatientsTableA from "../containers/PatientsTable";
 import PatientContentA from "../containers/PatientContent";
 import PatientHeaderA from "../containers/PatientHeader";
-import CheckListA from "../containers/CheckList";
+import CheckListA from "../components/CheckList";
 import PatientEditA from "../containers/PatientEdit";
 import VentilationsTableA from "../containers/VentilationsTable";
 import VentilationEditA from "../containers/VentilationEdit";

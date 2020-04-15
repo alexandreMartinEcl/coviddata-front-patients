@@ -24,12 +24,15 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import * as _ from "lodash";
-import { Grid } from "@material-ui/core";
+import { Grid, useMediaQuery } from "@material-ui/core";
+import { useTheme } from "@material-ui/styles";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
+  patientCard: {
     flexGrow: 1,
     width: "100%",
+    borderColor: theme.palette.primary.main,
+    borderInline: theme.palette.primary.main,
     backgroundColor: theme.palette.background.paper,
   },
   heading: {
@@ -38,14 +41,6 @@ const useStyles = makeStyles((theme) => ({
   secondaryHeading: {
     fontSize: theme.typography.pxToRem(15),
     color: theme.palette.text.secondary,
-  },
-  icon: {
-    verticalAlign: "bottom",
-    height: 20,
-    width: 20,
-  },
-  details: {
-    alignItems: "center",
   },
   column: {
     flexBasis: "33.33%",
@@ -63,7 +58,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function PatientHeader({ patientId, title, label, data = {} }) {
+export default function PatientHeader({
+  patientId,
+  title,
+  label,
+  data = {},
+  reFetch,
+}) {
   const classes = useStyles();
   const [editDial, setEditDial] = React.useState(false);
   const [savedInfos, setSavedInfos] = React.useState([]);
@@ -72,9 +73,14 @@ export default function PatientHeader({ patientId, title, label, data = {} }) {
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [errMsg, setErrMsg] = React.useState("");
 
-  delete addPatientBasicFormSchema.properties["NIP_id"];
-  delete addPatientBasicFormSchema.required;
   const schemaBasicPatient = cloneSchema(addPatientBasicFormSchema).schema;
+  delete schemaBasicPatient.properties["NIP_id"];
+  delete schemaBasicPatient.properties["stay_start_date"];
+  delete schemaBasicPatient.required;
+
+  const th = useTheme();
+  const isUpSm = useMediaQuery(th.breakpoints.up("sm"));
+  const variantHeaderContent = isUpSm ? "body1" : "body2";
 
   const closeEditDial = () => {
     setEditDial(false);
@@ -134,6 +140,8 @@ export default function PatientHeader({ patientId, title, label, data = {} }) {
         console.log(res);
         setLoadingCb(false);
         closeEditDial();
+        console.log(typeof reFetch);
+        reFetch();
       })
       .catch((err) => {
         console.log(err);
@@ -143,40 +151,50 @@ export default function PatientHeader({ patientId, title, label, data = {} }) {
       });
   }
 
+  // bed_description is like '1 - Lit 1 - Unité Sirrocco (Réanimation Rea1 - Hôpital Lariboisière) (1234)'
+  let [
+    ,
+    bedIndex,
+    unitPart1,
+    unitPart2,
+  ] = dataCopy.current_unit_stay.bed_description.split(" - ");
+  unitPart2 = unitPart2.split(") (")[0] + ")";
+  const bedInfo = [bedIndex, unitPart1, unitPart2].join(" - ");
+
   return (
-    <Card className={classes.patientCard} >
+    <Card className={classes.patientCard}>
       <CardContent>
         <Grid container space={2}>
-
           {dataCopy.current_unit_stay ? (
-            <Grid item xs={12}>
-
+            <Grid item xs={12} sm={12}>
               <Typography
+                variant={variantHeaderContent}
                 className={classes.title}
-                color="textSecondary"
                 gutterBottom
               >
-                {dataCopy.current_unit_stay.bed_description}
+                {dataCopy.current_unit_stay
+                  ? bedInfo
+                  : "A quitté la réanimation"}
               </Typography>
             </Grid>
           ) : (
-              <></>
-            )}
+            <></>
+          )}
 
-          <Grid item xs={3} container direction="column">
+          <Grid item xs={6} sm={3} container direction="column">
             <Grid item>
               <Typography
+                variant={variantHeaderContent}
                 className={classes.title}
-                color="textSecondary"
                 gutterBottom
               >
                 Patient n° {dataCopy.NIP_id}
               </Typography>
-              </Grid>
-              <Grid item>
+            </Grid>
+            <Grid item>
               <Typography
+                variant={variantHeaderContent}
                 className={classes.title}
-                color="textSecondary"
                 gutterBottom
               >
                 Sévérité: {severityInterface[dataCopy.severity]}
@@ -184,76 +202,87 @@ export default function PatientHeader({ patientId, title, label, data = {} }) {
             </Grid>
           </Grid>
 
-          <Grid item xs={3} container direction="column">
+          <Grid item xs={6} sm={3} container direction="column">
             <Grid item>
               <Typography
+                variant={variantHeaderContent}
                 className={classes.title}
-                color="textSecondary"
-                gutterBottom>
-                {dataCopy.family_name ? dataCopy.family_name.toUpperCase() : "..."}
-                {" "}
+                gutterBottom
+              >
+                {dataCopy.family_name
+                  ? dataCopy.family_name.toUpperCase()
+                  : "..."}{" "}
                 {dataCopy.first_name || "..."}
               </Typography>
             </Grid>
             <Grid item>
               <Typography
+                variant={variantHeaderContent}
                 className={classes.title}
-                color="textSecondary"
                 gutterBottom
               >
-                {dataCopy.sex ? sexInterface[dataCopy.sex] : "Sexe non mentionné"}
+                {dataCopy.sex
+                  ? sexInterface[dataCopy.sex]
+                  : "Sexe non mentionné"}
               </Typography>
             </Grid>
           </Grid>
 
-          <Grid item xs={3}>
+          <Grid item xs={6} sm={3}>
             <Typography
+              variant={variantHeaderContent}
               className={classes.title}
-              color="textSecondary"
               gutterBottom
             >
               {dataCopy.birth_date} ({getAge(dataCopy.birth_date)} ans)
-          </Typography>
+            </Typography>
           </Grid>
 
-          <Grid item xs={3} container direction="column">
+          <Grid item xs={6} sm={3} container direction="column">
             <Grid item>
               <Typography
+                variant={variantHeaderContent}
                 className={classes.title}
-                color="textSecondary"
-                gutterBottom>
+                gutterBottom
+              >
                 Poids: {dataCopy.weight_kg}kg
               </Typography>
             </Grid>
             <Grid item container direction="column">
               <Typography
+                variant={variantHeaderContent}
                 className={classes.title}
-                color="textSecondary"
-                gutterBottom>
+                gutterBottom
+              >
                 Taille: {dataCopy.size_cm}cm
-            </Typography>
+              </Typography>
             </Grid>
             <Grid item>
               <Typography
+                variant={variantHeaderContent}
                 className={classes.title}
-                color="textSecondary"
                 gutterBottom
               >
-                (IMC: {(dataCopy.weight_kg / (dataCopy.size_cm / 100) ** 2).toFixed(2)})
-            </Typography>
+                (IMC:{" "}
+                {(dataCopy.weight_kg / (dataCopy.size_cm / 100) ** 2).toFixed(
+                  2
+                )}
+                )
+              </Typography>
             </Grid>
           </Grid>
         </Grid>
       </CardContent>
       <CardActions>
-      <Button
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            startIcon={<AddIcon />}
-            onClick={openEditDial}>
+        <Button
+          variant="contained"
+          color="primary"
+          className={classes.button}
+          startIcon={<AddIcon />}
+          onClick={openEditDial}
+        >
           Modifier
-          </Button>
+        </Button>
       </CardActions>
 
       <Dialog
@@ -293,6 +322,6 @@ export default function PatientHeader({ patientId, title, label, data = {} }) {
           La requête a échoué {errMsg}
         </MuiAlert>
       </Snackbar>
-    </Card >
+    </Card>
   );
 }

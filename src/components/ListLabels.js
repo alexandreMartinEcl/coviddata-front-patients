@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import AddIcon from "@material-ui/icons/AddCircle";
 import RemoveIcon from "@material-ui/icons/RemoveCircle";
@@ -20,7 +20,12 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import * as _ from "lodash";
-import { Card, CardContent, CardActions } from "@material-ui/core";
+import {
+  Card,
+  CardContent,
+  CardActions,
+  useMediaQuery,
+} from "@material-ui/core";
 import theme from "../theme";
 
 const useStyles = makeStyles((theme) => ({
@@ -31,8 +36,8 @@ const useStyles = makeStyles((theme) => ({
     // backgroundColor: theme.palette.primary.light
   },
   labelTitle: {
-    verticalAlign: "center"
-  }
+    verticalAlign: "center",
+  },
 }));
 
 export default function ListLabels({
@@ -41,6 +46,7 @@ export default function ListLabels({
   doubleInfoElseSingle = false,
   field,
   data = {},
+  reFetch,
 }) {
   const classes = useStyles();
   const [editDial, setEditDial] = React.useState(false);
@@ -52,6 +58,10 @@ export default function ListLabels({
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [errMsg, setErrMsg] = React.useState("");
   const [loadingUpdateLabels, setLoadingUpdateLabels] = React.useState(false);
+
+  const th = useTheme();
+  const isUpSm = useMediaQuery(th.breakpoints.up("sm"));
+  const variantLabelContent = isUpSm ? "body1" : "body2";
 
   const closeEditDial = () => {
     setEditDial(false);
@@ -147,6 +157,7 @@ export default function ListLabels({
         console.log(res);
         setLoadingUpdateLabels(false);
         setEditDial(false);
+        reFetch();
       })
       .catch((err) => {
         console.log(err);
@@ -156,21 +167,29 @@ export default function ListLabels({
       });
   };
 
-  const labelComponent = (item, i) => {
+  const labelComponent = (item) => {
     return doubleInfoElseSingle ? (
-      <Grid item container xs={4} spacing={1} justify={"flex-start"} className={classes.label}>
-          <Grid item>
-            <Typography >{item.title}: </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography >{item.value}</Typography>
-          </Grid>
+      <Grid
+        item
+        container
+        xs={6}
+        sm={4}
+        spacing={1}
+        justify={"flex-start"}
+        className={classes.label}
+      >
+        <Grid item>
+          <Typography variant={variantLabelContent}>{item ? item.title : "Aucun"}: </Typography>
+        </Grid>
+        <Grid item xs={6} sm={6}>
+          <Typography variant={variantLabelContent}>{item ? item.value : ""}</Typography>
+        </Grid>
       </Grid>
     ) : (
-        <Grid item xs={4} className={classes.label}>
-          <Typography>{item}</Typography>
-        </Grid>
-      );
+      <Grid item xs={6} sm={4} className={classes.label}>
+        <Typography variant={variantLabelContent}>{item ? item : "Aucun"}</Typography>
+      </Grid>
+    );
   };
 
   const editableLabelComponent = (item, i) => {
@@ -197,54 +216,68 @@ export default function ListLabels({
           onClick={() => removeEditedLabel(i)}
         >
           Retirer
-            </Button>
+        </Button>
         <Divider vertical />
       </Grid>
     ) : (
-        <Grid>
-          <TextField
-            id={buildId("item", i)}
-            onChange={onChangeLabels}
-            type="text"
-            multiline
-            value={item}
-          />
-          <Button
-            variant="contained"
-            color="secondary"
-            className={classes.button}
-            startIcon={<RemoveIcon />}
-            onClick={() => removeEditedLabel(i)}
-          >
-            Retirer
-            </Button>
-          <Divider vertical />
-        </Grid>
-      );
+      <Grid>
+        <TextField
+          id={buildId("item", i)}
+          onChange={onChangeLabels}
+          type="text"
+          multiline
+          value={item}
+        />
+        <Button
+          variant="contained"
+          color="secondary"
+          className={classes.button}
+          startIcon={<RemoveIcon />}
+          onClick={() => removeEditedLabel(i)}
+        >
+          Retirer
+        </Button>
+        <Divider vertical />
+      </Grid>
+    );
   };
 
   return (
     <Card>
       <CardContent>
-    <Grid container spacing={2} className={classes.root} justify={"flex-start"} alignItems={"center"}>
-      <Grid item xs={2}>
-        <Typography className={classes.labelTitle}>{title}</Typography>
-      </Grid>
-      <Grid item container xs={10} spacing={2} justify={"flex-start"} alignItems={"center"}>
-        {dataCopy.map(labelComponent)}
-        <Grid item xs={4}>
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            startIcon={<AddIcon />}
-            onClick={openEditDial}
+        <Grid
+          container
+          spacing={2}
+          className={classes.root}
+          justify={"flex-start"}
+          alignItems={"center"}
+        >
+          <Grid item xs={12} sm={2}>
+            <Typography className={classes.labelTitle}>{title}</Typography>
+          </Grid>
+          <Grid
+            item
+            container
+            xs={12}
+            sm={10}
+            spacing={2}
+            justify={"flex-start"}
+            alignItems={"center"}
           >
-            Modifier
-            </Button>
-        </Grid>
-      </Grid>
-        {/* <CardActions>
+            {dataCopy.length ? dataCopy.map(labelComponent) : labelComponent()}
+            <Grid item xs={12} sm={4}>
+              <Button
+                variant="contained"
+                color="primary"
+                className={classes.button}
+                startIcon={<AddIcon />}
+                onClick={openEditDial}
+              >
+                Modifier
+              </Button>
+            </Grid>
+          </Grid>
+          {/* <CardActions>
         <Button
             variant="contained"
             color="secondary"
@@ -256,54 +289,57 @@ export default function ListLabels({
             </Button>
         </CardActions> */}
 
-      <Dialog
-        open={editDial}
-        onClose={closeEditDial}
-        aria-labelledby="form-dialog-title"
-      >
-        <DialogTitle id="form-dialog-title">
-          Modification des {title}
-        </DialogTitle>
-        <DialogContent>
-          {editedLabels.map(editableLabelComponent)}
-          <Button
-            variant="contained"
-            color="secondary"
-            className={classes.button}
-            startIcon={<AddIcon />}
-            onClick={addEditedLabel}
+          <Dialog
+            open={editDial}
+            onClose={closeEditDial}
+            aria-labelledby="form-dialog-title"
           >
-            Ajouter
-          </Button>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={cancelEditDial} color="primary">
-            Annuler
-          </Button>
-          <Button onClick={onSubmitLabels} color="primary">
-            Enregistrer
-          </Button>
-          {loadingUpdateLabels && (
-            <CircularProgress size={24} className={classes.buttonProgress} />
-          )}
-        </DialogActions>
-      </Dialog>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={closeSnackBar}
-      >
-        <MuiAlert
-          elevation={6}
-          variant="filled"
-          onClose={closeSnackBar}
-          severity="error"
-        >
-          La requête a échoué {errMsg}
-        </MuiAlert>
-      </Snackbar>
-    </Grid>
-    </CardContent>
+            <DialogTitle id="form-dialog-title">
+              Modification des {title}
+            </DialogTitle>
+            <DialogContent>
+              {editedLabels.map(editableLabelComponent)}
+              <Button
+                variant="contained"
+                color="secondary"
+                className={classes.button}
+                startIcon={<AddIcon />}
+                onClick={addEditedLabel}
+              >
+                Ajouter
+              </Button>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={cancelEditDial} color="primary">
+                Annuler
+              </Button>
+              <Button onClick={onSubmitLabels} color="primary">
+                Enregistrer
+              </Button>
+              {loadingUpdateLabels && (
+                <CircularProgress
+                  size={24}
+                  className={classes.buttonProgress}
+                />
+              )}
+            </DialogActions>
+          </Dialog>
+          <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={6000}
+            onClose={closeSnackBar}
+          >
+            <MuiAlert
+              elevation={6}
+              variant="filled"
+              onClose={closeSnackBar}
+              severity="error"
+            >
+              La requête a échoué {errMsg}
+            </MuiAlert>
+          </Snackbar>
+        </Grid>
+      </CardContent>
     </Card>
   );
 }
