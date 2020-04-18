@@ -20,10 +20,13 @@ Téléchargez dans un dossier les deux Git repository correspondant au Frontend 
 
 Entrez dans le dossier frontend et installez les librairies. (Installez npm si besoin)
 
+
 ```
 cd coviddata-front-patients
 npm install
 ```
+
+Pensez à vérifier le fichier _.env_ pour modifier _REACT_APP_IS_DEV sur 0 pour le build.
 
 Lancez la construction static de l'application web, et copiez-collez le dossier `build` dans le
 backend à `server/web/templates/beds_frontend/`
@@ -53,14 +56,7 @@ Puis lancez les migrations pour la création de la base de données et ajoutez l
 
 ```
 cd server
-python manage.py makemigrations
-python manage.py sqlmigrate beds 001
-python manage.py sqlmigrate maj 001
-python manage.py sqlmigrate patients 001
-python manage.py sqlmigrate users 001
-python manage.py sqlmigrate web 001
 python manage.py migrate
-python manage.py createsuperuser
 ```
 
 Copiez collez et renommer le fichier _.env.example_ et ajustez les paramètres.
@@ -107,17 +103,42 @@ Et enfin relancez les migrations avant de lancer le serveur
 
 ```
 cd server
-python manage.py makemigrations
-python manage.py sqlmigrate beds 00x
-python manage.py sqlmigrate maj 00x
-python manage.py sqlmigrate patients 00x
-python manage.py sqlmigrate users 00x
-python manage.py sqlmigrate web 00x
+python manage.py migrate
 ```
+
+Si une erreur se présente pendant les migrations et vous souhaitez relancer la base de données entièrement (**attention, on parle d'effacer toutes les données existantes!**):
+- lancez _postgresql_: `sudo -u postgres psql`
+- ouvrez la base de données avec le nom défini dans votre fichier _.env_: `\c db_name`
+- listez les tables présentes: `\dt`
+- effacez toutes les tables indiquées avec: `DROP TABLE table1, table2, etc.;`
+- puis relancez `python manage.py migrate`
 
 `python manage.py runserver`
 
 ## Notes pour le développeur
+
+### Avant de commit
+
+#### Frontend
+
+Lancez `npm run lint` et corrigez les erreurs si nécessaire.
+
+Lancez `npm run format` pour adapter le code aux critères de format.
+
+#### Backend
+
+Pour chaque dossier de migration, revenez à la dernière version mise en ligne:
+```
+rm users/migrations/*
+git checkout HEAD -- users/migrations
+etc.
+```
+
+Ensuite seulement, lancez makemigrations pour obtenir les migrations définitives à commit
+
+```python manage.py makemigrations```
+
+### Autres
 
 Pour lancer un mode sans authentification, dé-commentarisez cette ligne du fichier settings, au niveau du paramètre `REST_FRAMEWORK`
 

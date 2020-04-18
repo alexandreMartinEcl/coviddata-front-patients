@@ -1,10 +1,9 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import FormatListNumberedIcon from "@material-ui/icons/FormatListNumbered";
 import axios from "axios";
-import config from "../config";
+import config from "../../config";
 
 import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
@@ -20,10 +19,11 @@ import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Divider from "@material-ui/core/Divider";
 import CircularProgress from "@material-ui/core/CircularProgress";
+
+import { dateTimeToStr } from "../../shared/utils/date";
+
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
-
-import { dateTimeToStr } from "../shared/utils/date";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -61,6 +61,7 @@ export default function EditableText({
   data = {},
   field,
   reFetch,
+  readOnly,
 }) {
   const classes = useStyles();
   const [editDial, setEditDial] = React.useState(false);
@@ -71,9 +72,22 @@ export default function EditableText({
     dateTimeToStr(data.lastEdited)
   );
 
-  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const [errMsg, setErrMsg] = React.useState("");
   const [loadingUpdateText, setLoadingUpdateText] = React.useState(false);
+
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = React.useState(false);
+  const [infoMsg, setInfoMsg] = React.useState("");
+
+  const uiInform = (msg, isInfoElseError) => {
+    setInfoMsg(msg);
+    setSnackbarSeverity(isInfoElseError ? "success" : "error");
+    setSnackbarOpen(true);
+  };
+
+  const closeSnackBar = (event, reason) => {
+    setSnackbarOpen(false);
+    setInfoMsg("");
+  };
 
   const closeEditDial = () => {
     setEditDial(false);
@@ -88,12 +102,14 @@ export default function EditableText({
     setEditDial(true);
   };
 
-  const closeSnackBar = (event, reason) => {
-    setSnackbarOpen(false);
-  };
-
   const onChangeText = (event) => {
     setText(event.target.value);
+  };
+
+  const updateState = (resData) => {
+    setSavedText(resData[field]);
+    setText(resData[field]);
+    setLastEdited(resData[`last_edited_${field}`]);
   };
 
   const onSubmitTodoList = () => {
@@ -117,16 +133,12 @@ export default function EditableText({
       .then((res) => {
         console.log(res);
         setLoadingUpdateText(false);
-        // setSavedText(text);
-        // let d = dateTimeToStr(new Date());
-        // setLastEdited(d);
         closeEditDial();
-        reFetch();
+        updateState(res.data);
       })
       .catch((err) => {
         console.log(err);
-        setErrMsg(err.toString());
-        setSnackbarOpen(true);
+        uiInform && uiInform(`La requête a échoué: ${err.toString()}`, false);
         setLoadingUpdateText(false);
       });
   };
@@ -150,39 +162,30 @@ export default function EditableText({
             value={text}
             fullWidth
             onChange={onChangeText}
+            disabled={readOnly}
             multiline
           />
         </ExpansionPanelDetails>
         <Divider />
-        <ExpansionPanelActions>
-          <div className={classes.column}>
-            <Typography className={classes.heading}>
-              Dernière mise à jour: <br />
-              {lastEdited || data.lastEdited}
-            </Typography>
-          </div>
-          <Button size="small" onClick={cancelEditDial}>
-            Rétablir
-          </Button>
-          <Button size="small" color="primary" onClick={onSubmitTodoList}>
-            Enregistrer
-          </Button>
-        </ExpansionPanelActions>
+        {readOnly ? (
+          <></>
+        ) : (
+          <ExpansionPanelActions>
+            <div className={classes.column}>
+              <Typography className={classes.heading}>
+                Dernière mise à jour: <br />
+                {lastEdited || data.lastEdited}
+              </Typography>
+            </div>
+            <Button size="small" onClick={cancelEditDial}>
+              Rétablir
+            </Button>
+            <Button size="small" color="primary" onClick={onSubmitTodoList}>
+              Enregistrer
+            </Button>
+          </ExpansionPanelActions>
+        )}
       </ExpansionPanel>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={closeSnackBar}
-      >
-        <MuiAlert
-          elevation={6}
-          variant="filled"
-          onClose={closeSnackBar}
-          severity="error"
-        >
-          La requête a échoué {errMsg}
-        </MuiAlert>
-      </Snackbar>
     </React.Fragment>
   ) : (
     <React.Fragment>
@@ -209,22 +212,28 @@ export default function EditableText({
             value={text}
             fullWidth
             onChange={onChangeText}
+            disabled={readOnly}
             multiline
           />
           Dernière mise à jour: {lastEdited || data.lastEdited}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={cancelEditDial} color="primary">
-            Annuler
-          </Button>
-          <Button onClick={onSubmitTodoList} color="primary">
-            Enregistrer
-          </Button>
-          {loadingUpdateText && (
-            <CircularProgress size={24} className={classes.buttonProgress} />
-          )}
-        </DialogActions>
+        {readOnly ? (
+          <></>
+        ) : (
+          <DialogActions>
+            <Button onClick={cancelEditDial} color="primary">
+              Annuler
+            </Button>
+            <Button onClick={onSubmitTodoList} color="primary">
+              Enregistrer
+            </Button>
+            {loadingUpdateText && (
+              <CircularProgress size={24} className={classes.buttonProgress} />
+            )}
+          </DialogActions>
+        )}
       </Dialog>
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
@@ -234,9 +243,9 @@ export default function EditableText({
           elevation={6}
           variant="filled"
           onClose={closeSnackBar}
-          severity="error"
+          severity={snackbarSeverity}
         >
-          La requête a échoué {errMsg}
+          {infoMsg}
         </MuiAlert>
       </Snackbar>
     </React.Fragment>

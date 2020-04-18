@@ -3,7 +3,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import axios from "axios";
 import config from "../config";
 
-import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -16,16 +15,16 @@ import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import AddIcon from "@material-ui/icons/AddCircle";
 
-import { initSchema, cloneSchema, flat } from "../shared/utils/schema";
+import { cloneSchema, flat } from "../shared/utils/schema";
 import Form from "../components/Form";
 import addPatientBasicFormSchema from "../json/schemaPatientBasic.json";
-import { getAge } from "../shared/utils/date";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import Snackbar from "@material-ui/core/Snackbar";
-import MuiAlert from "@material-ui/lab/Alert";
+import { getAge, dateToDayStep } from "../shared/utils/date";
 import * as _ from "lodash";
 import { Grid, useMediaQuery } from "@material-ui/core";
 import { useTheme } from "@material-ui/styles";
+
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme) => ({
   patientCard: {
@@ -64,14 +63,26 @@ export default function PatientHeader({
   label,
   data = {},
   reFetch,
+  readOnly,
 }) {
   const classes = useStyles();
   const [editDial, setEditDial] = React.useState(false);
-  const [savedInfos, setSavedInfos] = React.useState([]);
   const [dataCopy, setDataCopy] = React.useState(_.cloneDeep(data));
-  const [editedInfos, setEditedInfos] = React.useState(_.cloneDeep(data));
+
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const [errMsg, setErrMsg] = React.useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = React.useState(false);
+  const [infoMsg, setInfoMsg] = React.useState("");
+
+  const uiInform = (msg, isInfoElseError) => {
+    setInfoMsg(msg);
+    setSnackbarSeverity(isInfoElseError ? "success" : "error");
+    setSnackbarOpen(true);
+  };
+
+  const closeSnackBar = (event, reason) => {
+    setSnackbarOpen(false);
+    setInfoMsg("");
+  };
 
   const schemaBasicPatient = cloneSchema(addPatientBasicFormSchema).schema;
   delete schemaBasicPatient.properties["NIP_id"];
@@ -87,25 +98,11 @@ export default function PatientHeader({
   };
 
   const cancelEditDial = () => {
-    setEditedInfos(_.cloneDeep(savedInfos));
     closeEditDial();
   };
 
   const openEditDial = () => {
     setEditDial(true);
-    setSavedInfos(_.cloneDeep(dataCopy));
-  };
-
-  const onChangeInfos = (event) => {
-    let id = event.target.id;
-
-    editedInfos[id] = event.target.value;
-
-    setEditedInfos(_.cloneDeep(editedInfos));
-  };
-
-  const closeSnackBar = (event, reason) => {
-    setSnackbarOpen(false);
   };
 
   const sexInterface = {
@@ -113,6 +110,17 @@ export default function PatientHeader({
     F: "Femme",
   };
   const severityInterface = ["A risque", "Instable", "Stable"];
+
+  const updateDisplayed = (resData) => {
+    let temData = _.cloneDeep(dataCopy);
+    let resKeys = Object.keys(resData);
+    Object.keys(temData).forEach((k) => {
+      if (resKeys.find((rk) => rk === k)) {
+        temData[k] = resData[k];
+      }
+    });
+    setDataCopy(temData);
+  };
 
   function onSubmitInfos(initialData, setLoadingCb) {
     setLoadingCb(true);
@@ -140,13 +148,11 @@ export default function PatientHeader({
         console.log(res);
         setLoadingCb(false);
         closeEditDial();
-        console.log(typeof reFetch);
-        reFetch();
+        updateDisplayed(res.data);
       })
       .catch((err) => {
         console.log(err);
-        setErrMsg(err.toString());
-        setSnackbarOpen(true);
+        uiInform && uiInform(`La requête a échoué: ${err.toString()}`, false);
         setLoadingCb(false);
       });
   }
@@ -159,7 +165,10 @@ export default function PatientHeader({
     unitPart2,
   ] = dataCopy.current_unit_stay.bed_description.split(" - ");
   unitPart2 = unitPart2.split(") (")[0] + ")";
-  const bedInfo = [bedIndex, unitPart1, unitPart2].join(" - ");
+  console.log("here", data.hospitalisationDate);
+  const bedInfo = `${[bedIndex, unitPart1, unitPart2].join(
+    " - "
+  )} (${dateToDayStep(data.hospitalisationDate)})`;
 
   return (
     <Card className={classes.patientCard}>
@@ -197,7 +206,7 @@ export default function PatientHeader({
                 className={classes.title}
                 gutterBottom
               >
-                Sévérité: {severityInterface[dataCopy.severity]}
+                Motif: {severityInterface[dataCopy.hospitalisation_cause]}
               </Typography>
             </Grid>
           </Grid>
@@ -273,17 +282,21 @@ export default function PatientHeader({
           </Grid>
         </Grid>
       </CardContent>
-      <CardActions>
-        <Button
-          variant="contained"
-          color="primary"
-          className={classes.button}
-          startIcon={<AddIcon />}
-          onClick={openEditDial}
-        >
-          Modifier
-        </Button>
-      </CardActions>
+      {readOnly ? (
+        <></>
+      ) : (
+        <CardActions>
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            startIcon={<AddIcon />}
+            onClick={openEditDial}
+          >
+            Modifier
+          </Button>
+        </CardActions>
+      )}
 
       <Dialog
         open={editDial}
@@ -308,6 +321,7 @@ export default function PatientHeader({
           </Button>
         </DialogActions>
       </Dialog>
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
@@ -317,9 +331,9 @@ export default function PatientHeader({
           elevation={6}
           variant="filled"
           onClose={closeSnackBar}
-          severity="error"
+          severity={snackbarSeverity}
         >
-          La requête a échoué {errMsg}
+          {infoMsg}
         </MuiAlert>
       </Snackbar>
     </Card>

@@ -1,0 +1,121 @@
+{
+  "p_f": {
+    "name": "P/F (Ratio pression artérielle sur fraction inspirée)",
+    "dbValue": 0,
+    "id": "p_f",
+    "fullName": "Ratio pression artérielle sur fraction inspirée",
+    "unit": "",
+    "small": "P/F",
+    "valueType": "number"
+  },
+  "nad": {
+    "name": "NAD (Noradrénaline)",
+    "dbValue": 1,
+    "id": "nad",
+    "fullName": "Noradrénaline",
+    "unit": "mg/h",
+    "small": "NAD",
+    "valueType": "number"
+  },
+  "creat": {
+    "name": "Créatinémie",
+    "dbValue": 2,
+    "id": "creat",
+    "fullName": "Créatinémie",
+    "unit": "μmol/l",
+    "small": "Creat",
+    "valueType": "number"
+  },
+  "dv": {
+    "name": "DV ",
+    "dbValue": 3,
+    "id": "dv",
+    "fullName": "Decubitus ventral",
+    "unit": "",
+    "small": "DV",
+    "valueType": "number"
+  },
+  "vent": {
+    "name": "Mode ventilatoire",
+    "dbValue": 4,
+    "id": "vent",
+    "fullName": "Mode ventilatoire",
+    "unit": "",
+    "small": "Mode Vent.",
+    "valueType": "string",
+    "enumNames": [
+      "Ventilation Pressions Contrôlée",
+      "Ventilation Assistée Contrôlée",
+      "Ventilation Spontanée Aide Inspiratoire",
+      "Ventilation Spontanée",
+      "Optiflow",
+      "Ventilation en Pression Positive Continue"
+    ],
+    "enum": ["VPC", "VAC", "VSAI", "VS", "opti", "CPAP"]
+  },
+  "seda": {
+    "name": "Sédation",
+    "dbValue": 5,
+    "id": "seda",
+    "fullName": "Sédation",
+    "unit": "",
+    "small": "Sédation",
+    "valueType": "string"
+  },
+  "antib": {
+    "name": "Antibiotiques",
+    "dbValue": 6,
+    "id": "antib",
+    "fullName": "Antibiotiques",
+    "unit": "",
+    "small": "Antib.",
+    "valueType": "string"
+  },
+  "prelev": {
+    "name": "Type de prélèvements",
+    "dbValue": 7,
+    "id": "prelev",
+    "fullName": "Type de prélèvements",
+    "unit": "",
+    "small": "Prélèvements",
+    "valueType": "string"
+  },
+  "germes": {
+    "name": "Germes",
+    "dbValue": 8,
+    "id": "germes",
+    "fullName": "Germes",
+    "unit": "",
+    "small": "Germes",
+    "valueType": "string"
+  },
+  "curar": {
+    "name": "Curares",
+    "dbValue": 9,
+    "id": "curar",
+    "fullName": "Curares",
+    "unit": "",
+    "small": "Curares",
+    "valueType": "string"
+  },
+  "lactat": {
+    "name": "Lactatémie",
+    "dbValue": 10,
+    "id": "lactat",
+    "fullName": "Lactatémie",
+    "unit": "mmol/l",
+    "small": "Lactatémie",
+    "valueType": "number"
+  },
+  "eer": {
+    "name": "Epuration extrarénale",
+    "dbValue": 11,
+    "id": "eer",
+    "fullName": "Epuration extrarénale",
+    "unit": "",
+    "small": "EER",
+    "valueType": "string",
+    "enumNames": ["Hémofiltration", "Dialyse", "Hémodiafiltration", "Non"],
+    "enum": ["HémoF", "Dial", "HémodiaF", ""]
+  }
+}

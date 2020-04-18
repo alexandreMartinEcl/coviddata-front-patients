@@ -54,3 +54,23 @@ export function getFormatDateFromFirst(firstDate, nbDays) {
 export function getAge(birthDate) {
   return Math.floor((new Date() - new Date(birthDate)) / 31557600000);
 }
+
+/**
+ * @param {Date} date1
+ * @param {Date} date2
+ */
+export function isSameDay(date1, date2) {
+  date1 = new Date(date1);
+  date2 = new Date(date2);
+
+  return (
+    date1.getDay() === date2.getDay() &&
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth()
+  );
+}
+
+export function setToMidnight(date) {
+  let d = new Date(date);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}

@@ -4,7 +4,7 @@ import components from "../containers/Components";
 import config from "../config";
 
 function Routes(props) {
-  const { PatientsTable, PatientLarib, PatientEdit, Beds } = components;
+  const { PatientLarib, PatientEdit, Beds } = components;
   return (
     <Router basename={config.basename}>
       <Switch>

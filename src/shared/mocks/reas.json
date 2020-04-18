@@ -34,7 +34,14 @@
                   "last_edited_evolution": null,
                   "todo_list": "Hello",
                   "last_edited_todo_list": "2020-04-11T18:33:29.985190Z",
-                  "assigned_caregivers": []
+                  "assigned_caregivers": [],
+                  "hospitalisation_cause": "Détresse respiratoire aigu sur Covid",
+                  "heart_failure": false,
+                  "bio_chemical_failure": true,
+                  "brain_failure": false,
+                  "lung_failure": true,
+                  "kidney_failure": false,
+                  "liver_failure": false
                 },
                 "bed_description": "1 - Lit 1 - Unité Unité Sirrocco (Service de réanimation Rénimation Rea1 (Hôpital Lariboisiere)) - Réanimation Rénimation Rea1 (Hôpital Lariboisiere) (1234)",
                 "start_date": "2020-04-11",
@@ -71,7 +78,14 @@
                   "last_edited_evolution": null,
                   "todo_list": "Hello",
                   "last_edited_todo_list": "2020-04-11T18:33:29.985190Z",
-                  "assigned_caregivers": []
+                  "assigned_caregivers": [],
+                  "hospitalisation_cause": "",
+                  "heart_failure": true,
+                  "bio_chemical_failure": true,
+                  "brain_failure": true,
+                  "lung_failure": true,
+                  "kidney_failure": true,
+                  "liver_failure": false
                 },
                 "bed_description": "1 - Lit 1 - Unité Unité Sirrocco (Service de réanimation Rénimation Rea1 (Hôpital Lariboisiere)) - Réanimation Rénimation Rea1 (Hôpital Lariboisiere) (1234)",
                 "start_date": "2020-04-08",
@@ -108,7 +122,14 @@
                   "last_edited_evolution": null,
                   "todo_list": "Hello",
                   "last_edited_todo_list": "2020-04-11T18:33:29.985190Z",
-                  "assigned_caregivers": []
+                  "assigned_caregivers": [],
+                  "hospitalisation_cause": "",
+                  "heart_failure": false,
+                  "bio_chemical_failure": false,
+                  "brain_failure": false,
+                  "lung_failure": false,
+                  "kidney_failure": false,
+                  "liver_failure": false
                 },
                 "bed_description": "1 - Lit 1 - Unité Unité Sirrocco (Service de réanimation Rénimation Rea1 (Hôpital Lariboisiere)) - Réanimation Rénimation Rea1 (Hôpital Lariboisiere) (1234)",
                 "start_date": "2020-04-01",

@@ -37,7 +37,17 @@
       "type": "number"
     },
     "2": {
-      "title": "Créatinémie",
+      "title": "Créatinémie (μmol/l)",
+      "type": "number"
+    },
+    "11": {
+      "title": "Epuration extrarénale",
+      "type": "string",
+      "enumNames": ["Hémofiltration", "Dialyse", "Hémodiafiltration", "Non"],
+      "enum": ["HémoF", "Dial", "HémodiaF", ""]
+    },
+    "10": {
+      "title": "Lactatémie (mmol/l)",
       "type": "number"
     },
     "6": {

@@ -12,26 +12,24 @@
 
 Mise à jour 15 Avril:
 
-- [ ] Infos de base patient (démographiques): Sortir la variable sévérité et ajouter date d'hospitalisation, motif d'hospitalisation (ex: "Détresse respiratoire aigu sur Covid")
-- [ ] Mise en forme page Patient: Remonter dépistage et infos démographique au meme niveau et totalité écran pour antécédents/allergies, TODOList en haut a droite
-- [ ] Ajout de deux lignes de mesures:
-    - EER: ["Hémofiltration", "Dialyse", "Hémodiafiltration"]
-    - Lactatémie: chiffre  (mmol/L) (après Creat/EER, avant Antibio)
-    - DV: boolean ave date de début, date de fin (affich nb d'heures)
-    - NAD: (mg/h)
-    - Créat: (umol/l)
-- [ ] Page _Patient_ :  ajout de la section "Photo du jour" comprenant le _Tableau de mesures_, un texte type _EditableText_ "Notes du jour" et une _CheckList_ "Défaillances", comprenant: [Foie, Rein, Cerveau, Poumon, Coeur, Biochimie] (avec Icones)
-- [ ] Ajouter _Defaillances" comme CheckList
-- [ ] Proposer directement la modification de _Défaillances_ suivant des critères sur les ajouts de _Mesures_ du jour-même
-    - EER -> Rein
-    - Lactatémie > 2.0 -> défaillance biochimie = métabolique
-    - P/F < 200 OU nad > 0.5 -> poumon
-- [ ] Affichage simplifié pour le mode garde
-- [ ] Page _Lits_ : afficher récap nbPatientsInstables et nbLitsDispo
-- [ ] Page _Lits_: enlever "depuis le", ajouter icones des défaillances, ajouter motif d'hospitalisation
-- [ ] _Tableau des mesures_: simplifier la modif
+- [x] Infos de base patient (démographiques): Sortir la variable sévérité et ajouter date d'hospitalisation, motif d'hospitalisation (ex: "Détresse respiratoire aigu sur Covid")
+- [x] Mise en forme page Patient: Remonter dépistage et infos démographique au meme niveau et totalité écran pour antécédents/allergies, TODOList en haut a droite
+- [x] Ajout de deux lignes de mesures:
+  - EER: ["Hémofiltration", "Dialyse", "Hémodiafiltration"]
+  - Lactatémie: chiffre (mmol/L) (après Creat/EER, avant Antibio)
+  - DV: boolean ave date de début, date de fin (affich nb d'heures)
+  - NAD: (mg/h)
+  - Créat: (umol/l)
+- [x] Page _Patient_ : ajout de la section "Photo du jour" comprenant le _Tableau de mesures_, un texte type _EditableText_ "Notes du jour" et une _CheckList_ "Défaillances", comprenant: [Foie, Rein, Cerveau, Poumon, Coeur, Biochimie] (avec Icones)
+- [x] Proposer directement la modification de _Défaillances_ suivant des critères sur les ajouts de _Mesures_ du jour-même
+  - EER -> Rein
+  - Lactatémie > 2.0 -> défaillance biochimie = métabolique
+  - P/F < 200 OU nad > 0.5 -> poumon
+- [x] Affichage simplifié pour le mode garde
+- [x] Page _Lits_ : afficher récap nbPatientsInstables et nbLitsDispo
+- [x] Page _Lits_: enlever "depuis le", ajouter icones des défaillances, ajouter motif d'hospitalisation
+- [x] _Tableau des mesures_: simplifier la modif
 - [ ] Bonus: Voir la doc FHIR (pour "certifier" l'app, et donc rassurer): www.hl7.org/fhir/resourcelist.html ou patient.html
-
 
 ### Frontend
 
@@ -62,7 +60,7 @@ Mise à jour 15 Avril:
 
 - [ ] v2: Structurer _Histoire maladie récente_ et _Evolution_ : date (avec affichage de _Jxx_ ou _J-xx_) et texte
 - [ ] v2: Rendre le tableau modulaire
-- [ ] V2: _Tableau des mesures_: pouvoir modifier sans Pop-up
+- [x] V2: _Tableau des mesures_: pouvoir modifier sans Pop-up
 
 ### Frontend
 

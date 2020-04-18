@@ -1,12 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
-import { frFR } from "@material-ui/core/locale";
+import { ThemeProvider } from "@material-ui/core/styles";
 import Routes from "./components/Routes";
-import ErrorTemplate from "./templates/Error";
-import useMultipleAxios from "./shared/hooks/useMultipleAxios";
-import { collectProperties } from "./shared/utils/table";
-import config, { global } from "./config";
 import "./design.scss";
 import theme from "./theme";
 
@@ -34,7 +29,7 @@ function Init(props) {
 
   return (
     <ThemeProvider theme={theme}>
-      <div style={{ backgroundColor: theme.palette.secondary.light }}>
+      <div style={{ backgroundColor: theme.palette.background.default }}>
         <Routes />
       </div>
     </ThemeProvider>

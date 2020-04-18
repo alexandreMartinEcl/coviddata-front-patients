@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Redirect } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import axios from "axios";
@@ -11,51 +11,58 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Button from "@material-ui/core/Button";
 import AddIcon from "@material-ui/icons/AddCircle";
 import RemoveIcon from "@material-ui/icons/RemoveCircle";
-import IconButton from '@material-ui/core/IconButton';
+import IconButton from "@material-ui/core/IconButton";
 
 // import TextField from '@material-ui/core/TextField';
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
-import { initSchema, cloneSchema, flat } from "../shared/utils/schema";
+import { cloneSchema, flat } from "../shared/utils/schema";
 import ReaTabs from "../components/ReaTabs";
 import Form from "../components/Form";
 
-import { getAge, dateToDayStep, dateToStr } from "../shared/utils/date";
+import { getAge, dateToDayStep } from "../shared/utils/date";
 import addPatientBasicFormSchema from "../json/schemaPatientBasic.json";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import Paper from "@material-ui/core/Paper";
-import { Typography, useMediaQuery } from "@material-ui/core";
+import { Typography, useMediaQuery, Grid } from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
 import { useTheme } from "@material-ui/styles";
-// import theme from "../theme";
+
+import {
+  HeartFailureIcon,
+  BioChemicalFailureIcon,
+  BrainFailureIcon,
+  LungFailureIcon,
+  KidneyFailureIcon,
+  LiverFailureIcon,
+} from "../shared/icons/index";
 
 const useStyles = makeStyles((theme) => ({
-  root: {},
+  root: {
+    backgroundColor: theme.palette.background.default,
+  },
   unitTitle: {
     marginRight: "100px",
   },
   bedItem: {
     height: "60px",
-    fontSize: 15,
+    backgroundColor: theme.palette.background.paper,
   },
   bedItemSeverityHigh: {
     height: "60px",
-    fontSize: "10rem",
     backgroundColor: theme.palette.danger.main,
   },
   bedItemSeverityMiddle: {
     height: "60px",
-    fontSize: 15,
     backgroundColor: theme.palette.danger.light,
   },
   bedIndex: {
-    width: "20%",
+    width: "5px",
   },
   patientDetails: {
     width: "40%",
@@ -70,13 +77,51 @@ const useStyles = makeStyles((theme) => ({
   secActionButton: {},
 }));
 
+const icons = {
+  heart_failure: (
+    <HeartFailureIcon
+      color="primary"
+      style={{ width: "30px", height: "100%" }}
+    />
+  ),
+  bio_chemical_failure: (
+    <BioChemicalFailureIcon
+      color="primary"
+      style={{ width: "30px", height: "100%" }}
+    />
+  ),
+  brain_failure: (
+    <BrainFailureIcon
+      color="primary"
+      style={{ width: "30px", height: "100%" }}
+    />
+  ),
+  lung_failure: (
+    <LungFailureIcon
+      color="primary"
+      style={{ width: "30px", height: "100%" }}
+    />
+  ),
+  kidney_failure: (
+    <KidneyFailureIcon
+      color="primary"
+      style={{ width: "30px", height: "100%" }}
+    />
+  ),
+  liver_failure: (
+    <LiverFailureIcon
+      color="primary"
+      style={{ width: "30px", height: "100%" }}
+    />
+  ),
+};
+
 function Beds({ data, reFetch, ...props }) {
   const classes = useStyles();
   const [page, setPage] = useState();
   const [openDialRea, setOpenDialRea] = React.useState(false);
   const [openDialPatient, setOpenDialPatient] = React.useState(false);
   const [openDialRemove, setOpenDialRemove] = React.useState(false);
-  const [currentRea, setCurrentRea] = React.useState();
   const [currentStay, setCurrentStay] = React.useState();
   const [currentBed, setCurrentBed] = React.useState();
   const [currentPatientName, setCurrentPatientName] = React.useState();
@@ -101,7 +146,7 @@ function Beds({ data, reFetch, ...props }) {
     },
   }).schema;
 
-  const bedStatusInterface = ["Utilisable", "Inutilisable"];
+  // const bedStatusInterface = ["Utilisable", "Inutilisable"];
   const severityInterface = ["A risque", "Instable", "Stable"];
 
   const getBedSeverityClass = (severity) => {
@@ -138,10 +183,6 @@ function Beds({ data, reFetch, ...props }) {
     } else {
       return;
     }
-  };
-
-  const tabHasChanged = (idRea) => {
-    setCurrentRea(idRea);
   };
 
   const handleAddReaOpen = () => {
@@ -185,6 +226,36 @@ function Beds({ data, reFetch, ...props }) {
     console.log(err);
     uiInform(`La requête a échoué: ${err.toString()}`, false);
     setLoadingCb(false);
+  };
+
+  const buildFailuresIconsGrids = (patient) => {
+    const toDisplay = [
+      "heart_failure",
+      "bio_chemical_failure",
+      "brain_failure",
+      "lung_failure",
+      "kidney_failure",
+      "liver_failure",
+    ].filter((k) => patient[k]);
+
+    return toDisplay.length ? (
+      <Grid
+        container
+        spacing={2}
+        justify="flex-start"
+        style={{ width: "120px" }}
+      >
+        {toDisplay.map((k) => {
+          return (
+            <Grid item xs={3}>
+              {icons[k]}
+            </Grid>
+          );
+        })}
+      </Grid>
+    ) : (
+      <></>
+    );
   };
 
   function onSubmitAddRea(initialData, setLoadingCb) {
@@ -317,6 +388,28 @@ function Beds({ data, reFetch, ...props }) {
     return `${firstName} ${lastName}`;
   };
 
+  const getReaListBeds = (rea) => {
+    return rea.units.reduce((a, b) => {
+      let t = a.beds.slice(0);
+      t.splice(-1, 0, ...b.beds);
+      return { beds: t };
+    }).beds;
+  };
+
+  const computeNbSeverePatients = (rea) => {
+    let beds = getReaListBeds(rea);
+    return beds.filter(
+      (b) =>
+        b.current_stay &&
+        severityInterface[b.current_stay.patient.severity] === "A risque"
+    ).length;
+  };
+
+  const computeNbAvailableBeds = (rea) => {
+    let beds = getReaListBeds(rea);
+    return beds.filter((b) => !b.current_stay).length;
+  };
+
   const bedItemList = (bed, unitName) => {
     const { unit_index, status, current_stay } = bed;
     const { patient, start_date } = current_stay ? current_stay : {};
@@ -326,7 +419,7 @@ function Beds({ data, reFetch, ...props }) {
       family_name,
       birth_date,
       severity,
-      nbDefaillance,
+      hospitalisation_cause,
       sex,
     } = patient ? patient : {};
     const idPatient = patient ? patient.id : {};
@@ -356,168 +449,170 @@ function Beds({ data, reFetch, ...props }) {
         />
         <ListItemText
           id={`otherDetails-${idPatient}`}
-          primary={`Depuis: ${dateToStr(start_date)} ${dateToDayStep(
-            start_date
-          )}`}
-          secondary={"Covid"}
+          primary={`${dateToDayStep(start_date)}`}
+          secondary={hospitalisation_cause}
           className={classes.otherDetails}
           primaryTypographyProps={{ variant: variantForBedItem }}
           secondaryTypographyProps={{ variant: variantForBedItem }}
         />
+        {buildFailuresIconsGrids(patient)}
         <ListItemSecondaryAction className={classes.listItemSecAction}>
           <IconButton
             onClick={() =>
               handleRemoveOpen(idStay, displayName(first_name, family_name))
             }
             color="primary"
-            >
-            <RemoveIcon
-              fontSize="large"
-            />
+          >
+            <RemoveIcon fontSize="large" />
           </IconButton>
         </ListItemSecondaryAction>
       </ListItem>
     ) : (
-        <ListItem
-          key={bed.id}
-          role={undefined}
-          button
-          divider
-          className={classes.bedItem}
-          onClick={() => handleAddPatientOpen(bed.id)}
-        >
-          <ListItemText
-            id={`bedIndex-${unit_index}`}
-            primary={unit_index}
-            className={classes.bedIndex}
-          />
-          <ListItemText
-            id={`dispo-${bed.id}`}
-            primary={Number(status) === 0 ? "Libre" : "Indisponible"}
-            className={classes.patientDetails}
-            primaryTypographyProps={{ variant: variantForBedItem }}
-          />
-          <ListItemText
-            id={`space-${bed.id}`}
-            primary={""}
-            className={classes.otherDetails}
-          />
-          <ListItemSecondaryAction className={classes.listItemSecAction}>
-            <IconButton
-              onClick={() => handleAddPatientOpen(bed.id)}
-              color="secondary"
-              >
-              <AddIcon
-                fontSize="large"
-              />
-            </IconButton>
-          </ListItemSecondaryAction>
-        </ListItem>
-      );
+      <ListItem
+        key={bed.id}
+        role={undefined}
+        button
+        divider
+        className={classes.bedItem}
+        onClick={() => handleAddPatientOpen(bed.id)}
+      >
+        <ListItemText
+          id={`bedIndex-${unit_index}`}
+          primary={unit_index}
+          className={classes.bedIndex}
+        />
+        <ListItemText
+          id={`dispo-${bed.id}`}
+          primary={Number(status) === 0 ? "Libre" : "Indisponible"}
+          className={classes.patientDetails}
+          primaryTypographyProps={{ variant: variantForBedItem }}
+        />
+        <ListItemText
+          id={`space-${bed.id}`}
+          primary={""}
+          className={classes.otherDetails}
+        />
+        <ListItemSecondaryAction className={classes.listItemSecAction}>
+          <IconButton
+            onClick={() => handleAddPatientOpen(bed.id)}
+            color="secondary"
+          >
+            <AddIcon fontSize="large" />
+          </IconButton>
+        </ListItemSecondaryAction>
+      </ListItem>
+    );
   };
 
   return page ? (
     <Redirect push to={page} />
   ) : (
-      <div>
-        <ReaTabs
-          labels={data.results.map((rea, id) =>
-            Object.assign({}, { title: rea.name, index: id })
-          )}
-          contents={data.results.map((rea, id) => {
-            return {
-              id: id,
-              toRender: (
-                <div>
-                  {rea.units.map((unit) => (
-                    <Paper>
-                      <Typography variant="h3" className={classes.unitTitle}>
-                        {unit.name}
-                      </Typography>
-                      <Divider />
-                      <List className={classes.root}>
-                        {unit.beds.map((bed) => bedItemList(bed, unit.name))}
-                      </List>
-                    </Paper>
-                  ))}
-                </div>
-              ),
-            };
-          })}
-          onTabChange={tabHasChanged}
-          onAddRea={handleAddReaOpen}
-        ></ReaTabs>
+    <div className={classes.root}>
+      <ReaTabs
+        labels={data.results.map((rea, id) =>
+          Object.assign({}, { title: rea.name, index: id })
+        )}
+        contents={data.results.map((rea, id) => {
+          return {
+            id: id,
+            toRender: (
+              <div>
+                <Paper>
+                  <Typography variant="h5">
+                    Cas à risques: {computeNbSeverePatients(rea)}
+                  </Typography>
+                  <Typography variant="h5">
+                    Lits libres: {computeNbAvailableBeds(rea)}
+                  </Typography>
+                </Paper>
+                {rea.units.map((unit) => (
+                  <Paper>
+                    <Typography variant="h3" className={classes.unitTitle}>
+                      {unit.name}
+                    </Typography>
+                    <Divider />
+                    <List className={classes.root}>
+                      {unit.beds.map((bed) => bedItemList(bed, unit.name))}
+                    </List>
+                  </Paper>
+                ))}
+              </div>
+            ),
+          };
+        })}
+        onAddRea={handleAddReaOpen}
+      ></ReaTabs>
 
-        <Dialog
-          open={openDialRea}
-          onClose={handleAddReaClose}
-          aria-labelledby="form-dialog-title"
-        >
-          <DialogContent>
-            <FormAddRea />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleAddReaClose} color="primary">
-              Annuler
-          </Button>
-          </DialogActions>
-        </Dialog>
-
-        <Dialog
-          open={openDialPatient}
-          onClose={handleAddPatientClose}
-          aria-labelledby="form-dialog-title"
-        >
-          <DialogTitle id="form-dialog-title">
-            Formulaire d'ajout de patient
-        </DialogTitle>
-          <DialogContent>
-            <FormAddPatient />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleAddPatientCancel} color="primary">
-              Annuler
-          </Button>
-          </DialogActions>
-        </Dialog>
-
-        <Dialog
-          open={openDialRemove}
-          onClose={handleRemoveClose}
-          aria-labelledby="form-dialog-title"
-        >
-          <DialogTitle id="form-dialog-title">Retrait d'un patient</DialogTitle>
-          <DialogContent>
-            Êtes-vous sûr de vouloir retirer le patient: {currentPatientName} ?
+      <Dialog
+        open={openDialRea}
+        onClose={handleAddReaClose}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogContent>
+          <FormAddRea />
         </DialogContent>
-          <DialogActions>
-            <Button onClick={handleRemoveClose} color="primary">
-              Annuler
+        <DialogActions>
+          <Button onClick={handleAddReaClose} color="primary">
+            Annuler
           </Button>
-            <Button onClick={onSubmitRemovePatient} color="primary">
-              Oui
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openDialPatient}
+        onClose={handleAddPatientClose}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title">
+          Formulaire d'ajout de patient
+        </DialogTitle>
+        <DialogContent>
+          <FormAddPatient />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleAddPatientCancel} color="primary">
+            Annuler
           </Button>
-            {loadingRemovePatient && (
-              <CircularProgress size={24} className={classes.buttonProgress} />
-            )}
-          </DialogActions>
-        </Dialog>
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={6000}
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openDialRemove}
+        onClose={handleRemoveClose}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title">Retrait d'un patient</DialogTitle>
+        <DialogContent>
+          Êtes-vous sûr de vouloir retirer le patient: {currentPatientName} ?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleRemoveClose} color="primary">
+            Annuler
+          </Button>
+          <Button onClick={onSubmitRemovePatient} color="primary">
+            Oui
+          </Button>
+          {loadingRemovePatient && (
+            <CircularProgress size={24} className={classes.buttonProgress} />
+          )}
+        </DialogActions>
+      </Dialog>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={closeSnackBar}
+      >
+        <MuiAlert
+          elevation={6}
+          variant="filled"
           onClose={closeSnackBar}
+          severity={snackbarSeverity}
         >
-          <MuiAlert
-            elevation={6}
-            variant="filled"
-            onClose={closeSnackBar}
-            severity={snackbarSeverity}
-          >
-            {infoMsg}
-          </MuiAlert>
-        </Snackbar>
-      </div>
-    );
+          {infoMsg}
+        </MuiAlert>
+      </Snackbar>
+    </div>
+  );
 }
 
 export default Beds;

@@ -1,19 +1,37 @@
-import React, { useState } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
+
 import PatientTemplate from "../templates/PatientLarib";
 import {
   PatientHeader,
   ListLabels,
   EditableText,
-  MeasuresTable,
   CheckList,
+  SimpleField,
+  DayPicture,
 } from "./Components";
-import { object } from "prop-types";
 
 function PatientLarib({ data = {}, reFetch }) {
   const { id } = useParams();
 
-  const [measuresId, setMeasuresId] = useState();
+  const [gardeMode, setGardeMode] = React.useState(
+    localStorage.getItem("gardeMode") || false
+  );
+
+  const updateMode = (mode) => {
+    switch (mode) {
+      case "garde":
+        localStorage.setItem("gardeMode", true);
+        setGardeMode(true);
+        break;
+      case "normal":
+        localStorage.setItem("gardeMode", false);
+        setGardeMode(false);
+        break;
+      default:
+        setGardeMode(false);
+    }
+  };
 
   const {
     first_name,
@@ -25,6 +43,7 @@ function PatientLarib({ data = {}, reFetch }) {
     sex,
     severity,
     current_unit_stay,
+    hospitalisation_cause,
   } = data;
   const dataPatientInfo = {
     first_name,
@@ -36,6 +55,7 @@ function PatientLarib({ data = {}, reFetch }) {
     sex,
     severity,
     current_unit_stay,
+    hospitalisation_cause,
   };
 
   const {
@@ -60,31 +80,44 @@ function PatientLarib({ data = {}, reFetch }) {
     detection_ERsecondMardi: "Détection ER second mardi",
   };
   let allergies;
-  if (data.allergies) {
-    try {
-      allergies = JSON.parse(data.allergies);
-    } catch (e) {
-      allergies = [];
+  const formatAllergies = (rawData) => {
+    if (rawData) {
+      try {
+        return JSON.parse(rawData);
+      } catch (e) {
+        return [];
+      }
+    } else {
+      return [];
     }
-  } else {
-    allergies = [];
-  }
+  };
+  allergies = formatAllergies(data.allergies);
+  let allergiesIsEmpty =
+    allergies.length === 0 ||
+    (allergies.length === 1 && allergies[0] === "Non indiqué");
 
   let antecedents;
-  if (data.antecedents) {
-    try {
-      // data.antecedents is like ' {"type": string} '
-      antecedents = JSON.parse(data.antecedents);
-      antecedents = Object.entries(antecedents).map((entry) => ({
-        title: entry[0],
-        value: entry[1],
-      }));
-    } catch (e) {
-      antecedents = [];
+  const formatAntecedents = (rawData) => {
+    if (rawData) {
+      try {
+        // rawData is like ' {"type": string} '
+        let temJson = JSON.parse(rawData);
+        return Object.entries(temJson).map((entry) => ({
+          title: entry[0],
+          value: entry[1],
+        }));
+      } catch (e) {
+        return [];
+      }
+    } else {
+      return [];
     }
-  } else {
-    antecedents = [];
-  }
+  };
+  antecedents = formatAntecedents(data.antecedents);
+  let antecedentsIsEmpty =
+    Object.keys(antecedents).length === 0 ||
+    (Object.keys(antecedents).length === 1 &&
+      Object.keys(antecedents)[0] === "NonIndique");
 
   const { recent_disease_history, last_edited_recent_disease_history } = data;
   const dataRecDisHist = {
@@ -98,21 +131,11 @@ function PatientLarib({ data = {}, reFetch }) {
   const { todo_list, last_edited_todo_list } = data;
   const dataTodo = { text: todo_list, lastEdited: last_edited_todo_list };
 
-  let dataMeasures;
-  const { status_measures, unit_stays } = data;
-  dataMeasures = { measures: status_measures };
+  const { unit_stays } = data;
   if (unit_stays && unit_stays.length) {
-    dataMeasures.hospitalisationDate = new Date(
+    dataPatientInfo.hospitalisationDate = new Date(
       Math.min(...unit_stays.map((s) => new Date(s.start_date)))
     );
-    dataMeasures.hospitalisationEndDate = unit_stays.filter(
-      (s) => !s.is_finished
-    ).length
-      ? null
-      : new Date(Math.max(...unit_stays.map((s) => new Date(s.end_date))));
-  }
-  if (data.weight_kg) {
-    dataMeasures.weight_kg = data.weight_kg;
   }
 
   const components = {
@@ -121,40 +144,66 @@ function PatientLarib({ data = {}, reFetch }) {
         patientId={id}
         data={dataPatientInfo}
         reFetch={reFetch}
+        readOnly={gardeMode}
         {...props}
       />
     ),
-    Depistages: (props) => (
-      <CheckList
+    SeverityField: (props) => (
+      <SimpleField
         patientId={id}
-        title="Dépistages"
-        data={{ checks: dataCheckList }}
-        dataInterface={depistageInterface}
+        data={data}
+        field="severity"
+        title="Gravité"
+        values={["A risque", "Instable", "Stable"]}
+        dataInterface={{ "A risque": 0, Instable: 1, Stable: 2 }}
+        readOnly={gardeMode}
         {...props}
       />
     ),
-    Antecedents: (props) => (
-      <ListLabels
-        patientId={id}
-        doubleInfoElseSingle={true}
-        field="antecedents"
-        title="Antécédents"
-        data={{ listItems: antecedents }}
-        reFetch={reFetch}
-        {...props}
-      />
-    ),
-    Allergies: (props) => (
-      <ListLabels
-        patientId={id}
-        doubleInfoElseSingle={false}
-        field="allergies"
-        title="Allergies"
-        data={{ listItems: allergies }}
-        reFetch={reFetch}
-        {...props}
-      />
-    ),
+    Depistages: gardeMode
+      ? (props) => <></>
+      : (props) => (
+          <CheckList
+            patientId={id}
+            title="Dépistages"
+            data={{ checks: dataCheckList }}
+            dataInterface={depistageInterface}
+            readOnly={gardeMode}
+            {...props}
+          />
+        ),
+    Antecedents:
+      gardeMode && antecedentsIsEmpty
+        ? (props) => <></>
+        : (props) => (
+            <ListLabels
+              patientId={id}
+              doubleInfoElseSingle={true}
+              field="antecedents"
+              title="Antécédents"
+              data={{ listItems: antecedents }}
+              formatData={formatAntecedents}
+              reFetch={reFetch}
+              readOnly={gardeMode}
+              {...props}
+            />
+          ),
+    Allergies:
+      gardeMode && allergiesIsEmpty
+        ? (props) => <></>
+        : (props) => (
+            <ListLabels
+              patientId={id}
+              doubleInfoElseSingle={false}
+              field="allergies"
+              title="Allergies"
+              data={{ listItems: allergies }}
+              formatData={formatAllergies}
+              reFetch={reFetch}
+              readOnly={gardeMode}
+              {...props}
+            />
+          ),
     RecentDiseaseHistory: (props) => (
       <EditableText
         patientId={id}
@@ -164,6 +213,7 @@ function PatientLarib({ data = {}, reFetch }) {
         data={dataRecDisHist}
         field="recent_disease_history"
         reFetch={reFetch}
+        readOnly={gardeMode}
         {...props}
       />
     ),
@@ -176,6 +226,7 @@ function PatientLarib({ data = {}, reFetch }) {
         data={dataEvo}
         field="evolution"
         reFetch={reFetch}
+        readOnly={gardeMode}
         {...props}
       />
     ),
@@ -188,22 +239,30 @@ function PatientLarib({ data = {}, reFetch }) {
         data={dataTodo}
         field="todo_list"
         reFetch={reFetch}
+        readOnly={gardeMode}
         {...props}
       />
     ),
-    MeasuresTable: (props) => (
-      <MeasuresTable
+    DayPicture: (props) => (
+      <DayPicture
         patientId={id}
-        setMeasures={setMeasuresId}
-        patient={id}
-        data={dataMeasures}
+        data={data}
         reFetch={reFetch}
+        readOnly={gardeMode}
         {...props}
       />
     ),
   };
 
-  return <PatientTemplate components={components} />;
+  return (
+    <React.Fragment>
+      <PatientTemplate
+        changeMode={updateMode}
+        gardeMode={gardeMode}
+        components={components}
+      />
+    </React.Fragment>
+  );
 }
 
 export default PatientLarib;

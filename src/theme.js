@@ -9,11 +9,13 @@ const theme = createMuiTheme(
         light: "#64BCB0",
         veryLight: "#CAF1EC",
         dark: "#026154",
+        contrastText: "#FFFFFF",
       },
       secondary: {
         main: "#2F5597",
         light: "#708EC2",
         dark: "#194180",
+        veryLight: "#9DB5DD",
         contrastText: "#f5f0f6",
       },
       danger: {
@@ -21,6 +23,10 @@ const theme = createMuiTheme(
         light: "#F98590",
         // main: "#C28416",
         // light: '#E4A636',
+      },
+      background: {
+        default: "#9DB5DD",
+        paper: "#FFFFFF",
       },
     },
     spacing: {

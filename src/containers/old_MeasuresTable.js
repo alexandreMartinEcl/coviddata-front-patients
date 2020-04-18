@@ -1,5 +1,6 @@
 import React from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
+import Button from "@material-ui/core/Button";
 import axios from "axios";
 import config from "../config";
 import * as _ from "lodash";
@@ -12,18 +13,16 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
+
 import { getFormatDateFromFirst, setToMidnight } from "../shared/utils/date";
-import {
-  Typography,
-  Tooltip,
-  TextField,
-  Select,
-  MenuItem,
-  IconButton,
-  CircularProgress,
-} from "@material-ui/core";
-import SaveIcon from "@material-ui/icons/Save";
-import CancelIcon from "@material-ui/icons/Cancel";
+import { Typography, Tooltip } from "@material-ui/core";
+import { cloneSchema, flat } from "../shared/utils/schema";
+import Form from "../components/Form";
+import addStatusMeasureFormSchema from "../json/schemaStatusMeasure.json";
 import statusMeasuresInterface from "../json/statusMeasures.json";
 
 import Snackbar from "@material-ui/core/Snackbar";
@@ -68,18 +67,6 @@ const configOrderRows = [
   statusMeasuresInterface.germes,
 ];
 
-const EditableCell = ({ statusType, ...props }) => {
-  return statusType.enum ? (
-    <Select margin="dense" {...props}>
-      {statusType.enum.map((v, i) => (
-        <MenuItem value={v}>{statusType.enumNames[i]}</MenuItem>
-      ))}
-    </Select>
-  ) : (
-    <TextField type={statusType.valueType} {...props} />
-  );
-};
-
 function MeasuresTable({
   patientId,
   data,
@@ -92,12 +79,11 @@ function MeasuresTable({
   ...props
 }) {
   const classes = useStyles();
+  const [openDialEdit, setOpenDialEdit] = React.useState(false);
   const [tableData, setTableData] = React.useState(forcedTableData);
-  const [savedTableData, setSavedTableData] = React.useState([]);
   const [selectedCol, setSelectedCol] = React.useState(null);
-  const [selectedRow, setSelectedRow] = React.useState(null);
+  const [formData, setFormData] = React.useState({});
 
-  const [loadingUpdate, setLoadingUpdate] = React.useState(false);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = React.useState(false);
   const [infoMsg, setInfoMsg] = React.useState("");
@@ -113,18 +99,7 @@ function MeasuresTable({
     setInfoMsg("");
   };
 
-  const handleKeyPress = (event) => {
-    switch (event.key) {
-      case "Enter":
-        submitEdit();
-        break;
-      case "Escape":
-        cancelEdit();
-        break;
-      default:
-        return;
-    }
-  };
+  const schemaAddMeasure = cloneSchema(addStatusMeasureFormSchema).schema;
 
   var firstMeasureDate;
   var lastMeasureDate;
@@ -152,7 +127,7 @@ function MeasuresTable({
 
   const buildRowTitles = () => {
     rowTitles = configOrderRows.map(
-      (status) => `${status.small} ${status.unit ? `(${status.unit})` : ""}`
+      (status) => `${status.small}${status.unit ? `(${status.unit})` : ""}`
     );
   };
 
@@ -186,8 +161,7 @@ function MeasuresTable({
       let row = configOrderRows.findIndex((i) => i === type);
       table[row][col] = m.value;
     });
-    setTableData(_.cloneDeep(table));
-    setSavedTableData(_.cloneDeep(table));
+    setTableData(table);
   };
 
   const measureAddedInfo = (configOrderRow, measureValue) => {
@@ -205,32 +179,43 @@ function MeasuresTable({
     }
   };
 
-  const makeColumnEditable = (row, col) => {
+  const closeEditDial = () => {
+    setOpenDialEdit(false);
+  };
+
+  const cancelEditDial = () => {
+    closeEditDial();
+  };
+
+  const openEditDial = (col) => {
     if (!readOnly) {
-      // let values = tableData.map((row) => row[col]);
+      let values = tableData.map((row) => row[col]);
       // change values only if we select another col than precedently
       if (col !== selectedCol) {
-        setTableData(_.cloneDeep(savedTableData));
-        setSelectedRow(row);
+        // setFormValues(values.slice(0));
+
+        let temData = {};
+        values.forEach((v, i) => {
+          let statusType = configOrderRows[i];
+          let dbStatusType = statusType.dbValue;
+          temData[dbStatusType] = isNaN(Number(v)) ? v : Number(v);
+        });
+        setFormData(_.cloneDeep(temData));
         setSelectedCol(col);
       }
+
+      setOpenDialEdit(true);
     }
   };
 
-  const cancelEdit = () => {
-    setSelectedCol(null);
-    setTableData(_.cloneDeep(savedTableData));
-  };
-
-  const onEditableCellChange = (row, col, valueType) => {
-    return (event) => {
-      if (valueType === "number" && event.target.value === "") {
-        return;
+  const cleanFormData = (fData) => {
+    let temData = _.cloneDeep(fData);
+    Object.entries(temData).forEach(([k, v]) => {
+      if (!v) {
+        delete temData[k];
       }
-      let temData = _.cloneDeep(tableData);
-      temData[row][col] = event.target.value;
-      setTableData(_.cloneDeepWith(temData));
-    };
+    });
+    return temData;
   };
 
   const updateTableData = (formData) => {
@@ -240,36 +225,26 @@ function MeasuresTable({
       let status = Object.values(statusMeasuresInterface).find(
         (s) => s.dbValue.toString() === statusDbValue
       );
+      console.log(e, status);
       if (status) {
+        console.log(e, status);
         let rwIndex = configOrderRows.findIndex((r) => r.id === status.id);
         temTableData[rwIndex][selectedCol] = value;
       }
     });
 
     setTableData(_.cloneDeep(temTableData));
-    setSavedTableData(_.cloneDeep(temTableData));
     updateParentTableData && updateParentTableData(temTableData);
   };
 
-  const submitEdit = () => {
-    setLoadingUpdate(true);
+  const onSubmitEdit = (initialData, setLoadingCb) => {
+    setLoadingCb(true);
+
+    const data = flat(initialData);
 
     const jsonData = [];
     let tDate = getDateFromColumn(selectedCol).toJSON().split("T")[0];
-
-    let values = tableData.map((row) => row[selectedCol]);
-    let savedValues = savedTableData.map((row) => row[selectedCol]);
-
-    let temData = {};
-    values.forEach((v, i) => {
-      if (v === savedValues[i]) return;
-
-      let statusType = configOrderRows[i];
-      let dbStatusType = statusType.dbValue;
-      temData[dbStatusType] = statusType.valueType === "number" ? Number(v) : v;
-    });
-
-    Object.entries(temData).forEach(([k, v]) => {
+    Object.entries(data).forEach(([k, v]) => {
       jsonData.push({
         created_date: tDate,
         id_patient: patientId,
@@ -277,11 +252,11 @@ function MeasuresTable({
         value: typeof v === "string" ? v.trim() : v,
       });
     });
-
     const url = config.path.measures;
 
     console.log("Sending to " + url);
     console.log(jsonData);
+
     axios({
       method: "post",
       url,
@@ -294,15 +269,15 @@ function MeasuresTable({
     })
       .then((res) => {
         console.log(res);
-        setLoadingUpdate(false);
+        setLoadingCb(false);
+        setOpenDialEdit(false);
         updateTableData(data);
         onMeasureSubmit(jsonData);
-        setSelectedCol(null);
       })
       .catch((err) => {
         console.log(err);
         uiInform && uiInform(`La requête a échoué: ${err.toString()}`, false);
-        setLoadingUpdate(false);
+        setLoadingCb(false);
       });
   };
 
@@ -315,38 +290,11 @@ function MeasuresTable({
         <TableHead>
           <TableRow>
             <StyledTableCell></StyledTableCell>
-            {columnTitles.map((c, j) => (
-              <StyledTableCell align="center">
+            {columnTitles.map((c, i) => (
+              <StyledTableCell align="center" onClick={() => openEditDial(i)}>
                 <Typography>{c.sum}</Typography>
                 <br />
                 <Typography>{c.full}</Typography>
-                {selectedCol === j ? (
-                  <React.Fragment>
-                    <br />
-                    <IconButton
-                      aria-label="save"
-                      color="primary"
-                      onClick={cancelEdit}
-                    >
-                      <CancelIcon fontSize="large" />
-                    </IconButton>
-                    <IconButton
-                      aria-label="save"
-                      color="primary"
-                      onClick={submitEdit}
-                    >
-                      <SaveIcon fontSize="large" />
-                    </IconButton>
-                    {loadingUpdate && (
-                      <CircularProgress
-                        size={24}
-                        className={classes.buttonProgress}
-                      />
-                    )}
-                  </React.Fragment>
-                ) : (
-                  <></>
-                )}
               </StyledTableCell>
             ))}
           </TableRow>
@@ -363,24 +311,9 @@ function MeasuresTable({
                   <Tooltip title={configOrderRows[i].fullName} arrow>
                     <StyledTableCell
                       align="center"
-                      onDoubleClick={() => makeColumnEditable(i, j)}
+                      onClick={() => openEditDial(j)}
                     >
-                      {selectedCol === j ? (
-                        <EditableCell
-                          statusType={configOrderRows[i]}
-                          autoFocus={i === selectedRow}
-                          value={`${cell}`}
-                          onChange={onEditableCellChange(
-                            i,
-                            j,
-                            configOrderRows[i].valueType
-                          )}
-                          defaultValue={null}
-                          onKeyDown={handleKeyPress}
-                        />
-                      ) : (
-                        `${cell} ${measureAddedInfo(configOrderRows[i], cell)}`
-                      )}
+                      {cell} {measureAddedInfo(configOrderRows[i], cell)}
                     </StyledTableCell>
                   </Tooltip>
                 ))}
@@ -388,6 +321,29 @@ function MeasuresTable({
             ))}
         </TableBody>
       </Table>
+      <Dialog
+        open={openDialEdit}
+        onClose={closeEditDial}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title">
+          Modification de la colonne J{selectedCol + 1}
+        </DialogTitle>
+        <DialogContent>
+          <Form
+            schema={schemaAddMeasure}
+            formData={cleanFormData(formData)}
+            onSubmit={(form, setLoadingCb) =>
+              onSubmitEdit(form.formData, setLoadingCb)
+            }
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={cancelEditDial} color="primary">
+            Annuler
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={snackbarOpen}

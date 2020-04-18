@@ -121,5 +121,15 @@
   "last_edited_evolution": null,
   "todo_list": "",
   "last_edited_todo_list": null,
-  "assigned_caregivers": []
+  "day_notice": "",
+  "last_edited_day_notice": null,
+  "assigned_caregivers": [],
+  "hospitalisation_cause": "Détresse respiratoire aigu sur Covid",
+
+  "heart_failure": false,
+  "bio_chemical_failure": true,
+  "brain_failure": false,
+  "lung_failure": true,
+  "kidney_failure": false,
+  "liver_failure": false
 }
