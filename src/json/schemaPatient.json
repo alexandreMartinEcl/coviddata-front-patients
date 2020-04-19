@@ -1,227 +1,227 @@
 {
-    "title": "Informations générales du patient",
-    "description": "Informations générales du patient",
-    "type": "object",
-    "required": [
-        "inclusion_nb",
-        "inclusion_code",
-        "age",
-        "size",
-        "weight",
-        "duree_symptomes",
-        "cardio_past",
-        "pneumo_past",
-        "chir_past",
-        "data_diagnostic",
-        "data_hospital",
-        "so2_admission",
-        "ta_systolic_admission",
-        "ta_diastolic_admission",
-        "hospitalization_type",
-        "traitement_en_cours"
-    ],
-    "properties": {
-        "id": { "type": "integer", "title": "id" },
-        "inclusion_nb": {
-            "type": "string",
-            "title": "Numéro d'inclusion"
+  "title": "Informations générales du patient",
+  "description": "Informations générales du patient",
+  "type": "object",
+  "required": [
+    "inclusion_nb",
+    "inclusion_code",
+    "age",
+    "size",
+    "weight",
+    "duree_symptomes",
+    "cardio_past",
+    "pneumo_past",
+    "chir_past",
+    "data_diagnostic",
+    "data_hospital",
+    "so2_admission",
+    "ta_systolic_admission",
+    "ta_diastolic_admission",
+    "hospitalization_type",
+    "traitement_en_cours"
+  ],
+  "properties": {
+    "id": { "type": "integer", "title": "id" },
+    "inclusion_nb": {
+      "type": "string",
+      "title": "Numéro d'inclusion"
+    },
+    "general": {
+      "title": "Données génerales",
+      "type": "object",
+      "properties": {
+        "inclusion_code": {
+          "type": "string",
+          "title": "Code centre inclusion"
         },
-        "general": {
-            "title": "Données génerales",
-            "type": "object",
-            "properties": {
-                "inclusion_code": {
-                    "type": "string",
-                    "title": "Code centre inclusion"
-                },
-                "age": {
-                    "type": "integer",
-                    "title": "Age",
-                    "python_minimum": 0,
-                    "python_maximum": 120
-                },
-                "size": {
-                    "type": "number",
-                    "title": "Taille",
-                    "python_minimum": 0,
-                    "python_maximum": 300
-                },
-                "weight": {
-                    "type": "number",
-                    "title": "Poids",
-                    "python_minimum": 0,
-                    "python_maximum": 150
-                },
-                "data_diagnostic": {
-                    "type": "string",
-                    "title": "Date de diagnostic positif",
-                    "format": "date"
-                },
-                "data_hospital": {
-                    "type": "string",
-                    "title": "Date d'admission en hospitalisation",
-                    "format": "date"
-                },
-                "data_reanimation": {
-                    "type": "string",
-                    "title": "Date d'admission en soins intensifs réanimation",
-                    "format": "date"
-                },
-                "hospitalization_type": {
-                    "type": "integer",
-                    "title": "Type d'hospitalisation",
-                    "enum": [0, 1, 2, 3, 4],
-                    "enumNames": [
-                        "ambulatoire",
-                        "conventionel",
-                        "soin intensif",
-                        "reanimation",
-                        "reanimation + ECMO"
-                    ]
-                }
-            }
+        "age": {
+          "type": "integer",
+          "title": "Age",
+          "python_minimum": 0,
+          "python_maximum": 120
         },
-        "bio": {
-            "title": "Données biologiques",
-            "type": "object",
-            "properties": {
-                "cardio_past": {
-                    "type": "integer",
-                    "title": "Antécédants cardiovasculaires",
-                    "enum": [0, 1, 2],
-                    "default": 0,
-                    "enumNames": [
-                        "Pas d'antécédant",
-                        "Antécédant mineur : souffle cardiaque",
-                        "Antécédant"
-                    ]
-                },
-                "pneumo_past": {
-                    "type": "integer",
-                    "title": "Antécédants pneumos",
-                    "enum": [0, 1],
-                    "default": 0,
-                    "enumNames": ["Pas d'antécédant", "Athme / BPCO"]
-                },
-                "chir_past": {
-                    "type": "integer",
-                    "title": "Antécédants chirurgicaux",
-                    "enum": [0, 1, 2, 3, 4, 5, 6],
-                    "default": 0,
-                    "enumNames": [
-                        "Pas d'antécédant",
-                        "Chirurgie thoracique",
-                        "Chirurgie abdominale",
-                        "Chirurgie orthopédique",
-                        "Chirurgie thoracique + abdominale",
-                        "Chirurgie thorcique + abdominale + orthopédique",
-                        "Chirurgie abdominale + orthopédique"
-                    ]
-                },
-                "cough": {
-                    "type": "boolean",
-                    "title": "Toux",
-                    "default": false
-                },
-                "fever": {
-                    "type": "boolean",
-                    "title": "Fièvre (> 37.8 C)",
-                    "default": false
-                },
-                "appetite_loss": {
-                    "type": "boolean",
-                    "title": "Perte d'apétit",
-                    "default": false
-                },
-                "dispnea": {
-                    "type": "boolean",
-                    "title": "Dyspnée",
-                    "default": false
-                },
-                "sore_throat": {
-                    "type": "boolean",
-                    "title": "Maux de gorge",
-                    "default": false
-                },
-                "diarrhea": {
-                    "type": "boolean",
-                    "title": "Diarrhée",
-                    "default": false
-                },
-                "nausea": {
-                    "type": "boolean",
-                    "title": "Nausée",
-                    "default": false
-                },
-                "vertigo": {
-                    "type": "boolean",
-                    "title": "Vertiges",
-                    "default": false
-                },
-                "headache": {
-                    "type": "boolean",
-                    "title": "Céphalées",
-                    "default": false
-                },
-                "vomit": {
-                    "type": "boolean",
-                    "title": "Vomissments",
-                    "default": false
-                },
-                "so2_admission": {
-                    "type": "number",
-                    "title": "Saturation 02 à l'admission",
-                    "python_minimum": 50,
-                    "python_maximum": 100
-                },
-                "ta_systolic_admission": {
-                    "type": "number",
-                    "title": "TA systolique à l'admission",
-                    "python_minimum": 80,
-                    "python_maximum": 220
-                },
-                "ta_diastolic_admission": {
-                    "type": "number",
-                    "title": "TA diastolique à l'admission",
-                    "python_minimum": 50,
-                    "python_maximum": 150
-                },
-                "tdm_ad_frosted_glass": {
-                    "type": "boolean",
-                    "title": "Verre dépoli",
-                    "default": false
-                },
-                "tdm_ad_atelectasie": {
-                    "type": "boolean",
-                    "title": "Atelectasie",
-                    "default": false
-                },
-                "tdm_ad_pleural_obstruction": {
-                    "type": "boolean",
-                    "title": "Epenchement pleural",
-                    "default": false
-                },
-                "surinfection_bacterienne": {
-                    "type": "boolean",
-                    "title": "Surinfection bactérienne",
-                    "default": false
-                },
-                "traitement_en_cours": {
-                    "type": "integer",
-                    "title": "Traitement en cours",
-                    "enum": [0, 1],
-                    "enumNames": ["Pas de traitement", "Antibiothérapie"]
-                },
-                "duree_symptomes": {
-                    "type": "integer",
-                    "title": "Durée des symptomes"
-                },
-                "image_test": {
-                    "type": "string",
-                    "title": "Test upload image",
-                    "format": "data-url"
-                }
-            }
+        "size": {
+          "type": "number",
+          "title": "Taille",
+          "python_minimum": 0,
+          "python_maximum": 300
+        },
+        "weight": {
+          "type": "number",
+          "title": "Poids",
+          "python_minimum": 0,
+          "python_maximum": 150
+        },
+        "data_diagnostic": {
+          "type": "string",
+          "title": "Date de diagnostic positif",
+          "format": "date"
+        },
+        "data_hospital": {
+          "type": "string",
+          "title": "Date d'admission en hospitalisation",
+          "format": "date"
+        },
+        "data_reanimation": {
+          "type": "string",
+          "title": "Date d'admission en soins intensifs réanimation",
+          "format": "date"
+        },
+        "hospitalization_type": {
+          "type": "integer",
+          "title": "Type d'hospitalisation",
+          "enum": [0, 1, 2, 3, 4],
+          "enumNames": [
+            "ambulatoire",
+            "conventionel",
+            "soin intensif",
+            "reanimation",
+            "reanimation + ECMO"
+          ]
         }
+      }
+    },
+    "bio": {
+      "title": "Données biologiques",
+      "type": "object",
+      "properties": {
+        "cardio_past": {
+          "type": "integer",
+          "title": "Antécédants cardiovasculaires",
+          "enum": [0, 1, 2],
+          "default": 0,
+          "enumNames": [
+            "Pas d'antécédant",
+            "Antécédant mineur : souffle cardiaque",
+            "Antécédant"
+          ]
+        },
+        "pneumo_past": {
+          "type": "integer",
+          "title": "Antécédants pneumos",
+          "enum": [0, 1],
+          "default": 0,
+          "enumNames": ["Pas d'antécédant", "Athme / BPCO"]
+        },
+        "chir_past": {
+          "type": "integer",
+          "title": "Antécédants chirurgicaux",
+          "enum": [0, 1, 2, 3, 4, 5, 6],
+          "default": 0,
+          "enumNames": [
+            "Pas d'antécédant",
+            "Chirurgie thoracique",
+            "Chirurgie abdominale",
+            "Chirurgie orthopédique",
+            "Chirurgie thoracique + abdominale",
+            "Chirurgie thorcique + abdominale + orthopédique",
+            "Chirurgie abdominale + orthopédique"
+          ]
+        },
+        "cough": {
+          "type": "boolean",
+          "title": "Toux",
+          "default": false
+        },
+        "fever": {
+          "type": "boolean",
+          "title": "Fièvre (> 37.8 C)",
+          "default": false
+        },
+        "appetite_loss": {
+          "type": "boolean",
+          "title": "Perte d'apétit",
+          "default": false
+        },
+        "dispnea": {
+          "type": "boolean",
+          "title": "Dyspnée",
+          "default": false
+        },
+        "sore_throat": {
+          "type": "boolean",
+          "title": "Maux de gorge",
+          "default": false
+        },
+        "diarrhea": {
+          "type": "boolean",
+          "title": "Diarrhée",
+          "default": false
+        },
+        "nausea": {
+          "type": "boolean",
+          "title": "Nausée",
+          "default": false
+        },
+        "vertigo": {
+          "type": "boolean",
+          "title": "Vertiges",
+          "default": false
+        },
+        "headache": {
+          "type": "boolean",
+          "title": "Céphalées",
+          "default": false
+        },
+        "vomit": {
+          "type": "boolean",
+          "title": "Vomissments",
+          "default": false
+        },
+        "so2_admission": {
+          "type": "number",
+          "title": "Saturation 02 à l'admission",
+          "python_minimum": 50,
+          "python_maximum": 100
+        },
+        "ta_systolic_admission": {
+          "type": "number",
+          "title": "TA systolique à l'admission",
+          "python_minimum": 80,
+          "python_maximum": 220
+        },
+        "ta_diastolic_admission": {
+          "type": "number",
+          "title": "TA diastolique à l'admission",
+          "python_minimum": 50,
+          "python_maximum": 150
+        },
+        "tdm_ad_frosted_glass": {
+          "type": "boolean",
+          "title": "Verre dépoli",
+          "default": false
+        },
+        "tdm_ad_atelectasie": {
+          "type": "boolean",
+          "title": "Atelectasie",
+          "default": false
+        },
+        "tdm_ad_pleural_obstruction": {
+          "type": "boolean",
+          "title": "Epenchement pleural",
+          "default": false
+        },
+        "surinfection_bacterienne": {
+          "type": "boolean",
+          "title": "Surinfection bactérienne",
+          "default": false
+        },
+        "traitement_en_cours": {
+          "type": "integer",
+          "title": "Traitement en cours",
+          "enum": [0, 1],
+          "enumNames": ["Pas de traitement", "Antibiothérapie"]
+        },
+        "duree_symptomes": {
+          "type": "integer",
+          "title": "Durée des symptomes"
+        },
+        "image_test": {
+          "type": "string",
+          "title": "Test upload image",
+          "format": "data-url"
+        }
+      }
     }
+  }
 }

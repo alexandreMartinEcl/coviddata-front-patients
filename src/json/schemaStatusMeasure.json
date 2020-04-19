@@ -1,0 +1,66 @@
+{
+  "title": "Mesures de l'état",
+  "type": "object",
+  "description": "Décrivez l'état du patient",
+  "properties": {
+    "4": {
+      "title": "Mode ventilatoire",
+      "type": "string",
+      "enumNames": [
+        "Ventilation Pressions Contrôlée",
+        "Ventilation Assistée Contrôlée",
+        "Ventilation Spontanée Aide Inspiratoire",
+        "Ventilation Spontanée",
+        "Optiflow",
+        "Ventilation en Pression Positive Continue"
+      ],
+      "enum": ["VPC", "VAC", "VSAI", "VS", "opti", "CPAP"]
+    },
+    "0": {
+      "title": "Ratio pression artérielle sur fraction inspirée",
+      "type": "number"
+    },
+    "3": {
+      "title": "Decubitus ventral",
+      "type": "number"
+    },
+    "5": {
+      "title": "Sédation",
+      "type": "string"
+    },
+    "9": {
+      "title": "Curares",
+      "type": "string"
+    },
+    "1": {
+      "title": "Noradrénaline (mg/h)",
+      "type": "number"
+    },
+    "2": {
+      "title": "Créatinémie (μmol/l)",
+      "type": "number"
+    },
+    "11": {
+      "title": "Epuration extrarénale",
+      "type": "string",
+      "enumNames": ["Hémofiltration", "Dialyse", "Hémodiafiltration", "Non"],
+      "enum": ["HémoF", "Dial", "HémodiaF", ""]
+    },
+    "10": {
+      "title": "Lactatémie (mmol/l)",
+      "type": "number"
+    },
+    "6": {
+      "title": "Antibiotiques",
+      "type": "string"
+    },
+    "7": {
+      "title": "Type de prélèvements",
+      "type": "string"
+    },
+    "8": {
+      "title": "Germes",
+      "type": "string"
+    }
+  }
+}

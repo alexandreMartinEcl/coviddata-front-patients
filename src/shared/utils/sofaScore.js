@@ -1,10 +1,10 @@
 function getPlace(value, array) {
-    let i = 0;
-    array.forEach(e => {
-        if (value < e) return;
-        i++;
-    });
-    return i - 1;
+  let i = 0;
+  array.forEach((e) => {
+    if (value < e) return;
+    i++;
+  });
+  return i - 1;
 }
 
 // function getPlaceInv(value, array) {
@@ -23,29 +23,29 @@ function getPlace(value, array) {
 // }
 
 export default function getSOFAfromData(data) {
-    return [
-        "score_respiration_pao2_fio2",
-        "score_coagulation",
-        "score_hepatique",
-        "score_cardiovasculaire",
-        "score_neurologique",
-        "score_renal_creatine",
-        "score_renal_diurese"
-    ]
-        .map(e => data[e])
-        .reduce((a, b) => a + b, 0);
+  return [
+    "score_respiration_pao2_fio2",
+    "score_coagulation",
+    "score_hepatique",
+    "score_cardiovasculaire",
+    "score_neurologique",
+    "score_renal_creatine",
+    "score_renal_diurese",
+  ]
+    .map((e) => data[e])
+    .reduce((a, b) => a + b, 0);
 }
 
 const colors = [
-    "#f31d24",
-    "#ff7b00",
-    "#f4bb00",
-    "#c0cc00",
-    "#5cb400",
-    "#00a3a3"
+  "#f31d24",
+  "#ff7b00",
+  "#f4bb00",
+  "#c0cc00",
+  "#5cb400",
+  "#00a3a3",
 ];
 
 export function color(sofaScore) {
-    const place = getPlace(sofaScore, [0, 6, 6.5, 7, 8, 9]);
-    return colors[place];
+  const place = getPlace(sofaScore, [0, 6, 6.5, 7, 8, 9]);
+  return colors[place];
 }
