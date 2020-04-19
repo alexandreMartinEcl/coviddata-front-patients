@@ -5,12 +5,15 @@ import { getType } from "./schema";
 import moment from "moment";
 
 export function collectProperties(obj, collect = {}, parent) {
-  function compact(properties, collect) {
-    for (const field in properties) {
-      const value = properties[field];
-      if (value.type === "object") collectProperties(value, collect, field);
-      else if (parent) collect[field] = { ...value, parent };
-      else collect[field] = value;
+    function compact(properties, collect) {
+        for (const field in properties) {
+            const value = properties[field];
+            if (value.type === "object")
+                collectProperties(value, collect, field);
+            else if (parent) value.parent = parent;
+            collect[field] = value;
+        }
+        return collect;
     }
     return collect;
   }
