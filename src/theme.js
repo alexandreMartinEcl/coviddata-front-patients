@@ -10,6 +10,7 @@ const theme = createMuiTheme(
         veryLight: "#CAF1EC",
         dark: "#026154",
         contrastText: "#FFFFFF",
+        text: "#FFFFFF",
       },
       secondary: {
         main: "#2F5597",
@@ -17,6 +18,7 @@ const theme = createMuiTheme(
         dark: "#194180",
         veryLight: "#9DB5DD",
         contrastText: "#f5f0f6",
+        text: "#f5f0f6",
       },
       danger: {
         main: "#DC3444",
@@ -29,9 +31,7 @@ const theme = createMuiTheme(
         paper: "#FFFFFF",
       },
     },
-    spacing: {
-      row: 1,
-    },
+    spacing: 1,
     overrides: {
       MuiTypography: {
         body2: {

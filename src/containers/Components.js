@@ -6,7 +6,7 @@ import PatientLaribA from "../containers/PatientLarib";
 import PatientsTableA from "../containers/PatientsTable";
 import PatientContentA from "../containers/PatientContent";
 import PatientHeaderA from "../containers/PatientHeader";
-import SimpleFieldA from "../components/patient/SimpleField";
+import SimpleSelectA from "../components/patient/SimpleSelect";
 import CheckListA from "../components/patient/CheckList";
 import PatientEditA from "../containers/PatientEdit";
 import VentilationsTableA from "../containers/VentilationsTable";
@@ -33,7 +33,7 @@ function withData(Component, props, url, extraConfig = {}) {
 
 export const PatientB = PatientA;
 
-export const SimpleField = SimpleFieldA;
+export const SimpleSelect = SimpleSelectA;
 
 export const CheckList = CheckListA;
 

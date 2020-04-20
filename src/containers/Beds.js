@@ -29,8 +29,13 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import Paper from "@material-ui/core/Paper";
-import { Typography, useMediaQuery, Grid } from "@material-ui/core";
-import Divider from "@material-ui/core/Divider";
+import {
+  Typography,
+  useMediaQuery,
+  Grid,
+  ListSubheader,
+  Box,
+} from "@material-ui/core";
 import { useTheme } from "@material-ui/styles";
 
 import {
@@ -40,6 +45,8 @@ import {
   LungFailureIcon,
   KidneyFailureIcon,
   LiverFailureIcon,
+  BedIcon,
+  ToWatchIcon,
 } from "../shared/icons/index";
 
 const useStyles = makeStyles((theme) => ({
@@ -113,6 +120,10 @@ const icons = {
       color="primary"
       style={{ width: "30px", height: "100%" }}
     />
+  ),
+  bed: <BedIcon color="secondary" style={{ width: "30px", height: "100%" }} />,
+  toWatch: (
+    <ToWatchIcon color="secondary" style={{ width: "30px", height: "100%" }} />
   ),
 };
 
@@ -222,9 +233,14 @@ function Beds({ data, reFetch, ...props }) {
     setOpenDialRemove(false);
   };
 
-  const manageError = (err, setLoadingCb) => {
-    console.log(err);
-    uiInform(`La requête a échoué: ${err.toString()}`, false);
+  const manageError = (errResp, setLoadingCb) => {
+    console.log(errResp);
+    uiInform(
+      `La requête a échoué: ${
+        errResp.data.msg ? errResp.data.msg : errResp.toString()
+      }`,
+      false
+    );
     setLoadingCb(false);
   };
 
@@ -247,7 +263,7 @@ function Beds({ data, reFetch, ...props }) {
       >
         {toDisplay.map((k) => {
           return (
-            <Grid item xs={3}>
+            <Grid item xs={4}>
               {icons[k]}
             </Grid>
           );
@@ -288,7 +304,7 @@ function Beds({ data, reFetch, ...props }) {
         }
       })
       .catch((err) => {
-        manageError(err, setLoadingCb);
+        manageError(err.response, setLoadingCb);
       });
   }
 
@@ -332,7 +348,7 @@ function Beds({ data, reFetch, ...props }) {
         setPage(`/patient/${res.data.id}`);
       })
       .catch((err) => {
-        manageError(err, setLoadingCb);
+        manageError(err.response, setLoadingCb);
       });
   }
 
@@ -360,7 +376,7 @@ function Beds({ data, reFetch, ...props }) {
         reFetch();
       })
       .catch((err) => {
-        manageError(err, setLoadingRemovePatient);
+        manageError(err.response, setLoadingRemovePatient);
       });
   }
 
@@ -427,7 +443,7 @@ function Beds({ data, reFetch, ...props }) {
       <ListItem
         key={bed.id}
         button
-        divider
+        // divider
         className={getBedSeverityClass(severity)}
         onClick={() => handlePatientClick(idPatient)}
       >
@@ -472,7 +488,7 @@ function Beds({ data, reFetch, ...props }) {
         key={bed.id}
         role={undefined}
         button
-        divider
+        // divider
         className={classes.bedItem}
         onClick={() => handleAddPatientOpen(bed.id)}
       >
@@ -516,27 +532,51 @@ function Beds({ data, reFetch, ...props }) {
           return {
             id: id,
             toRender: (
-              <div>
-                <Paper>
-                  <Typography variant="h5">
-                    Cas à risques: {computeNbSeverePatients(rea)}
-                  </Typography>
-                  <Typography variant="h5">
-                    Lits libres: {computeNbAvailableBeds(rea)}
-                  </Typography>
-                </Paper>
+              <React.Fragment>
+                <Box
+                  border={1}
+                  style={{
+                    padding: "1px",
+                    marginLeft: "10px",
+                    width: "40%",
+                    borderColor: th.palette.primary.light,
+                    borderRadius: "5px",
+                    backgroundColor: "white",
+                  }}
+                >
+                  <Grid container alignItems="center" justify="space-around">
+                    <Grid item xs={6}>
+                      <Typography variant="body1">
+                        {icons.toWatch} Cas à risques:{" "}
+                        {computeNbSeverePatients(rea)}
+                      </Typography>
+                    </Grid>
+
+                    <Grid item xs={6}>
+                      <Typography variant="body1">
+                        {icons.bed} Lits libres: {computeNbAvailableBeds(rea)}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Box>
+
                 {rea.units.map((unit) => (
                   <Paper>
-                    <Typography variant="h3" className={classes.unitTitle}>
-                      {unit.name}
-                    </Typography>
-                    <Divider />
-                    <List className={classes.root}>
+                    <List
+                      subheader={
+                        <ListSubheader
+                          component="div"
+                          id="nested-list-subheader"
+                        >
+                          {unit.name}
+                        </ListSubheader>
+                      }
+                    >
                       {unit.beds.map((bed) => bedItemList(bed, unit.name))}
                     </List>
                   </Paper>
                 ))}
-              </div>
+              </React.Fragment>
             ),
           };
         })}

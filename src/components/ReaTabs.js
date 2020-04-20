@@ -57,7 +57,7 @@ export default function ReaTabs({ labels, contents, onTabChange, onAddRea }) {
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
-    onTabChange(labels[newValue].title);
+    onTabChange && onTabChange(labels[newValue].title);
   };
 
   const handleAddRea = () => {
@@ -86,7 +86,7 @@ export default function ReaTabs({ labels, contents, onTabChange, onAddRea }) {
             startIcon={<AddIcon />}
             onClick={handleAddRea}
           >
-            Ajouter un service de réanimation
+            Nouveau
           </Button>
         </Tabs>
       </AppBar>

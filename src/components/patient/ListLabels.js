@@ -17,24 +17,25 @@ import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import * as _ from "lodash";
-import {
-  Card,
-  CardContent,
-  useMediaQuery,
-} from "@material-ui/core";
+import { useMediaQuery, Box } from "@material-ui/core";
 
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme) => ({
   label: {
-    height: "30%",
-    paddingTop: 1,
-    paddingBottom: 1,
-    // backgroundColor: theme.palette.primary.light
+    backgroundColor: "white",
+    textAlign: "center",
+    margin: "5px",
+    borderRadius: "10px",
   },
   labelTitle: {
-    verticalAlign: "center",
+    backgroundColor: theme.palette.primary.light,
+    textColor: "white",
+    textAlign: "center",
+    borderRadius: "15px",
+    verticalAlign: "middle",
+    height: "40px",
   },
 }));
 
@@ -178,38 +179,36 @@ export default function ListLabels({
 
   const labelComponent = (item) => {
     return doubleInfoElseSingle ? (
-      <Grid
-        item
-        container
-        xs={6}
-        sm={4}
-        spacing={1}
-        justify={"flex-start"}
-        className={classes.label}
-      >
-        <Grid item>
-          <Typography variant={variantLabelContent}>
-            {item ? item.title : "Aucun"}:{" "}
-          </Typography>
-        </Grid>
-        <Grid item xs={6} sm={6}>
-          <Typography variant={variantLabelContent}>
-            {item ? item.value : ""}
-          </Typography>
-        </Grid>
+      <Grid item xs={6} sm={4} key={item ? item.title : "Aucun"}>
+        <Box className={classes.label}>
+          <Grid container spacing={1} justify={"center"} alignContent="center">
+            <Grid item>
+              <Typography variant={variantLabelContent}>
+                {item ? item.title : "Aucun"}:{" "}
+              </Typography>
+            </Grid>
+            <Grid item xs={6} sm={6}>
+              <Typography variant={variantLabelContent}>
+                {item ? item.value : ""}
+              </Typography>
+            </Grid>
+          </Grid>
+        </Box>
       </Grid>
     ) : (
-      <Grid item xs={6} sm={4} className={classes.label}>
-        <Typography variant={variantLabelContent}>
-          {item ? item : "Aucun"}
-        </Typography>
+      <Grid item xs={6} sm={4} key={item ? item : "Aucun"}>
+        <Box className={classes.label}>
+          <Typography variant={variantLabelContent}>
+            {item ? item : "Aucun"}
+          </Typography>
+        </Box>
       </Grid>
     );
   };
 
   const editableLabelComponent = (item, i) => {
     return doubleInfoElseSingle ? (
-      <Grid>
+      <Grid key={i}>
         <TextField
           id={buildId("title", i)}
           onChange={onChangeLabels}
@@ -235,7 +234,7 @@ export default function ListLabels({
         <Divider vertical />
       </Grid>
     ) : (
-      <Grid>
+      <Grid key={i}>
         <TextField
           id={buildId("item", i)}
           onChange={onChangeLabels}
@@ -258,8 +257,17 @@ export default function ListLabels({
   };
 
   return (
-    <Card>
-      <CardContent>
+    <React.Fragment>
+      <Box
+        border={1}
+        style={{
+          padding: "2px",
+          margin: "5px",
+          borderWidth: "1px",
+          borderColor: "white",
+          borderRadius: "15px",
+        }}
+      >
         <Grid
           container
           spacing={2}
@@ -268,45 +276,39 @@ export default function ListLabels({
           alignItems={"center"}
         >
           <Grid item xs={12} sm={2}>
-            <Typography className={classes.labelTitle}>{title}</Typography>
+            <Box className={classes.labelTitle}>
+              <Typography variant="h5">{title}</Typography>
+            </Box>
           </Grid>
           <Grid
             item
             container
             xs={12}
             sm={10}
-            spacing={2}
+            spacing={1}
             justify={"flex-start"}
             alignItems={"center"}
+            style={{ outlineWidth: "thin", outlineColor: "white" }}
           >
             {dataCopy.length ? dataCopy.map(labelComponent) : labelComponent()}
             <Grid item xs={12} sm={4}>
               {readOnly ? (
                 <></>
               ) : (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  className={classes.button}
-                  startIcon={<AddIcon />}
-                  onClick={openEditDial}
-                >
-                  Modifier
-                </Button>
+                <Box style={{ textAlign: "center", margin: "5px" }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    className={classes.button}
+                    startIcon={<AddIcon />}
+                    onClick={openEditDial}
+                  >
+                    Modifier
+                  </Button>
+                </Box>
               )}
             </Grid>
           </Grid>
-          {/* <CardActions>
-        <Button
-            variant="contained"
-            color="secondary"
-            className={classes.button}
-            startIcon={<AddIcon />}
-            onClick={openEditDial}
-          >
-            Modifier
-            </Button>
-        </CardActions> */}
 
           <Dialog
             open={editDial}
@@ -344,7 +346,7 @@ export default function ListLabels({
             </DialogActions>
           </Dialog>
         </Grid>
-      </CardContent>
+      </Box>
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
@@ -359,6 +361,6 @@ export default function ListLabels({
           {infoMsg}
         </MuiAlert>
       </Snackbar>
-    </Card>
+    </React.Fragment>
   );
 }

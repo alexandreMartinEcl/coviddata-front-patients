@@ -1,13 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Grid, Paper } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
-
-// const useStyles = makeStyles((theme) => ({
-//   root: {
-//     width: "100%",
-//   },
-// }));
 
 export default function PatientTemplate({ changeMode, gardeMode, components }) {
   const {
@@ -21,7 +15,6 @@ export default function PatientTemplate({ changeMode, gardeMode, components }) {
     TodoList,
     DayPicture,
   } = components;
-  // const classes = useStyles();
 
   let modeButtonText = gardeMode ? "Mode normal" : "Mode garde";
   let modeButtonColor = gardeMode ? "primary" : "secondary";
@@ -29,14 +22,21 @@ export default function PatientTemplate({ changeMode, gardeMode, components }) {
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12} sm={12} container justify="space-between">
-        <Grid xs={2} sm={2} item>
+      <Grid
+        item
+        xs={12}
+        sm={12}
+        container
+        justify="space-around"
+        alignItems="center"
+      >
+        <Grid xs={3} sm={3} item>
           <Link to="/">
             <Button variant="contained">Retour</Button>
           </Link>
         </Grid>
 
-        <Grid xs={2} sm={2} item>
+        <Grid xs={3} sm={3} item>
           <Button
             variant="contained"
             color={modeButtonColor}
@@ -46,31 +46,39 @@ export default function PatientTemplate({ changeMode, gardeMode, components }) {
           </Button>
         </Grid>
 
-        <Grid xs={2} sm={2} item>
+        <Grid xs={3} sm={3} item>
           <TodoList />
         </Grid>
       </Grid>
 
-      <Grid container item xs={12} sm={12} spacing={3} alignItems="center">
+      <Grid
+        container
+        item
+        xs={12}
+        sm={12}
+        spacing={1}
+        alignItems="flex-start"
+        justify="center"
+      >
         <Grid
           item
           xs={12}
-          sm={gardeMode ? 12 : 9}
+          sm={gardeMode ? 12 : 8}
           container
-          justify="flew-start"
+          justify="flex-start"
         >
-          <Grid item xs={9} sm={12}>
+          <Grid item xs={12} sm={12}>
             <PatientInfos />
-          </Grid>
-          <Grid item xs={3} sm={2}>
-            <Paper>
-              <SeverityField />
-            </Paper>
           </Grid>
         </Grid>
 
-        <Grid item xs={12} sm={3}>
-          <Depistages />
+        <Grid item xs={12} sm={4} container justify="center">
+          <Grid item xs={12} sm={12}>
+            <Depistages />
+          </Grid>
+          <Grid item xs={8} sm={12}>
+            <SeverityField />
+          </Grid>
         </Grid>
       </Grid>
 
@@ -86,38 +94,16 @@ export default function PatientTemplate({ changeMode, gardeMode, components }) {
       </Grid>
 
       <Grid item container xs={12} sm={12} spacing={2} justify="space-around">
-        <Grid xs={12} sm={9} container item>
-          <Grid xs={12} sm={12} item>
-            <Paper>
-              <RecentDiseaseHistory />
-            </Paper>
-          </Grid>
-          <Grid xs={12} sm={12} item>
-            <Paper>
-              <Evolution />
-            </Paper>
-          </Grid>
+        <Grid xs={12} sm={12} item>
+          <RecentDiseaseHistory />
+        </Grid>
+        <Grid xs={12} sm={12} item>
+          <Evolution />
         </Grid>
       </Grid>
 
       <Grid item xs={12} sm={12}>
-        <Paper>
-          <DayPicture />
-          {/* <Typography variant="h3">Photo du jour</Typography>
-          <Grid container spacing={2} justify="space-around">
-            <Grid xs={12} sm={8} item>
-              <DayNotice />
-            </Grid>
-
-            <Grid xs={12} sm={4} item>
-              <Failures />
-            </Grid>
-
-            <Grid xs={12} sm={12} item>
-              <MeasuresTable />
-            </Grid>
-          </Grid> */}
-        </Paper>
+        <DayPicture />
       </Grid>
     </Grid>
   );

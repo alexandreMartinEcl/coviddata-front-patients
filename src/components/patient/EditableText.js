@@ -17,13 +17,16 @@ import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelActions from "@material-ui/core/ExpansionPanelActions";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import Divider from "@material-ui/core/Divider";
+import SaveIcon from "@material-ui/icons/Save";
+import HistoryIcon from "@material-ui/icons/History";
+import CancelIcon from "@material-ui/icons/Cancel";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
 import { dateTimeToStr } from "../../shared/utils/date";
 
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
+import { Box } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -31,25 +34,8 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     backgroundColor: theme.palette.background.paper,
   },
-  heading: {
-    fontSize: theme.typography.pxToRem(15),
-  },
-  details: {
-    alignItems: "center",
-  },
   column: {
     flexBasis: "33.33%",
-  },
-  helper: {
-    borderLeft: `2px solid ${theme.palette.divider}`,
-    padding: theme.spacing(1, 2),
-  },
-  link: {
-    color: theme.palette.primary.main,
-    textDecoration: "none",
-    "&:hover": {
-      textDecoration: "underline",
-    },
   },
 }));
 
@@ -109,7 +95,7 @@ export default function EditableText({
   const updateState = (resData) => {
     setSavedText(resData[field]);
     setText(resData[field]);
-    setLastEdited(resData[`last_edited_${field}`]);
+    setLastEdited(dateTimeToStr(resData[`last_edited_${field}`]));
   };
 
   const onSubmitTodoList = () => {
@@ -145,47 +131,63 @@ export default function EditableText({
 
   return extensibleElseDial ? (
     <React.Fragment>
-      <ExpansionPanel defaultExpanded={false}>
-        <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1c-content"
-          id="panel1c-header"
-        >
-          <Typography className={classes.heading}>{title}</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails className={classes.details}>
-          <TextField
-            margin="dense"
-            id="todo_text"
-            //            label={label}
-            type="text"
-            value={text}
-            fullWidth
-            onChange={onChangeText}
-            disabled={readOnly}
-            multiline
-          />
-        </ExpansionPanelDetails>
-        <Divider />
-        {readOnly ? (
-          <></>
-        ) : (
+      <Box style={{ margin: "1px", padding: "2px" }}>
+        <ExpansionPanel defaultExpanded={false}>
+          <ExpansionPanelSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1c-content"
+            id="panel1c-header"
+            style={{ paddingLeft: "10px", paddingRight: "10px" }}
+          >
+            <Typography>{title}</Typography>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails>
+            <TextField
+              margin="dense"
+              id="todo_text"
+              //            label={label}
+              type="text"
+              value={text}
+              fullWidth
+              onChange={onChangeText}
+              disabled={readOnly}
+              multiline
+              variant="outlined"
+            />
+          </ExpansionPanelDetails>
           <ExpansionPanelActions>
             <div className={classes.column}>
-              <Typography className={classes.heading}>
-                Dernière mise à jour: <br />
-                {lastEdited || data.lastEdited}
+              <Typography>
+                Mise à jour: {lastEdited || data.lastEdited}
               </Typography>
             </div>
-            <Button size="small" onClick={cancelEditDial}>
-              Rétablir
-            </Button>
-            <Button size="small" color="primary" onClick={onSubmitTodoList}>
-              Enregistrer
-            </Button>
+            {readOnly ? (
+              <></>
+            ) : (
+              <React.Fragment>
+                <Button
+                  size="small"
+                  color="primary"
+                  variant="outlined"
+                  startIcon={<HistoryIcon />}
+                  onClick={cancelEditDial}
+                >
+                  Rétablir
+                </Button>
+                <Button
+                  size="small"
+                  color="primary"
+                  variant="contained"
+                  startIcon={<SaveIcon />}
+                  onClick={onSubmitTodoList}
+                >
+                  Enregistrer
+                </Button>
+              </React.Fragment>
+            )}
           </ExpansionPanelActions>
-        )}
-      </ExpansionPanel>
+        </ExpansionPanel>
+      </Box>
     </React.Fragment>
   ) : (
     <React.Fragment>
@@ -214,17 +216,28 @@ export default function EditableText({
             onChange={onChangeText}
             disabled={readOnly}
             multiline
+            variant="outlined"
           />
-          Dernière mise à jour: {lastEdited || data.lastEdited}
+          Mise à jour: {lastEdited || data.lastEdited}
         </DialogContent>
         {readOnly ? (
           <></>
         ) : (
           <DialogActions>
-            <Button onClick={cancelEditDial} color="primary">
+            <Button
+              onClick={cancelEditDial}
+              color="primary"
+              variant="outlined"
+              startIcon={<CancelIcon />}
+            >
               Annuler
             </Button>
-            <Button onClick={onSubmitTodoList} color="primary">
+            <Button
+              onClick={onSubmitTodoList}
+              color="primary"
+              variant="contained"
+              startIcon={<SaveIcon />}
+            >
               Enregistrer
             </Button>
             {loadingUpdateText && (

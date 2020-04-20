@@ -316,7 +316,7 @@ function MeasuresTable({
           <TableRow>
             <StyledTableCell></StyledTableCell>
             {columnTitles.map((c, j) => (
-              <StyledTableCell align="center">
+              <StyledTableCell key={`${c.sum}`} align="center">
                 <Typography>{c.sum}</Typography>
                 <br />
                 <Typography>{c.full}</Typography>
@@ -354,16 +354,21 @@ function MeasuresTable({
         <TableBody>
           {!tableData ||
             tableData.map((row, i) => (
-              <StyledTableRow key={configOrderRows[i].small}>
+              <StyledTableRow key={`${rowTitles[i]}`}>
                 <StyledTableCell component="th" scope="row">
                   {rowTitles[i]}
                 </StyledTableCell>
 
                 {row.map((cell, j) => (
-                  <Tooltip title={configOrderRows[i].fullName} arrow>
+                  <Tooltip
+                    key={`${rowTitles[i]}-${j}`}
+                    title={configOrderRows[i].fullName}
+                    arrow
+                  >
                     <StyledTableCell
                       align="center"
                       onDoubleClick={() => makeColumnEditable(i, j)}
+                      key={`${rowTitles[i]}-${j}`}
                     >
                       {selectedCol === j ? (
                         <EditableCell
@@ -375,7 +380,6 @@ function MeasuresTable({
                             j,
                             configOrderRows[i].valueType
                           )}
-                          defaultValue={null}
                           onKeyDown={handleKeyPress}
                         />
                       ) : (

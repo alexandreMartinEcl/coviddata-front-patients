@@ -21,7 +21,26 @@ import {
   DialogTitle,
   DialogContent,
   Dialog,
+  Box,
+  makeStyles,
 } from "@material-ui/core";
+
+const useStyles = makeStyles((theme) => ({
+  label: {
+    backgroundColor: "white",
+    textAlign: "center",
+    margin: "5px",
+    borderRadius: "10px",
+  },
+  title: {
+    backgroundColor: theme.palette.primary.light,
+    textColor: "white",
+    textAlign: "center",
+    borderRadius: "5px",
+    verticalAlign: "middle",
+    height: "40px",
+  },
+}));
 
 const failureProposerCriteria = [
   {
@@ -75,6 +94,7 @@ const compare = (relation, valLeft, valRight) => {
 
 function DayPicture({ data = {}, reFetch, patientId, readOnly }) {
   const { id } = useParams();
+  const classes = useStyles();
 
   const [childTableData, setChildTableData] = useState(null);
 
@@ -153,20 +173,20 @@ function DayPicture({ data = {}, reFetch, patientId, readOnly }) {
   };
   const failuresIcons = {
     heart_failure: (
-      <HeartFailureIcon style={{ width: "50px", height: "50px" }} />
+      <HeartFailureIcon style={{ width: "40px", height: "40px" }} />
     ),
     bio_chemical_failure: (
-      <BioChemicalFailureIcon style={{ width: "50px", height: "50px" }} />
+      <BioChemicalFailureIcon style={{ width: "40px", height: "40px" }} />
     ),
     brain_failure: (
-      <BrainFailureIcon style={{ width: "50px", height: "50px" }} />
+      <BrainFailureIcon style={{ width: "40px", height: "40px" }} />
     ),
-    lung_failure: <LungFailureIcon style={{ width: "50px", height: "50px" }} />,
+    lung_failure: <LungFailureIcon style={{ width: "40px", height: "40px" }} />,
     kidney_failure: (
-      <KidneyFailureIcon style={{ width: "50px", height: "50px" }} />
+      <KidneyFailureIcon style={{ width: "40px", height: "40px" }} />
     ),
     liver_failure: (
-      <LiverFailureIcon style={{ width: "50px", height: "50px" }} />
+      <LiverFailureIcon style={{ width: "40px", height: "40px" }} />
     ),
   };
 
@@ -189,47 +209,65 @@ function DayPicture({ data = {}, reFetch, patientId, readOnly }) {
 
   return (
     <React.Fragment>
-      <Typography variant="h3">Photo du jour</Typography>
-      <Grid container spacing={2} justify="space-around">
-        <Grid xs={12} sm={8} item>
-          <EditableText
-            patientId={id}
-            label="Décrit l'état du patient à ce jour"
-            title="Notes du jour"
-            extensibleElseDial={true}
-            data={dataDayNotice}
-            field="day_notice"
-            reFetch={reFetch}
-            readOnly={readOnly}
-          />
-        </Grid>
+      <Box
+        border={1}
+        style={{
+          padding: "15px",
+          margin: "5px",
+          borderWidth: "1px",
+          borderColor: "white",
+          borderRadius: "15px",
+        }}
+      >
+        <Grid container spacing={2} justify="space-around">
+          <Grid xs={12} sm={8} item container>
+            <Grid xs={12} item>
+              <Box className={classes.title}>
+                <Typography variant="h4">Photo du jour</Typography>
+              </Box>
+            </Grid>
 
-        <Grid xs={12} sm={4} item>
-          <CheckList
-            patientId={id}
-            title="Défaillances"
-            data={{ checks: dataFailures }}
-            dataInterface={failuresInterface}
-            suggestedData={failureChange}
-            setSuggestedData={setFailureChange}
-            customIcons={failuresIcons}
-            readOnly={readOnly}
-          />
-        </Grid>
+            <Grid xs={12} item>
+              <EditableText
+                patientId={id}
+                label="Décrit l'état du patient à ce jour"
+                title="Notes du jour"
+                extensibleElseDial={true}
+                data={dataDayNotice}
+                field="day_notice"
+                reFetch={reFetch}
+                readOnly={readOnly}
+              />
+            </Grid>
+          </Grid>
 
-        <Grid xs={12} sm={12} item>
-          <MeasuresTable
-            patientId={id}
-            patient={id}
-            data={dataMeasures}
-            reFetch={reFetch}
-            forcedTableData={childTableData}
-            updateParentTableData={setChildTableData}
-            onMeasureSubmit={suggestFailureChange}
-            readOnly={readOnly}
-          />
+          <Grid xs={12} sm={4} item>
+            <CheckList
+              patientId={id}
+              title="Défaillances"
+              data={{ checks: dataFailures }}
+              dataInterface={failuresInterface}
+              suggestedData={failureChange}
+              setSuggestedData={setFailureChange}
+              customIcons={failuresIcons}
+              readOnly={readOnly}
+            />
+          </Grid>
+
+          <Grid xs={12} sm={12} item>
+            <MeasuresTable
+              patientId={id}
+              patient={id}
+              data={dataMeasures}
+              reFetch={reFetch}
+              forcedTableData={childTableData}
+              updateParentTableData={setChildTableData}
+              onMeasureSubmit={suggestFailureChange}
+              readOnly={readOnly}
+            />
+          </Grid>
         </Grid>
-      </Grid>
+      </Box>
 
       <Dialog open={failureWarnDial} onClose={() => setFailureWarnDial(false)}>
         <DialogTitle>Capteur de défaillance</DialogTitle>

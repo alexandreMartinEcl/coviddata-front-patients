@@ -7,17 +7,14 @@ import FormLabel from "@material-ui/core/FormLabel";
 import FormControl from "@material-ui/core/FormControl";
 import FormGroup from "@material-ui/core/FormGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
 import Checkbox from "@material-ui/core/Checkbox";
 
-import Card from "@material-ui/core/Card";
-import CardActions from "@material-ui/core/CardActions";
-import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
-
+import HistoryIcon from "@material-ui/icons/History";
+import SaveIcon from "@material-ui/icons/Save";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import * as _ from "lodash";
-import { Tooltip, Grid } from "@material-ui/core";
+import { Tooltip, Grid, Box } from "@material-ui/core";
 
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
@@ -34,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function PatientHeader({
+export default function CheckList({
   patientId,
   title,
   label,
@@ -140,7 +137,7 @@ export default function PatientHeader({
 
   const CustomFormControlLabel = (key, value) => {
     return customIcons ? (
-      <Grid item xs={2}>
+      <Grid item xs={2} key={key}>
         <FormControlLabel
           control={
             <React.Fragment>
@@ -162,8 +159,14 @@ export default function PatientHeader({
       </Grid>
     ) : (
       <FormControlLabel
+        key={key}
         control={
-          <Checkbox name={key} checked={value} onChange={handleChange} />
+          <Checkbox
+            name={key}
+            checked={value}
+            style={{ padding: "1px", paddingLeft: "9px" }}
+            onChange={handleChange}
+          />
         }
         label={dataInterface[key]}
       />
@@ -172,51 +175,75 @@ export default function PatientHeader({
 
   return (
     <React.Fragment>
-      <Card className={classes.root} variant="outlined">
-        <CardContent>
-          <FormControl
-            component="fieldset"
-            error={errorCheck}
-            className={classes.formControl}
+      <Box
+        style={{
+          padding: "2px",
+          margin: "15px",
+          backgroundColor: "white",
+          borderRadius: "15px",
+        }}
+      >
+        <FormControl
+          component="fieldset"
+          error={errorCheck}
+          className={classes.formControl}
+        >
+          <FormLabel
+            style={{ paddingTop: "5px", paddingLeft: "5px" }}
+            component="legend"
           >
-            <FormLabel component="legend">{title}</FormLabel>
-            <FormGroup>
-              <Grid container justify="flex-start">
-                {Object.entries(editedInfos).map((e) =>
-                  CustomFormControlLabel(e[0], e[1])
-                )}
-              </Grid>
-            </FormGroup>
-            <FormHelperText>
+            {title}
+          </FormLabel>
+          <FormGroup>
+            <Grid container justify="flex-start">
+              {Object.entries(editedInfos).map((e) =>
+                CustomFormControlLabel(e[0], e[1])
+              )}
+            </Grid>
+          </FormGroup>
+          {/* <FormHelperText>
               Pensez à enregistrer si vous modifiez
-            </FormHelperText>
-          </FormControl>
-        </CardContent>
-        {readOnly ? (
+            </FormHelperText> */}
+        </FormControl>
+        {readOnly || !errorCheck ? (
           <></>
         ) : (
-          <CardActions>
-            <Button
-              size="small"
-              onClick={onCancel}
-              variant={errorCheck ? "outlined" : ""}
-            >
-              Annuler les changements
-            </Button>
-            <Button
-              size="small"
-              onClick={onSubmitInfos}
-              variant="outlined"
-              color={errorCheck ? "primary" : ""}
-            >
-              Enregistrer
-            </Button>
-            {loadingUpdate && (
-              <CircularProgress size={24} className={classes.buttonProgress} />
-            )}
-          </CardActions>
+          <div>
+            <Grid container justify="space-around" space={1}>
+              <Grid item xs={5}>
+                <Button
+                  size="small"
+                  color="primary"
+                  variant="outlined"
+                  startIcon={<HistoryIcon />}
+                  style={{ margin: "2px" }}
+                  onClick={onCancel}
+                >
+                  Rétablir
+                </Button>
+              </Grid>
+              <Grid item xs={7}>
+                <Button
+                  size="small"
+                  color="primary"
+                  variant="contained"
+                  startIcon={<SaveIcon />}
+                  style={{ margin: "2px" }}
+                  onClick={onSubmitInfos}
+                >
+                  Enregistrer
+                </Button>
+                {loadingUpdate && (
+                  <CircularProgress
+                    size={24}
+                    className={classes.buttonProgress}
+                  />
+                )}
+              </Grid>
+            </Grid>
+          </div>
         )}
-      </Card>
+      </Box>
 
       <Snackbar
         open={snackbarOpen}

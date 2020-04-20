@@ -5,20 +5,22 @@ import config from "../../config";
 
 import Select from "@material-ui/core/Select";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { MenuItem } from "@material-ui/core";
+import { MenuItem, Box, Grid } from "@material-ui/core";
 
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme) => ({}));
 
-export default function SimpleField({
+export default function SimpleSelect({
   patientId,
   title,
   data = {},
   field,
   values = [],
   dataInterface = {},
+  icons = {},
+  colors = {},
   reFetch,
   readOnly,
 }) {
@@ -78,23 +80,39 @@ export default function SimpleField({
 
   return (
     <React.Fragment>
-      <Select
-        margin="dense"
-        id={`simple_field-${patientId}`}
-        label={title}
-        value={currentValue}
-        // fullWidth
-        onChange={onChange}
-        multiline
+      <Box
+        border={1}
+        style={{
+          margin: "2px",
+          padding: "2px",
+          backgroundColor: "white",
+          borderWidth: "1px",
+          borderColor: "#CAF1EC",
+          borderRadius: "10px",
+        }}
       >
-        {values.map((v) => (
-          <MenuItem value={dataInterface[v]}>{v}</MenuItem>
-        ))}
-      </Select>
-      {loadingUpdate && (
-        <CircularProgress size={24} className={classes.buttonProgress} />
-      )}
-
+        <Grid container alignItems="center" justify="center">
+          {Object.keys(icons).length ? icons[currentValue] : <></>}
+          <Select
+            margin="dense"
+            id={`simple_field-${patientId}`}
+            label={title}
+            value={currentValue}
+            onChange={onChange}
+            style={{ margin: "4px", color: colors[currentValue] }}
+            variant="outlined"
+          >
+            {values.map((v) => (
+              <MenuItem key={v} value={dataInterface[v]}>
+                {v}
+              </MenuItem>
+            ))}
+          </Select>
+          {loadingUpdate && (
+            <CircularProgress size={24} className={classes.buttonProgress} />
+          )}
+        </Grid>
+      </Box>
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}

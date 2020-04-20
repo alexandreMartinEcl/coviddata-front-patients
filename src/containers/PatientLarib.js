@@ -7,15 +7,19 @@ import {
   ListLabels,
   EditableText,
   CheckList,
-  SimpleField,
+  SimpleSelect,
   DayPicture,
 } from "./Components";
+
+import { ToWatchIcon } from "../shared/icons/index";
+import theme from "../theme";
+// import { useTheme } from "@material-ui/core";
 
 function PatientLarib({ data = {}, reFetch }) {
   const { id } = useParams();
 
   const [gardeMode, setGardeMode] = React.useState(
-    localStorage.getItem("gardeMode") || false
+    localStorage.getItem("gardeMode") === "true" || false
   );
 
   const updateMode = (mode) => {
@@ -56,6 +60,48 @@ function PatientLarib({ data = {}, reFetch }) {
     severity,
     current_unit_stay,
     hospitalisation_cause,
+  };
+
+  const severityValues = ["A risque", "Instable", "Stable"];
+  const severityDataInterface = { "A risque": 0, Instable: 1, Stable: 2 };
+
+  const severityIcons = {
+    0: (
+      <ToWatchIcon
+        style={{
+          width: "40px",
+          height: "80%",
+          borderWidth: "5px",
+          color: theme.palette.danger.main,
+        }}
+      />
+    ),
+    1: (
+      <ToWatchIcon
+        style={{
+          width: "40px",
+          height: "80%",
+          borderWidth: "1px",
+          color: theme.palette.danger.light,
+        }}
+      />
+    ),
+    2: (
+      <ToWatchIcon
+        style={{
+          width: "40px",
+          height: "80%",
+          borderWidth: "1px",
+          color: theme.palette.secondary.main,
+        }}
+      />
+    ),
+  };
+
+  const severityColors = {
+    0: theme.palette.danger.main,
+    1: theme.palette.danger.light,
+    2: theme.palette.secondary.main,
   };
 
   const {
@@ -149,13 +195,15 @@ function PatientLarib({ data = {}, reFetch }) {
       />
     ),
     SeverityField: (props) => (
-      <SimpleField
+      <SimpleSelect
         patientId={id}
         data={data}
         field="severity"
         title="Gravité"
-        values={["A risque", "Instable", "Stable"]}
-        dataInterface={{ "A risque": 0, Instable: 1, Stable: 2 }}
+        values={severityValues}
+        dataInterface={severityDataInterface}
+        icons={severityIcons}
+        colors={severityColors}
         readOnly={gardeMode}
         {...props}
       />

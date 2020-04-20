@@ -3,24 +3,25 @@ import { makeStyles } from "@material-ui/core/styles";
 import axios from "axios";
 import config from "../config";
 
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-
-import Card from "@material-ui/core/Card";
-import CardActions from "@material-ui/core/CardActions";
-import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import AddIcon from "@material-ui/icons/AddCircle";
+import HistoryIcon from "@material-ui/icons/History";
+import SaveIcon from "@material-ui/icons/Save";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
-import { cloneSchema, flat } from "../shared/utils/schema";
-import Form from "../components/Form";
+import { cloneSchema } from "../shared/utils/schema";
 import addPatientBasicFormSchema from "../json/schemaPatientBasic.json";
 import { getAge, dateToDayStep } from "../shared/utils/date";
 import * as _ from "lodash";
-import { Grid, useMediaQuery } from "@material-ui/core";
+import {
+  Grid,
+  useMediaQuery,
+  Box,
+  Select,
+  MenuItem,
+  TextField,
+} from "@material-ui/core";
 import { useTheme } from "@material-ui/styles";
 
 import Snackbar from "@material-ui/core/Snackbar";
@@ -57,6 +58,63 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const DataCell = ({
+  editable,
+  dataType,
+  variant,
+  multiline,
+  value,
+  infoToAdd = "",
+  label,
+  onDoubleClick,
+  ...props
+}) => {
+  if (!editable) {
+    return (
+      <Box
+        border={1}
+        style={{
+          margin: "2px",
+          padding: "2px",
+          borderWidth: "1px",
+          borderColor: "#CAF1EC",
+          borderRadius: "10px",
+        }}
+      >
+        <Typography onDoubleClick={onDoubleClick} variant={variant} {...props}>
+          {label}: {value} {infoToAdd}
+        </Typography>
+      </Box>
+    );
+  }
+  return dataType.enum ? (
+    <Select
+      margin="dense"
+      label={label}
+      value={value}
+      variant="outlined"
+      style={{ margin: "4px" }}
+      {...props}
+    >
+      {dataType.enum.map((v, i) => (
+        <MenuItem key={v} value={v}>
+          {dataType.enumNames[i]}
+        </MenuItem>
+      ))}
+    </Select>
+  ) : (
+    <TextField
+      type={dataType.valueType}
+      label={label}
+      value={value}
+      variant="outlined"
+      multiline={multiline}
+      style={{ margin: "4px", width: "95%" }}
+      {...props}
+    />
+  );
+};
+
 export default function PatientHeader({
   patientId,
   title,
@@ -66,9 +124,13 @@ export default function PatientHeader({
   readOnly,
 }) {
   const classes = useStyles();
-  const [editDial, setEditDial] = React.useState(false);
+  // const [editDial, setEditDial] = React.useState(false);
   const [dataCopy, setDataCopy] = React.useState(_.cloneDeep(data));
+  const [editedData, setEditedData] = React.useState(_.cloneDeep(data));
+  const [isEditable, setIsEditable] = React.useState(_.cloneDeep(false));
+  const [cellFocus, setCellFocus] = React.useState("");
 
+  const [loadingUpdate, setLoadingUpdate] = React.useState(false);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = React.useState(false);
   const [infoMsg, setInfoMsg] = React.useState("");
@@ -84,6 +146,19 @@ export default function PatientHeader({
     setInfoMsg("");
   };
 
+  const handleKeyPress = (event) => {
+    switch (event.key) {
+      case "Enter":
+        submit();
+        break;
+      case "Escape":
+        onCancel();
+        break;
+      default:
+        return;
+    }
+  };
+
   const schemaBasicPatient = cloneSchema(addPatientBasicFormSchema).schema;
   delete schemaBasicPatient.properties["NIP_id"];
   delete schemaBasicPatient.properties["stay_start_date"];
@@ -93,23 +168,46 @@ export default function PatientHeader({
   const isUpSm = useMediaQuery(th.breakpoints.up("sm"));
   const variantHeaderContent = isUpSm ? "body1" : "body2";
 
-  const closeEditDial = () => {
-    setEditDial(false);
+  // const closeEditDial = () => {
+  //   setEditDial(false);
+  // };
+
+  // const cancelEditDial = () => {
+  //   closeEditDial();
+  // };
+
+  // const openEditDial = () => {
+  //   setEditDial(true);
+  // };
+
+  const makeEditable = (focus = "") => {
+    if (!readOnly) {
+      setCellFocus(focus);
+      setIsEditable(true);
+    }
   };
 
-  const cancelEditDial = () => {
-    closeEditDial();
+  const makeUnEditable = () => {
+    setIsEditable(false);
   };
 
-  const openEditDial = () => {
-    setEditDial(true);
+  const onCancel = () => {
+    setEditedData(_.cloneDeep(dataCopy));
+    makeUnEditable();
+  };
+
+  const editValue = (field) => {
+    return (event) => {
+      let temEditedData = _.cloneDeep(editedData);
+      temEditedData[field] = event.target.value;
+      setEditedData(_.cloneDeep(temEditedData));
+    };
   };
 
   const sexInterface = {
     H: "Homme",
     F: "Femme",
   };
-  const severityInterface = ["A risque", "Instable", "Stable"];
 
   const updateDisplayed = (resData) => {
     let temData = _.cloneDeep(dataCopy);
@@ -119,223 +217,310 @@ export default function PatientHeader({
         temData[k] = resData[k];
       }
     });
-    setDataCopy(temData);
+    setDataCopy(_.cloneDeep(temData));
+    setDataCopy(_.cloneDeep(temData));
   };
 
-  function onSubmitInfos(initialData, setLoadingCb) {
-    setLoadingCb(true);
+  function submit() {
+    setLoadingUpdate(true);
 
-    const data = flat(initialData);
-    const formData = new FormData();
+    let jsonData = {};
 
-    for (let [key, value] of Object.entries(data)) {
-      formData.append(key, value);
-    }
+    let temEditedData = _.cloneDeep(editedData);
+    delete temEditedData.current_unit_stay;
+    delete temEditedData.hospitalisationDate;
+
+    Object.entries(temEditedData)
+      .filter(([key, value]) => dataCopy[key] !== value)
+      .forEach(([key, value]) => {
+        jsonData[key] = value;
+      });
 
     const url = `${config.path.patient}${patientId}/`;
 
+    console.log("Sending to:", url);
+    console.log(jsonData);
     axios({
       method: "patch",
       url,
-      data: formData,
+      data: jsonData,
       ...config.axios,
       headers: {
-        "Content-Type": "multipart/form-data",
+        // "Content-Type": "multipart/form-data",
+        "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
       },
     })
       .then((res) => {
         console.log(res);
-        setLoadingCb(false);
-        closeEditDial();
+        setLoadingUpdate(false);
         updateDisplayed(res.data);
+        makeUnEditable();
       })
       .catch((err) => {
         console.log(err);
         uiInform && uiInform(`La requête a échoué: ${err.toString()}`, false);
-        setLoadingCb(false);
+        setLoadingUpdate(false);
       });
   }
 
   // bed_description is like '1 - Lit 1 - Unité Sirrocco (Réanimation Rea1 - Hôpital Lariboisière) (1234)'
-  let [
-    ,
-    bedIndex,
-    unitPart1,
-    unitPart2,
-  ] = dataCopy.current_unit_stay.bed_description.split(" - ");
-  unitPart2 = unitPart2.split(") (")[0] + ")";
-  console.log("here", data.hospitalisationDate);
-  const bedInfo = `${[bedIndex, unitPart1, unitPart2].join(
-    " - "
-  )} (${dateToDayStep(data.hospitalisationDate)})`;
+
+  let bedInfo;
+  if (dataCopy.current_unit_stay) {
+    let [
+      ,
+      bedIndex,
+      unitPart1,
+      unitPart2,
+    ] = dataCopy.current_unit_stay.bed_description.split(" - ");
+    unitPart2 = unitPart2.split(") (")[0] + ")";
+    bedInfo = `${[bedIndex, unitPart1, unitPart2].join(" - ")} (${dateToDayStep(
+      data.hospitalisationDate
+    )})`;
+  }
 
   return (
-    <Card className={classes.patientCard}>
-      <CardContent>
+    <React.Fragment>
+      <Box
+        style={{
+          padding: "2px",
+          margin: "15px",
+          backgroundColor: "white",
+          borderRadius: "15px",
+        }}
+      >
         <Grid container space={2}>
-          {dataCopy.current_unit_stay ? (
-            <Grid item xs={12} sm={12}>
-              <Typography
-                variant={variantHeaderContent}
-                className={classes.title}
-                gutterBottom
-              >
-                {dataCopy.current_unit_stay
-                  ? bedInfo
-                  : "A quitté la réanimation"}
-              </Typography>
-            </Grid>
-          ) : (
-            <></>
-          )}
-
-          <Grid item xs={6} sm={3} container direction="column">
-            <Grid item>
-              <Typography
-                variant={variantHeaderContent}
-                className={classes.title}
-                gutterBottom
-              >
-                Patient n° {dataCopy.NIP_id}
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography
-                variant={variantHeaderContent}
-                className={classes.title}
-                gutterBottom
-              >
-                Motif: {severityInterface[dataCopy.hospitalisation_cause]}
-              </Typography>
-            </Grid>
-          </Grid>
-
-          <Grid item xs={6} sm={3} container direction="column">
-            <Grid item>
-              <Typography
-                variant={variantHeaderContent}
-                className={classes.title}
-                gutterBottom
-              >
-                {dataCopy.family_name
-                  ? dataCopy.family_name.toUpperCase()
-                  : "..."}{" "}
-                {dataCopy.first_name || "..."}
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography
-                variant={variantHeaderContent}
-                className={classes.title}
-                gutterBottom
-              >
-                {dataCopy.sex
-                  ? sexInterface[dataCopy.sex]
-                  : "Sexe non mentionné"}
-              </Typography>
-            </Grid>
-          </Grid>
-
-          <Grid item xs={6} sm={3}>
-            <Typography
+          <Grid item xs={12} sm={12}>
+            <DataCell
+              value={
+                dataCopy.current_unit_stay ? bedInfo : "A quitté la réanimation"
+              }
               variant={variantHeaderContent}
-              className={classes.title}
-              gutterBottom
-            >
-              {dataCopy.birth_date} ({getAge(dataCopy.birth_date)} ans)
-            </Typography>
+              editable={false}
+              label="Situation"
+            />
           </Grid>
 
-          <Grid item xs={6} sm={3} container direction="column">
+          <Grid item xs={6} sm={6} container direction="column">
             <Grid item>
-              <Typography
+              <DataCell
+                value={editedData.NIP_id}
+                editable={isEditable}
+                label="NIP"
                 variant={variantHeaderContent}
-                className={classes.title}
-                gutterBottom
-              >
-                Poids: {dataCopy.weight_kg}kg
-              </Typography>
+                autoFocus={cellFocus === "NIP_id"}
+                onChange={editValue("NIP_id")}
+                dataType={{ valueType: "string" }}
+                onKeyDown={handleKeyPress}
+                onDoubleClick={() => {
+                  makeEditable("NIP_id");
+                }}
+              />
+            </Grid>
+            <Grid item>
+              <DataCell
+                value={
+                  editedData.family_name
+                    ? editedData.family_name.toUpperCase()
+                    : "..."
+                }
+                editable={isEditable}
+                label="Nom"
+                variant={variantHeaderContent}
+                autoFocus={cellFocus === "family_name"}
+                onChange={editValue("family_name")}
+                dataType={{ valueType: "string" }}
+                onDoubleClick={() => makeEditable("family_name")}
+                onKeyDown={handleKeyPress}
+              />
+            </Grid>
+            <Grid item>
+              <DataCell
+                value={editedData.first_name || "..."}
+                editable={isEditable}
+                label="Prénom"
+                variant={variantHeaderContent}
+                autoFocus={cellFocus === "first_name"}
+                onChange={editValue("first_name")}
+                dataType={{ valueType: "string" }}
+                onDoubleClick={() => makeEditable("first_name")}
+                onKeyDown={handleKeyPress}
+              />
+            </Grid>
+            <Grid item>
+              <DataCell
+                value={editedData.sex}
+                editable={isEditable}
+                label="Sexe"
+                variant={variantHeaderContent}
+                autoFocus={cellFocus === "sex"}
+                onChange={editValue("sex")}
+                dataType={{
+                  valueType: "string",
+                  enum: Object.keys(sexInterface),
+                  enumNames: Object.values(sexInterface),
+                }}
+                onDoubleClick={() => makeEditable("sex")}
+              />
+            </Grid>
+          </Grid>
+
+          <Grid item xs={6} sm={6} container direction="column">
+            <Grid item>
+              <DataCell
+                value={editedData.birth_date}
+                editable={isEditable}
+                label="Naissance"
+                infoToAdd={`(${getAge(dataCopy.birth_date)} ans)`}
+                variant={variantHeaderContent}
+                autoFocus={cellFocus === "birth_date"}
+                onChange={editValue("birth_date")}
+                dataType={{ valueType: "date" }}
+                onDoubleClick={() => makeEditable("birth_date")}
+                onKeyDown={handleKeyPress}
+              />
+            </Grid>
+            <Grid item>
+              <DataCell
+                value={editedData.weight_kg}
+                editable={isEditable}
+                label="Poids (kg)"
+                variant={variantHeaderContent}
+                autoFocus={cellFocus === "weight_kg"}
+                onChange={editValue("weight_kg")}
+                dataType={{ valueType: "number" }}
+                onDoubleClick={() => makeEditable("weight_kg")}
+                onKeyDown={handleKeyPress}
+              />
             </Grid>
             <Grid item container direction="column">
-              <Typography
+              <DataCell
+                value={editedData.size_cm}
+                editable={isEditable}
+                label="Taille (cm)"
+                infoToAdd={`(IMC: 
+                  ${(
+                    dataCopy.weight_kg /
+                    (dataCopy.size_cm / 100) ** 2
+                  ).toFixed(2)})`}
                 variant={variantHeaderContent}
-                className={classes.title}
-                gutterBottom
-              >
-                Taille: {dataCopy.size_cm}cm
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography
-                variant={variantHeaderContent}
-                className={classes.title}
-                gutterBottom
-              >
-                (IMC:{" "}
-                {(dataCopy.weight_kg / (dataCopy.size_cm / 100) ** 2).toFixed(
-                  2
-                )}
-                )
-              </Typography>
+                autoFocus={cellFocus === "size_cm"}
+                onChange={editValue("size_cm")}
+                dataType={{ valueType: "number" }}
+                onDoubleClick={() => makeEditable("size_cm")}
+                onKeyDown={handleKeyPress}
+              />
             </Grid>
           </Grid>
+
+          <Grid item xs={12} sm={12}>
+            <DataCell
+              value={editedData.hospitalisation_cause}
+              editable={isEditable}
+              label="Motif"
+              variant={variantHeaderContent}
+              autoFocus={cellFocus === "hospitalisation_cause"}
+              onChange={editValue("hospitalisation_cause")}
+              dataType={{ valueType: "string" }}
+              multiline
+              onDoubleClick={() => makeEditable("hospitalisation_cause")}
+            />
+          </Grid>
         </Grid>
-      </CardContent>
-      {readOnly ? (
-        <></>
-      ) : (
-        <CardActions>
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            startIcon={<AddIcon />}
-            onClick={openEditDial}
-          >
-            Modifier
-          </Button>
-        </CardActions>
-      )}
+        {isEditable ? (
+          <div>
+            <Grid container justify="space-around" space={1}>
+              <Grid item xs={5}>
+                <Button
+                  size="small"
+                  color="primary"
+                  variant="outlined"
+                  startIcon={<HistoryIcon />}
+                  style={{ margin: "2px" }}
+                  onClick={onCancel}
+                >
+                  Rétablir
+                </Button>
+              </Grid>
+              <Grid item xs={7}>
+                <Button
+                  size="small"
+                  color="primary"
+                  variant="contained"
+                  startIcon={<SaveIcon />}
+                  style={{ margin: "2px" }}
+                  onClick={submit}
+                >
+                  Enregistrer
+                </Button>
+                {loadingUpdate && (
+                  <CircularProgress
+                    size={24}
+                    className={classes.buttonProgress}
+                  />
+                )}
+              </Grid>
+            </Grid>
+          </div>
+        ) : (
+          <React.Fragment>
+            {readOnly ? (
+              <></>
+            ) : (
+              <Button
+                size="small"
+                color="primary"
+                variant="contained"
+                startIcon={<AddIcon />}
+                style={{ margin: "2px" }}
+                onClick={makeEditable}
+              >
+                Modifier
+              </Button>
+            )}
+          </React.Fragment>
+        )}
 
-      <Dialog
-        open={editDial}
-        onClose={closeEditDial}
-        aria-labelledby="form-dialog-title"
-      >
-        <DialogTitle id="form-dialog-title">
-          Modification des {title}
-        </DialogTitle>
-        <DialogContent>
-          <Form
-            schema={schemaBasicPatient}
-            formData={dataCopy}
-            onSubmit={(form, setLoadingCb) =>
-              onSubmitInfos(form.formData, setLoadingCb)
-            }
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={cancelEditDial} color="primary">
-            Annuler
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={closeSnackBar}
-      >
-        <MuiAlert
-          elevation={6}
-          variant="filled"
-          onClose={closeSnackBar}
-          severity={snackbarSeverity}
+        {/* <Dialog
+          open={editDial}
+          onClose={closeEditDial}
+          aria-labelledby="form-dialog-title"
         >
-          {infoMsg}
-        </MuiAlert>
-      </Snackbar>
-    </Card>
+          <DialogTitle id="form-dialog-title">
+            Modification des {title}
+          </DialogTitle>
+          <DialogContent>
+            <Form
+              schema={schemaBasicPatient}
+              formData={dataCopy}
+              onSubmit={(form, setLoadingCb) =>
+                onSubmitInfos(form.formData, setLoadingCb)
+              }
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={cancelEditDial} color="primary">
+              Annuler
+          </Button>
+          </DialogActions>
+        </Dialog> */}
+
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={closeSnackBar}
+        >
+          <MuiAlert
+            elevation={6}
+            variant="filled"
+            onClose={closeSnackBar}
+            severity={snackbarSeverity}
+          >
+            {infoMsg}
+          </MuiAlert>
+        </Snackbar>
+      </Box>
+    </React.Fragment>
   );
 }
