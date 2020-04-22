@@ -6,7 +6,9 @@
   "properties": {
     "NIP_id": {
       "type": "string",
-      "title": "Identifiant NIP"
+      "title": "Identifiant NIP",
+      "minLength": 10,
+      "maxLength": 10    
     },
     "stay_start_date": {
       "type": "string",

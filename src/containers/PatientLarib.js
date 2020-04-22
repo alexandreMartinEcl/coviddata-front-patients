@@ -140,7 +140,7 @@ function PatientLarib({ data = {}, reFetch }) {
   allergies = formatAllergies(data.allergies);
   let allergiesIsEmpty =
     allergies.length === 0 ||
-    (allergies.length === 1 && allergies[0] === "Non indiqué");
+    (allergies.length === 1 && allergies[0] === "Inconnues");
 
   let antecedents;
   const formatAntecedents = (rawData) => {
@@ -163,7 +163,7 @@ function PatientLarib({ data = {}, reFetch }) {
   let antecedentsIsEmpty =
     Object.keys(antecedents).length === 0 ||
     (Object.keys(antecedents).length === 1 &&
-      Object.keys(antecedents)[0] === "NonIndique");
+      Object.keys(antecedents)[0] === "Inconnus");
 
   const { recent_disease_history, last_edited_recent_disease_history } = data;
   const dataRecDisHist = {
