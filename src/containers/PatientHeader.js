@@ -26,6 +26,7 @@ import { useTheme } from "@material-ui/styles";
 
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
+import { manageError } from "../shared/utils/tools";
 
 const useStyles = makeStyles((theme) => ({
   patientCard: {
@@ -135,9 +136,14 @@ export default function PatientHeader({
   const [snackbarSeverity, setSnackbarSeverity] = React.useState(false);
   const [infoMsg, setInfoMsg] = React.useState("");
 
-  const uiInform = (msg, isInfoElseError) => {
+  /**
+   * Display information snackbar
+   * @param {string} msg
+   * @param {string} infoType either 'success', 'error', 'info' or 'warning'
+   */
+  const uiInform = (msg, infoType) => {
     setInfoMsg(msg);
-    setSnackbarSeverity(isInfoElseError ? "success" : "error");
+    setSnackbarSeverity(infoType);
     setSnackbarOpen(true);
   };
 
@@ -258,9 +264,8 @@ export default function PatientHeader({
         makeUnEditable();
       })
       .catch((err) => {
-        console.log(err);
-        uiInform && uiInform(`La requête a échoué: ${err.toString()}`, false);
         setLoadingUpdate(false);
+        manageError(err.response, uiInform);
       });
   }
 

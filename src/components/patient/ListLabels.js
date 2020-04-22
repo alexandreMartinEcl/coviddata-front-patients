@@ -21,6 +21,7 @@ import { useMediaQuery, Box } from "@material-ui/core";
 
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
+import { manageError } from "../../shared/utils/tools";
 
 const useStyles = makeStyles((theme) => ({
   label: {
@@ -61,9 +62,14 @@ export default function ListLabels({
   const [snackbarSeverity, setSnackbarSeverity] = React.useState(false);
   const [infoMsg, setInfoMsg] = React.useState("");
 
-  const uiInform = (msg, isInfoElseError) => {
+  /**
+   * Display information snackbar
+   * @param {string} msg
+   * @param {string} infoType either 'success', 'error', 'info' or 'warning'
+   */
+  const uiInform = (msg, infoType) => {
     setInfoMsg(msg);
-    setSnackbarSeverity(isInfoElseError ? "success" : "error");
+    setSnackbarSeverity(infoType);
     setSnackbarOpen(true);
   };
 
@@ -171,9 +177,8 @@ export default function ListLabels({
         updateLabels(res.data);
       })
       .catch((err) => {
-        console.log(err);
-        uiInform && uiInform(`La requête a échoué: ${err.toString()}`, false);
         setLoadingUpdateLabels(false);
+        manageError(err.response, uiInform);
       });
   };
 

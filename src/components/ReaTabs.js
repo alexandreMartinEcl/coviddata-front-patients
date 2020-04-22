@@ -71,13 +71,14 @@ export default function ReaTabs({ labels, contents, onTabChange, onAddRea }) {
           value={value}
           onChange={handleChange}
           indicatorColor="primary"
+          // color="primary"
           textColor="primary"
           variant="scrollable"
           scrollButtons="auto"
           aria-label="scrollable auto tabs example"
         >
           {labels.map((label) => {
-            return <Tab label={label.title} {...a11yProps(label.id)} />;
+            return <Tab key={label.title} label={label.title} {...a11yProps(label.id)} />;
           })}
           <Button
             variant="contained"
@@ -92,7 +93,7 @@ export default function ReaTabs({ labels, contents, onTabChange, onAddRea }) {
       </AppBar>
       {contents.map((content) => {
         return (
-          <TabPanel value={value} index={content.id}>
+          <TabPanel key={content.id} value={value} index={content.id}>
             {content.toRender}
           </TabPanel>
         );

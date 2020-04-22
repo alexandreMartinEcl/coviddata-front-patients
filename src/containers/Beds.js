@@ -22,6 +22,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import { cloneSchema, flat } from "../shared/utils/schema";
 import ReaTabs from "../components/ReaTabs";
 import Form from "../components/Form";
+import { manageError } from "../shared/utils/tools";
 
 import { getAge, dateToDayStep } from "../shared/utils/date";
 import addPatientBasicFormSchema from "../json/schemaPatientBasic.json";
@@ -177,9 +178,14 @@ function Beds({ data, reFetch, ...props }) {
   const isUpSm = useMediaQuery(th.breakpoints.up("sm"));
   const variantForBedItem = isUpSm ? "body1" : "body2";
 
-  const uiInform = (msg, isInfoElseError) => {
+  /**
+   * Display information snackbar
+   * @param {string} msg
+   * @param {string} infoType either 'success', 'error', 'info' or 'warning'
+   */
+  const uiInform = (msg, infoType) => {
     setInfoMsg(msg);
-    setSnackbarSeverity(isInfoElseError ? "success" : "error");
+    setSnackbarSeverity(infoType);
     setSnackbarOpen(true);
   };
 
@@ -233,17 +239,6 @@ function Beds({ data, reFetch, ...props }) {
     setOpenDialRemove(false);
   };
 
-  const manageError = (errResp, setLoadingCb) => {
-    console.log(errResp);
-    uiInform(
-      `La requête a échoué: ${
-        errResp.data.msg ? errResp.data.msg : errResp.toString()
-      }`,
-      false
-    );
-    setLoadingCb(false);
-  };
-
   const buildFailuresIconsGrids = (patient) => {
     const toDisplay = [
       "heart_failure",
@@ -263,7 +258,7 @@ function Beds({ data, reFetch, ...props }) {
       >
         {toDisplay.map((k) => {
           return (
-            <Grid item xs={4}>
+            <Grid key={k} item xs={4}>
               {icons[k]}
             </Grid>
           );
@@ -297,14 +292,15 @@ function Beds({ data, reFetch, ...props }) {
         console.log(res);
         setLoadingCb(false);
         if (res.data.count === 0) {
-          uiInform("Aucune unité n'a été trouvée avec ce code", false);
+          uiInform("Aucune unité n'a été trouvée avec ce code", "error");
         } else {
           handleAddReaClose();
           localAddRea(res.data.results[0]);
         }
       })
       .catch((err) => {
-        manageError(err.response, setLoadingCb);
+        setLoadingCb(false);
+        manageError(err.response, uiInform);
       });
   }
 
@@ -312,9 +308,12 @@ function Beds({ data, reFetch, ...props }) {
     let reaNames = data.results.map((r) => r.name);
     if (!reaNames.find((name) => rea.name === name)) {
       data.results.push(rea);
-      uiInform(`L'unité de réanimation ${rea.name} a été récupérée`, true);
+      uiInform(`L'unité de réanimation ${rea.name} a été récupérée`, "success");
     } else {
-      uiInform(`L'unité de réanimation ${rea.name} était déjà ajoutée`, false);
+      uiInform(
+        `L'unité de réanimation ${rea.name} était déjà ajoutée`,
+        "warning"
+      );
     }
   };
 
@@ -325,7 +324,11 @@ function Beds({ data, reFetch, ...props }) {
     const dataToSend = new FormData();
 
     for (let [key, value] of Object.entries(data)) {
-      dataToSend.append(key, value);
+      if (key === "stay_start_date") {
+        value && dataToSend.append(key, value);
+      } else {
+        dataToSend.append(key, value);
+      }
     }
     dataToSend.append("bed", currentBed);
 
@@ -348,7 +351,7 @@ function Beds({ data, reFetch, ...props }) {
         setPage(`/patient/${res.data.id}`);
       })
       .catch((err) => {
-        manageError(err.response, setLoadingCb);
+        manageError(err.response, uiInform);
       });
   }
 
@@ -376,7 +379,7 @@ function Beds({ data, reFetch, ...props }) {
         reFetch();
       })
       .catch((err) => {
-        manageError(err.response, setLoadingRemovePatient);
+        manageError(err.response, uiInform);
       });
   }
 
@@ -561,7 +564,7 @@ function Beds({ data, reFetch, ...props }) {
                 </Box>
 
                 {rea.units.map((unit) => (
-                  <Paper>
+                  <Paper key={unit.name}>
                     <List
                       subheader={
                         <ListSubheader

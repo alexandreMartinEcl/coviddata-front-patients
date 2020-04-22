@@ -27,6 +27,7 @@ import { dateTimeToStr } from "../../shared/utils/date";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import { Box } from "@material-ui/core";
+import { manageError } from "../../shared/utils/tools";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -64,9 +65,14 @@ export default function EditableText({
   const [snackbarSeverity, setSnackbarSeverity] = React.useState(false);
   const [infoMsg, setInfoMsg] = React.useState("");
 
-  const uiInform = (msg, isInfoElseError) => {
+  /**
+   * Display information snackbar
+   * @param {string} msg
+   * @param {string} infoType either 'success', 'error', 'info' or 'warning'
+   */
+  const uiInform = (msg, infoType) => {
     setInfoMsg(msg);
-    setSnackbarSeverity(isInfoElseError ? "success" : "error");
+    setSnackbarSeverity(infoType);
     setSnackbarOpen(true);
   };
 
@@ -123,9 +129,8 @@ export default function EditableText({
         updateState(res.data);
       })
       .catch((err) => {
-        console.log(err);
-        uiInform && uiInform(`La requête a échoué: ${err.toString()}`, false);
         setLoadingUpdateText(false);
+        manageError(err.response, uiInform);
       });
   };
 

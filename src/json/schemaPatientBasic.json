@@ -8,7 +8,7 @@
       "type": "string",
       "title": "Identifiant NIP",
       "minLength": 10,
-      "maxLength": 10    
+      "maxLength": 10
     },
     "stay_start_date": {
       "type": "string",
