@@ -1,6 +1,5 @@
-const baseURL = "http://localhost:8000/api/";
-// const baseURL = "http://80.14.192.60:3002/api/";
-
+const baseURL = process.env.REACT_APP_BASE_URL;
+console.log(baseURL);
 export default {
   axios: {
     baseURL,

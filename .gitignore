@@ -39,3 +39,4 @@ src/_
 src/__
 public/uploads/*
 public/edited/*
+.env
