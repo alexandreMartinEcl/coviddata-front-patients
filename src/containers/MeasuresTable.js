@@ -21,6 +21,7 @@ import {
   MenuItem,
   IconButton,
   CircularProgress,
+  Grid,
 } from "@material-ui/core";
 import SaveIcon from "@material-ui/icons/Save";
 import CancelIcon from "@material-ui/icons/Cancel";
@@ -29,6 +30,16 @@ import statusMeasuresInterface from "../json/statusMeasures.json";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import { manageError } from "../shared/utils/tools";
+
+import {
+  HeartFailureIcon,
+  BioChemicalFailureIcon,
+  BrainFailureIcon,
+  LungFailureIcon,
+  KidneyFailureIcon,
+  LiverFailureIcon,
+  HematologicFailureIcon,
+} from "../shared/icons/index";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -55,19 +66,83 @@ const useStyles = makeStyles({
 });
 
 const configOrderRows = [
+  // {
+  //   title: "Poumons",
+  //   rows: [
   statusMeasuresInterface.vent,
   statusMeasuresInterface.p_f,
-  statusMeasuresInterface.dv,
   statusMeasuresInterface.seda,
   statusMeasuresInterface.curar,
-  statusMeasuresInterface.nad,
+  //   ],
+  // },
+  // {
+  //   title: "Reins",
+  //   rows: [
   statusMeasuresInterface.creat,
   statusMeasuresInterface.eer,
+  //       ],
+  // },
+  // {
+  //   title: "Coeur",
+  //   rows: [
+  statusMeasuresInterface.nad,
+  statusMeasuresInterface.adren,
+  statusMeasuresInterface.dobut,
+  //           ],
+  // },
+  // {
+  //   title: "Métabolique",
+  //   rows: [
   statusMeasuresInterface.lactat,
+  //           ],
+  // },
+  // {
+  //   title: "Cerveau",
+  //   rows: [
+  statusMeasuresInterface.glasgow,
+  //   ],
+  // },
+  // {
+  //   title: "Foie",
+  //   rows: [
+  statusMeasuresInterface.t_p,
+  //   ],
+  // },
+  // {
+  //   title: "Bactériologie",
+  //   rows: [
   statusMeasuresInterface.antib,
   statusMeasuresInterface.prelev,
   statusMeasuresInterface.germes,
+  //   ],
+  // },
+  // {
+  //   title: "Hématologique",
+  //   rows: [
+  statusMeasuresInterface.plaqu,
+  //   ],
+  // },
+  // statusMeasuresInterface.dv,
 ];
+
+const rowIcons = {
+  heart: (
+    <HeartFailureIcon
+      color="secondary"
+      style={{ width: "20px", height: "20px" }}
+    />
+  ),
+  metabolic: (
+    <BioChemicalFailureIcon style={{ width: "20px", height: "20px" }} />
+  ),
+  brain: <BrainFailureIcon style={{ width: "20px", height: "20px" }} />,
+  lung: <LungFailureIcon style={{ width: "20px", height: "20px" }} />,
+  kidney: <KidneyFailureIcon style={{ width: "20px", height: "20px" }} />,
+  liver: <LiverFailureIcon style={{ width: "20px", height: "20px" }} />,
+  hematologic: (
+    <HematologicFailureIcon style={{ width: "20px", height: "20px" }} />
+  ),
+};
 
 const EditableCell = ({ statusType, ...props }) => {
   return statusType.enum ? (
@@ -158,7 +233,15 @@ function MeasuresTable({
 
   const buildRowTitles = () => {
     rowTitles = configOrderRows.map(
-      (status) => `${status.small} ${status.unit ? `(${status.unit})` : ""}`
+      (status) =>
+        // <Grid container alignItems="center" justify="flex-start">
+        //   <Grid item xs>
+        //     {status.group ? rowIcons[status.group] : (<></>)}
+        //   </Grid>
+        //   <Grid item xs>
+        `${status.small} ${status.unit ? `(${status.unit})` : ""}`
+      //   </Grid>
+      // </Grid>
     );
   };
 
@@ -190,7 +273,7 @@ function MeasuresTable({
         (status) => status.dbValue === Number(m.status_type)
       );
       let row = configOrderRows.findIndex((i) => i === type);
-      table[row][col] = m.value;
+      if (row !== -1) table[row][col] = m.value;
     });
     setTableData(_.cloneDeep(table));
     setSavedTableData(_.cloneDeep(table));
@@ -198,11 +281,30 @@ function MeasuresTable({
 
   const measureAddedInfo = (configOrderRow, measureValue) => {
     switch (configOrderRow) {
-      case statusMeasuresInterface.nad:
+      case statusMeasuresInterface.nad: // mg/h -> mg/kg/h
         if (Number(data.weight_kg) && Number(measureValue)) {
           return `(${
             Number(measureValue) / Number(data.weight_kg).toFixed(2)
           } mg/kg/h)`;
+        } else {
+          return "";
+        }
+      case statusMeasuresInterface.dobut: // μg/min -> μg/kg/min
+        if (Number(data.weight_kg) && Number(measureValue)) {
+          return `(${(Number(measureValue) / Number(data.weight_kg)).toFixed(
+            2
+          )} μg/kg/min)`;
+        } else {
+          return "";
+        }
+      case statusMeasuresInterface.adren: // mg/h -> μg/kg/min
+        if (Number(data.weight_kg) && Number(measureValue)) {
+          return `(${(
+            Number(measureValue) /
+            Number(data.weight_kg) /
+            1000 /
+            60
+          ).toFixed(2)} μg/kg/min)`;
         } else {
           return "";
         }
@@ -260,27 +362,31 @@ function MeasuresTable({
   const submitEdit = () => {
     setLoadingUpdate(true);
 
-    const jsonData = [];
     let tDate = getDateFromColumn(selectedCol).toJSON().split("T")[0];
 
     let values = tableData.map((row) => row[selectedCol]);
     let savedValues = savedTableData.map((row) => row[selectedCol]);
 
-    let temData = {};
+    // const savedData = {}; // describe the former data of the column, for FailureChange callback
+    const newData = {}; // describe the former data of the column, for FailureChange callback
+    const jsonData = []; // describe the data to send to backend (only changed value, with right format)
     values.forEach((v, i) => {
-      if (v === savedValues[i]) return;
-
       let statusType = configOrderRows[i];
       let dbStatusType = statusType.dbValue;
-      temData[dbStatusType] = statusType.valueType === "number" ? Number(v) : v;
-    });
+      // let savedValue = savedValues[i];
+      // savedValue = statusType.valueType === "number" ? Number(savedValue) : (statusType.valueType === "string" ? savedValue.trim() : savedValue);
 
-    Object.entries(temData).forEach(([k, v]) => {
+      // savedData[configOrderRows[i].dbValue] = savedValue;
+      v = statusType.valueType === "string" ? v.trim() : v;
+      newData[configOrderRows[i].dbValue] = v;
+      if (v === savedValues[i]) return;
+      let value = statusType.valueType === "number" ? Number(v) : v;
+
       jsonData.push({
         created_date: tDate,
         id_patient: patientId,
-        status_type: k,
-        value: typeof v === "string" ? v.trim() : v,
+        status_type: dbStatusType,
+        value: value,
       });
     });
 
@@ -302,7 +408,7 @@ function MeasuresTable({
         console.log(res);
         setLoadingUpdate(false);
         updateTableData(data);
-        onMeasureSubmit(jsonData);
+        onMeasureSubmit(newData, tDate);
         setSelectedCol(null);
       })
       .catch((err) => {
@@ -358,43 +464,46 @@ function MeasuresTable({
         </TableHead>
         <TableBody>
           {!tableData ||
-            tableData.map((row, i) => (
-              <StyledTableRow key={`${rowTitles[i]}`}>
-                <StyledTableCell component="th" scope="row">
-                  {rowTitles[i]}
-                </StyledTableCell>
+            tableData
+              .filter((row) => !readOnly || row.find((c) => c)) // display only not empty rows when readOnly
+              .map((row, i) => (
+                <StyledTableRow key={`${rowTitles[i]}`}>
+                  <StyledTableCell>{rowTitles[i]}</StyledTableCell>
 
-                {row.map((cell, j) => (
-                  <Tooltip
-                    key={`${rowTitles[i]}-${j}`}
-                    title={configOrderRows[i].fullName}
-                    arrow
-                  >
-                    <StyledTableCell
-                      align="center"
-                      onDoubleClick={() => makeColumnEditable(i, j)}
+                  {row.map((cell, j) => (
+                    <Tooltip
                       key={`${rowTitles[i]}-${j}`}
+                      title={configOrderRows[i].fullName}
+                      arrow
                     >
-                      {selectedCol === j ? (
-                        <EditableCell
-                          statusType={configOrderRows[i]}
-                          autoFocus={i === selectedRow}
-                          value={`${cell}`}
-                          onChange={onEditableCellChange(
-                            i,
-                            j,
-                            configOrderRows[i].valueType
-                          )}
-                          onKeyDown={handleKeyPress}
-                        />
-                      ) : (
-                        `${cell} ${measureAddedInfo(configOrderRows[i], cell)}`
-                      )}
-                    </StyledTableCell>
-                  </Tooltip>
-                ))}
-              </StyledTableRow>
-            ))}
+                      <StyledTableCell
+                        align="center"
+                        onDoubleClick={() => makeColumnEditable(i, j)}
+                        key={`${rowTitles[i]}-${j}`}
+                      >
+                        {selectedCol === j ? (
+                          <EditableCell
+                            statusType={configOrderRows[i]}
+                            autoFocus={i === selectedRow}
+                            value={`${cell}`}
+                            onChange={onEditableCellChange(
+                              i,
+                              j,
+                              configOrderRows[i].valueType
+                            )}
+                            onKeyDown={handleKeyPress}
+                          />
+                        ) : (
+                          `${cell} ${measureAddedInfo(
+                            configOrderRows[i],
+                            cell
+                          )}`
+                        )}
+                      </StyledTableCell>
+                    </Tooltip>
+                  ))}
+                </StyledTableRow>
+              ))}
         </TableBody>
       </Table>
 

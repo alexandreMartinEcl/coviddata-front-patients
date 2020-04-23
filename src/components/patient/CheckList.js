@@ -42,6 +42,7 @@ export default function CheckList({
   setSuggestedData,
   data = {},
   readOnly,
+  forceUpdate = false,
 }) {
   const classes = useStyles();
   const [dataCopy, setDataCopy] = React.useState(_.cloneDeep(data.checks));
@@ -74,6 +75,9 @@ export default function CheckList({
   };
 
   const handleChange = (event) => {
+    if (readOnly) {
+      return;
+    }
     let temData = _.cloneDeep(editedInfos);
     temData[event.target.name] = event.target.checked;
     setEditedInfos(_.cloneDeep(temData));
@@ -84,19 +88,6 @@ export default function CheckList({
     // setSuggestedData && setSuggestedData(_.cloneDeep(temData));
   };
 
-  if (!userEdit && Object.keys(suggestedData).length) {
-    let temData = _.cloneDeep(editedInfos);
-    Object.assign(temData, suggestedData);
-
-    if (!_.isEqual(temData, editedInfos)) {
-      setEditedInfos(_.cloneDeep(temData));
-      setErrorCheck(
-        Object.keys(dataCopy).filter((k) => dataCopy[k] !== temData[k]).length >
-          0
-      );
-    }
-  }
-
   const onCancel = () => {
     let temData = _.cloneDeep(dataCopy);
     setEditedInfos(_.cloneDeep(temData));
@@ -106,8 +97,8 @@ export default function CheckList({
     setUserEdit(true);
   };
 
-  const onSubmitInfos = () => {
-    let temData = _.cloneDeep(editedInfos);
+  const onSubmitInfos = (inputData) => {
+    let temData = inputData ? inputData : _.cloneDeep(editedInfos);
 
     setLoadingUpdate(true);
 
@@ -117,7 +108,8 @@ export default function CheckList({
     }
 
     const url = `${config.path.patient}${patientId}/`;
-
+    console.log(`Sending to: ${url}`);
+    console.log(Array.from(formData.entries()));
     axios({
       method: "patch",
       url,
@@ -140,13 +132,43 @@ export default function CheckList({
       });
   };
 
+  if (!userEdit && Object.keys(suggestedData).length) {
+    let temData = _.cloneDeep(editedInfos);
+    Object.assign(temData, suggestedData);
+
+    if (!_.isEqual(temData, editedInfos)) {
+      setEditedInfos(_.cloneDeep(temData));
+      setErrorCheck(
+        Object.keys(dataCopy).filter((k) => dataCopy[k] !== temData[k]).length >
+          0
+      );
+
+      //TODO this is a quick fix for forcing failure update
+      if (forceUpdate) {
+        onSubmitInfos(temData);
+      }
+    }
+  }
+
   const CustomFormControlLabel = (key, value) => {
     return customIcons ? (
-      <Grid item xs={2} key={key}>
+      <Grid item xs={3} key={key}>
         <FormControlLabel
           control={
             <React.Fragment>
-              <Tooltip title={dataInterface[key]} arrow>
+              <Tooltip
+                title={
+                  <div>
+                    {dataInterface[key].split("\n").map((rw) => (
+                      <React.Fragment>
+                        {rw}
+                        <br />
+                      </React.Fragment>
+                    ))}
+                  </div>
+                }
+                arrow
+              >
                 <Checkbox
                   checkedIcon={customIcons[key]}
                   icon={customIcons[key]}
@@ -155,7 +177,6 @@ export default function CheckList({
                   checked={value}
                   onChange={handleChange}
                   color="primary"
-                  size="medium"
                 />
               </Tooltip>
             </React.Fragment>
@@ -183,6 +204,7 @@ export default function CheckList({
       <Box
         style={{
           padding: "2px",
+          paddingLeft: "20px",
           margin: "15px",
           backgroundColor: "white",
           borderRadius: "15px",

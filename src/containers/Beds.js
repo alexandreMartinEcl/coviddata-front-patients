@@ -46,6 +46,7 @@ import {
   LungFailureIcon,
   KidneyFailureIcon,
   LiverFailureIcon,
+  HematologicFailureIcon,
   BedIcon,
   ToWatchIcon,
 } from "../shared/icons/index";
@@ -118,6 +119,12 @@ const icons = {
   ),
   liver_failure: (
     <LiverFailureIcon
+      color="primary"
+      style={{ width: "30px", height: "100%" }}
+    />
+  ),
+  hematologic_failure: (
+    <HematologicFailureIcon
       color="primary"
       style={{ width: "30px", height: "100%" }}
     />
@@ -247,6 +254,7 @@ function Beds({ data, reFetch, ...props }) {
       "lung_failure",
       "kidney_failure",
       "liver_failure",
+      "hematologic_failure",
     ].filter((k) => patient[k]);
 
     return toDisplay.length ? (

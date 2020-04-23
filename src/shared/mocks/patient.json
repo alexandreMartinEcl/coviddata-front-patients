@@ -131,5 +131,6 @@
   "brain_failure": false,
   "lung_failure": true,
   "kidney_failure": false,
-  "liver_failure": false
+  "liver_failure": false,
+  "hematologic_failure": true
 }

@@ -4,6 +4,7 @@
     "dbValue": 0,
     "id": "p_f",
     "fullName": "Ratio pression artérielle sur fraction inspirée",
+    "group": "lung",
     "unit": "",
     "small": "P/F",
     "valueType": "number"
@@ -13,6 +14,7 @@
     "dbValue": 1,
     "id": "nad",
     "fullName": "Noradrénaline",
+    "group": "heart",
     "unit": "mg/h",
     "small": "NAD",
     "valueType": "number"
@@ -22,6 +24,7 @@
     "dbValue": 2,
     "id": "creat",
     "fullName": "Créatinémie",
+    "group": "kidney",
     "unit": "μmol/l",
     "small": "Creat",
     "valueType": "number"
@@ -31,6 +34,7 @@
     "dbValue": 3,
     "id": "dv",
     "fullName": "Decubitus ventral",
+    "group": "",
     "unit": "",
     "small": "DV",
     "valueType": "number"
@@ -40,6 +44,7 @@
     "dbValue": 4,
     "id": "vent",
     "fullName": "Mode ventilatoire",
+    "group": "lung",
     "unit": "",
     "small": "Mode Vent.",
     "valueType": "string",
@@ -58,6 +63,7 @@
     "dbValue": 5,
     "id": "seda",
     "fullName": "Sédation",
+    "group": "lung",
     "unit": "",
     "small": "Sédation",
     "valueType": "string"
@@ -67,6 +73,7 @@
     "dbValue": 6,
     "id": "antib",
     "fullName": "Antibiotiques",
+    "group": "",
     "unit": "",
     "small": "Antib.",
     "valueType": "string"
@@ -76,6 +83,7 @@
     "dbValue": 7,
     "id": "prelev",
     "fullName": "Type de prélèvements",
+    "group": "",
     "unit": "",
     "small": "Prélèvements",
     "valueType": "string"
@@ -85,6 +93,7 @@
     "dbValue": 8,
     "id": "germes",
     "fullName": "Germes",
+    "group": "",
     "unit": "",
     "small": "Germes",
     "valueType": "string"
@@ -94,6 +103,7 @@
     "dbValue": 9,
     "id": "curar",
     "fullName": "Curares",
+    "group": "lung",
     "unit": "",
     "small": "Curares",
     "valueType": "string"
@@ -103,6 +113,7 @@
     "dbValue": 10,
     "id": "lactat",
     "fullName": "Lactatémie",
+    "group": "metabolic",
     "unit": "mmol/l",
     "small": "Lactatémie",
     "valueType": "number"
@@ -112,10 +123,61 @@
     "dbValue": 11,
     "id": "eer",
     "fullName": "Epuration extrarénale",
+    "group": "kidney",
     "unit": "",
     "small": "EER",
     "valueType": "string",
     "enumNames": ["Hémofiltration", "Dialyse", "Hémodiafiltration", "Non"],
     "enum": ["HémoF", "Dial", "HémodiaF", ""]
+  },
+  "t_p": {
+    "name": "Taux de prothrombine",
+    "dbValue": 12,
+    "id": "t_p",
+    "fullName": "Taux de prothrombine",
+    "group": "liver",
+    "unit": "%",
+    "small": "TP",
+    "valueType": "number"
+  },
+  "adren": {
+    "name": "Adrénaline",
+    "dbValue": 13,
+    "id": "adren",
+    "fullName": "Adrénaline",
+    "group": "heart",
+    "unit": "mg/h",
+    "small": "Adrén",
+    "valueType": "number"
+  },
+  "dobut": {
+    "name": "Dobutamine",
+    "dbValue": 14,
+    "id": "dobut",
+    "fullName": "Dobutamine",
+    "group": "heart",
+    "unit": "μg/mn",
+    "small": "Dobut",
+    "valueType": "number"
+  },
+  "plaqu": {
+    "name": "Plaquettes",
+    "dbValue": 15,
+    "id": "plaqu",
+    "fullName": "Plaquettes",
+    "group": "hematologic",
+    "unit": "u/mm^3",
+    "small": "Plaqu",
+    "valueType": "number"
+  },
+  "glasgow": {
+    "name": "Glasgow",
+    "dbValue": 16,
+    "id": "glasgow",
+    "fullName": "Glasgow",
+    "group": "brain",
+    "unit": "",
+    "small": "Glasgow",
+    "valueType": "number"
   }
 }
