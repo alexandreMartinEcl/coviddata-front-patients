@@ -550,7 +550,7 @@ function Beds({ data, reFetch, ...props }) {
                   <Grid container alignItems="center" justify="space-around">
                     <Grid item xs={6}>
                       <Typography variant="body1">
-                        {icons.toWatch} Cas à risques:{" "}
+                        {icons.toWatch} Cas à gravité haute:{" "}
                         {computeNbSeverePatients(rea)}
                       </Typography>
                     </Grid>
@@ -575,7 +575,9 @@ function Beds({ data, reFetch, ...props }) {
                         </ListSubheader>
                       }
                     >
-                      {unit.beds.map((bed) => bedItemList(bed, unit.name))}
+                      {unit.beds
+                        .sort((a, b) => a.unit_index >= b.unit_index)
+                        .map((bed) => bedItemList(bed, unit.name))}
                     </List>
                   </Paper>
                 ))}

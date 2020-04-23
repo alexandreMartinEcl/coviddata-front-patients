@@ -53,10 +53,13 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ReaTabs({ labels, contents, onTabChange, onAddRea }) {
   const classes = useStyles();
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = React.useState(
+    Number(localStorage.getItem("currentReaTab")) || 0
+  );
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+    localStorage.setItem("currentReaTab", newValue);
     onTabChange && onTabChange(labels[newValue].title);
   };
 
@@ -71,14 +74,19 @@ export default function ReaTabs({ labels, contents, onTabChange, onAddRea }) {
           value={value}
           onChange={handleChange}
           indicatorColor="primary"
-          // color="primary"
           textColor="primary"
           variant="scrollable"
           scrollButtons="auto"
           aria-label="scrollable auto tabs example"
         >
           {labels.map((label) => {
-            return <Tab key={label.title} label={label.title} {...a11yProps(label.id)} />;
+            return (
+              <Tab
+                key={label.title}
+                label={label.title}
+                {...a11yProps(label.id)}
+              />
+            );
           })}
           <Button
             variant="contained"

@@ -27,7 +27,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "format": "prettier --write \"**/*.+(js|jsx|json|css|md)\"",
+    "format": "prettier --write \"src/**/*.+(js|jsx|json|css|md)\"",
     "lint": "eslint .",
     "build": "react-scripts build",
     "test": "react-scripts test",

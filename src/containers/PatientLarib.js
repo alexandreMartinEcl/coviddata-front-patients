@@ -62,8 +62,8 @@ function PatientLarib({ data = {}, reFetch }) {
     hospitalisation_cause,
   };
 
-  const severityValues = ["A risque", "Instable", "Stable"];
-  const severityDataInterface = { "A risque": 0, Instable: 1, Stable: 2 };
+  const severityValues = ["Haute", "Moyenne", "Faible"];
+  const severityDataInterface = { Haute: 0, Moyenne: 1, Faible: 2 };
 
   const severityIcons = {
     0: (
