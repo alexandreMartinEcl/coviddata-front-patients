@@ -29,92 +29,15 @@ import MuiAlert from "@material-ui/lab/Alert";
 import { manageError } from "../shared/utils/tools";
 
 const useStyles = makeStyles((theme) => ({
-  patientCard: {
-    flexGrow: 1,
-    width: "100%",
-    borderColor: theme.palette.primary.main,
-    borderInline: theme.palette.primary.main,
-    backgroundColor: theme.palette.background.paper,
+  boldHeader: {
+    fontWeight: "bold",
+    marginRight: "5px"
   },
-  heading: {
-    fontSize: theme.typography.pxToRem(15),
-  },
-  secondaryHeading: {
-    fontSize: theme.typography.pxToRem(15),
-    color: theme.palette.text.secondary,
-  },
-  column: {
-    flexBasis: "33.33%",
-  },
-  helper: {
-    borderLeft: `2px solid ${theme.palette.divider}`,
-    padding: theme.spacing(1, 2),
-  },
-  link: {
-    color: theme.palette.primary.main,
-    textDecoration: "none",
-    "&:hover": {
-      textDecoration: "underline",
-    },
-  },
-}));
-
-const DataCell = ({
-  editable,
-  dataType,
-  variant,
-  multiline,
-  value,
-  infoToAdd = "",
-  label,
-  onDoubleClick,
-  ...props
-}) => {
-  if (!editable) {
-    return (
-      <Box
-        border={1}
-        style={{
-          margin: "2px",
-          padding: "2px",
-          borderWidth: "1px",
-          borderColor: "#CAF1EC",
-          borderRadius: "10px",
-        }}
-      >
-        <Typography onDoubleClick={onDoubleClick} variant={variant} {...props}>
-          {label}: {value} {infoToAdd}
-        </Typography>
-      </Box>
-    );
+  italicComplement: {
+    fontStyle: "italic",
+    marginLeft: "5px"
   }
-  return dataType.enum ? (
-    <Select
-      margin="dense"
-      label={label}
-      value={value}
-      variant="outlined"
-      style={{ margin: "4px" }}
-      {...props}
-    >
-      {dataType.enum.map((v, i) => (
-        <MenuItem key={v} value={v}>
-          {dataType.enumNames[i]}
-        </MenuItem>
-      ))}
-    </Select>
-  ) : (
-    <TextField
-      type={dataType.valueType}
-      label={label}
-      value={value}
-      variant="outlined"
-      multiline={multiline}
-      style={{ margin: "4px", width: "95%" }}
-      {...props}
-    />
-  );
-};
+}));
 
 export default function PatientHeader({
   patientId,
@@ -165,26 +88,9 @@ export default function PatientHeader({
     }
   };
 
-  const schemaBasicPatient = cloneSchema(addPatientBasicFormSchema).schema;
-  delete schemaBasicPatient.properties["NIP_id"];
-  delete schemaBasicPatient.properties["stay_start_date"];
-  delete schemaBasicPatient.required;
-
   const th = useTheme();
   const isUpSm = useMediaQuery(th.breakpoints.up("sm"));
   const variantHeaderContent = isUpSm ? "body1" : "body2";
-
-  // const closeEditDial = () => {
-  //   setEditDial(false);
-  // };
-
-  // const cancelEditDial = () => {
-  //   closeEditDial();
-  // };
-
-  // const openEditDial = () => {
-  //   setEditDial(true);
-  // };
 
   const makeEditable = (focus = "") => {
     if (!readOnly) {
@@ -285,6 +191,71 @@ export default function PatientHeader({
     )})`;
   }
 
+  const DataCell = ({
+    editable,
+    dataType,
+    variant,
+    multiline,
+    value,
+    infoToAdd = "",
+    label,
+    onDoubleClick,
+    ...props
+  }) => {
+    if (!editable) {
+      return (
+        <Box
+          border={1}
+          style={{
+            margin: "2px",
+            padding: "2px",
+            borderWidth: "1px",
+            borderColor: "#CAF1EC",
+            borderRadius: "10px",
+          }}
+        >
+          <Grid container spacing={1}>
+          <Typography onDoubleClick={onDoubleClick} variant={variant} className={classes.boldHeader} {...props}>
+            {label}: {" "}
+          </Typography>
+          <Typography onDoubleClick={onDoubleClick} variant={variant} {...props}>
+            {value}
+          </Typography>
+          <Typography onDoubleClick={onDoubleClick} variant={variant} className={classes.italicComplement} {...props}>
+            {infoToAdd}
+          </Typography>
+          </Grid>
+        </Box>
+      );
+    }
+    return dataType.enum ? (
+      <Select
+        margin="dense"
+        label={label}
+        value={value}
+        variant="outlined"
+        style={{ margin: "4px" }}
+        {...props}
+      >
+        {dataType.enum.map((v, i) => (
+          <MenuItem key={v} value={v}>
+            {dataType.enumNames[i]}
+          </MenuItem>
+        ))}
+      </Select>
+    ) : (
+      <TextField
+        type={dataType.valueType}
+        label={label}
+        value={value}
+        variant="outlined"
+        multiline={multiline}
+        style={{ margin: "4px", width: "95%" }}
+        {...props}
+      />
+    );
+  };
+  
   return (
     <React.Fragment>
       <Box
@@ -486,30 +457,6 @@ export default function PatientHeader({
             )}
           </React.Fragment>
         )}
-
-        {/* <Dialog
-          open={editDial}
-          onClose={closeEditDial}
-          aria-labelledby="form-dialog-title"
-        >
-          <DialogTitle id="form-dialog-title">
-            Modification des {title}
-          </DialogTitle>
-          <DialogContent>
-            <Form
-              schema={schemaBasicPatient}
-              formData={dataCopy}
-              onSubmit={(form, setLoadingCb) =>
-                onSubmitInfos(form.formData, setLoadingCb)
-              }
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={cancelEditDial} color="primary">
-              Annuler
-          </Button>
-          </DialogActions>
-        </Dialog> */}
 
         <Snackbar
           open={snackbarOpen}

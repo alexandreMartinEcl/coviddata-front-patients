@@ -12,8 +12,17 @@
   "status_measures": [
     {
       "id": 1,
-      "status_type": 0,
+      "status_type": 19,
       "value": "2",
+      "created_date": "2020-04-11",
+      "created_by": "user1",
+      "patient": 1,
+      "reanimation_service": 1
+    },
+    {
+      "id": 1,
+      "status_type": 18,
+      "value": "4",
       "created_date": "2020-04-11",
       "created_by": "user1",
       "patient": 1,
@@ -129,7 +138,7 @@
   "heart_failure": false,
   "bio_chemical_failure": true,
   "brain_failure": false,
-  "lung_failure": true,
+  "lung_failure": false,
   "kidney_failure": false,
   "liver_failure": false,
   "hematologic_failure": true

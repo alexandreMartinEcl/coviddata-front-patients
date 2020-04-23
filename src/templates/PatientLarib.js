@@ -16,7 +16,7 @@ export default function PatientTemplate({ changeMode, gardeMode, components }) {
     DayPicture,
   } = components;
 
-  let modeButtonText = gardeMode ? "Mode normal" : "Mode garde";
+  let modeButtonText = gardeMode ? "Mode garde" : "Mode normal";
   let modeButtonColor = gardeMode ? "primary" : "secondary";
   let modeToSet = gardeMode ? "normal" : "garde";
 

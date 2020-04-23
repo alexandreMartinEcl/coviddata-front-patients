@@ -3,6 +3,7 @@ import { makeStyles, withStyles } from "@material-ui/core/styles";
 import axios from "axios";
 import config from "../config";
 import * as _ from "lodash";
+import { evaluate as mathEval } from "mathjs";
 
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -10,7 +11,6 @@ import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
 
 import { getFormatDateFromFirst, setToMidnight } from "../shared/utils/date";
 import {
@@ -22,6 +22,8 @@ import {
   IconButton,
   CircularProgress,
   Grid,
+  Box,
+  Slider,
 } from "@material-ui/core";
 import SaveIcon from "@material-ui/icons/Save";
 import CancelIcon from "@material-ui/icons/Cancel";
@@ -39,109 +41,114 @@ import {
   KidneyFailureIcon,
   LiverFailureIcon,
   HematologicFailureIcon,
+  InfectiousIcon,
 } from "../shared/icons/index";
 
-const StyledTableCell = withStyles((theme) => ({
-  head: {
+const useStyles = makeStyles((theme) => ({
+  globalTableContainer: {
+    maxHeight: 1000,
+    borderRadius: "10px",
+  },
+  tableHead: {
     backgroundColor: theme.palette.primary.dark,
     color: theme.palette.common.white,
+    minWidth: "150px",
+    [theme.breakpoints.down("ms")]: {
+      fontSize: 6,
+      minWidth: "10px",
+    },
   },
-  body: {
+  firstCol: {
+    minWidth: "50px",
+    width: "80px",
+    maxWidth: "80px",
+    [theme.breakpoints.down("ms")]: {
+      minWidth: "10px",
+      width: "10px",
+      maxWidth: "10px",
+    },
+  },
+  tableCell: {
     fontSize: 14,
+    [theme.breakpoints.down("ms")]: {
+      fontSize: 5,
+    },
   },
-}))(TableCell);
-
-const StyledTableRow = withStyles((theme) => ({
-  root: {
+  tableTitleCell: {
+    fontWeight: "bold",
+  },
+  tableRow: {
     "&:nth-of-type(odd)": {
       backgroundColor: theme.palette.primary.veryLight,
     },
   },
-}))(TableRow);
-
-const useStyles = makeStyles({
-  table: {
-    minWidth: 700,
+  rowIcon: {
+    width: "50px",
+    height: "50px",
+    [theme.breakpoints.down("ms")]: {
+      width: "5px",
+      height: "5px",
+    },
   },
-});
+}));
 
-const configOrderRows = [
-  // {
-  //   title: "Poumons",
-  //   rows: [
-  statusMeasuresInterface.vent,
-  statusMeasuresInterface.p_f,
-  statusMeasuresInterface.seda,
-  statusMeasuresInterface.curar,
-  //   ],
-  // },
-  // {
-  //   title: "Reins",
-  //   rows: [
-  statusMeasuresInterface.creat,
-  statusMeasuresInterface.eer,
-  //       ],
-  // },
-  // {
-  //   title: "Coeur",
-  //   rows: [
-  statusMeasuresInterface.nad,
-  statusMeasuresInterface.adren,
-  statusMeasuresInterface.dobut,
-  //           ],
-  // },
-  // {
-  //   title: "Métabolique",
-  //   rows: [
-  statusMeasuresInterface.lactat,
-  //           ],
-  // },
-  // {
-  //   title: "Cerveau",
-  //   rows: [
-  statusMeasuresInterface.glasgow,
-  //   ],
-  // },
-  // {
-  //   title: "Foie",
-  //   rows: [
-  statusMeasuresInterface.t_p,
-  //   ],
-  // },
-  // {
-  //   title: "Bactériologie",
-  //   rows: [
-  statusMeasuresInterface.antib,
-  statusMeasuresInterface.prelev,
-  statusMeasuresInterface.germes,
-  //   ],
-  // },
-  // {
-  //   title: "Hématologique",
-  //   rows: [
-  statusMeasuresInterface.plaqu,
-  //   ],
-  // },
+const configOrderRows = {
+  lung: {
+    title: "Poumons",
+    rows: [
+      statusMeasuresInterface.vent,
+      statusMeasuresInterface.p_f,
+      statusMeasuresInterface.o_2,
+      statusMeasuresInterface.pa_o2,
+      statusMeasuresInterface.fio2,
+      statusMeasuresInterface.curar,
+    ],
+    id: "lung",
+  },
+  kidney: {
+    title: "Reins",
+    rows: [statusMeasuresInterface.creat, statusMeasuresInterface.eer],
+    id: "kidney",
+  },
+  heart: {
+    title: "Coeur",
+    rows: [
+      statusMeasuresInterface.nad,
+      statusMeasuresInterface.adren,
+      statusMeasuresInterface.dobut,
+    ],
+    id: "heart",
+  },
+  metabolic: {
+    title: "Métabolique",
+    rows: [statusMeasuresInterface.lactat],
+    id: "metabolic",
+  },
+  brain: {
+    title: "Cerveau",
+    rows: [statusMeasuresInterface.glasgow, statusMeasuresInterface.seda],
+    id: "brain",
+  },
+  liver: {
+    title: "Foie",
+    rows: [statusMeasuresInterface.t_p],
+    id: "liver",
+  },
+  hematologic: {
+    title: "Hématologique",
+    rows: [statusMeasuresInterface.plaqu],
+    id: "hematologic",
+  },
+  infectious: {
+    title: "Infectieux",
+    rows: [
+      statusMeasuresInterface.antib,
+      statusMeasuresInterface.prelev,
+      statusMeasuresInterface.germes,
+    ],
+    id: "infectious",
+  },
   // statusMeasuresInterface.dv,
-];
-
-const rowIcons = {
-  heart: (
-    <HeartFailureIcon
-      color="secondary"
-      style={{ width: "20px", height: "20px" }}
-    />
-  ),
-  metabolic: (
-    <BioChemicalFailureIcon style={{ width: "20px", height: "20px" }} />
-  ),
-  brain: <BrainFailureIcon style={{ width: "20px", height: "20px" }} />,
-  lung: <LungFailureIcon style={{ width: "20px", height: "20px" }} />,
-  kidney: <KidneyFailureIcon style={{ width: "20px", height: "20px" }} />,
-  liver: <LiverFailureIcon style={{ width: "20px", height: "20px" }} />,
-  hematologic: (
-    <HematologicFailureIcon style={{ width: "20px", height: "20px" }} />
-  ),
 };
 
 const EditableCell = ({ statusType, ...props }) => {
@@ -170,8 +177,16 @@ function MeasuresTable({
   const classes = useStyles();
   const [tableData, setTableData] = React.useState(forcedTableData);
   const [savedTableData, setSavedTableData] = React.useState([]);
+  const [selectedGroup, setSelectedGroup] = React.useState(null);
   const [selectedCol, setSelectedCol] = React.useState(null);
   const [selectedRow, setSelectedRow] = React.useState(null);
+
+  const defaultNbDaysToDisplay = readOnly
+    ? localStorage.getItem("nbDaysToDisplayGarde")
+    : localStorage.getItem("nbDaysToDisplay");
+  const [nbDaysToDisplay, setNbDaysToDisplay] = React.useState(
+    defaultNbDaysToDisplay
+  );
 
   const [loadingUpdate, setLoadingUpdate] = React.useState(false);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
@@ -207,10 +222,21 @@ function MeasuresTable({
     }
   };
 
+  const rowIcons = {
+    heart: <HeartFailureIcon className={classes.rowIcon} />,
+    metabolic: <BioChemicalFailureIcon className={classes.rowIcon} />,
+    brain: <BrainFailureIcon className={classes.rowIcon} />,
+    lung: <LungFailureIcon className={classes.rowIcon} />,
+    kidney: <KidneyFailureIcon className={classes.rowIcon} />,
+    liver: <LiverFailureIcon className={classes.rowIcon} />,
+    hematologic: <HematologicFailureIcon className={classes.rowIcon} />,
+    infectious: <InfectiousIcon className={classes.rowIcon} />,
+  };
+
   var firstMeasureDate;
   var lastMeasureDate;
   var columnTitles;
-  var rowTitles;
+  let rowTitles;
 
   const buildColumnTitles = () => {
     lastMeasureDate = data.hospitalisationEndDate
@@ -232,17 +258,12 @@ function MeasuresTable({
   };
 
   const buildRowTitles = () => {
-    rowTitles = configOrderRows.map(
-      (status) =>
-        // <Grid container alignItems="center" justify="flex-start">
-        //   <Grid item xs>
-        //     {status.group ? rowIcons[status.group] : (<></>)}
-        //   </Grid>
-        //   <Grid item xs>
-        `${status.small} ${status.unit ? `(${status.unit})` : ""}`
-      //   </Grid>
-      // </Grid>
-    );
+    rowTitles = {};
+    Object.entries(configOrderRows).forEach(([group, { rows }]) => {
+      rowTitles[group] = rows.map(
+        (status) => `${status.small} ${status.unit ? `(${status.unit})` : ""}`
+      );
+    });
   };
 
   const getColumnFromDate = (date) => {
@@ -261,20 +282,49 @@ function MeasuresTable({
     );
   };
 
+  const completeReadOnlyRows = (data) => {
+    Object.entries(configOrderRows).forEach(([group, groupConfig]) => {
+      let dataMatch = (col) => {
+        let res = {};
+        groupConfig.rows.forEach((status, i) => {
+          res[`${status.id}`] = data[group][i][col];
+        });
+        return res;
+      };
+      groupConfig.rows.forEach((status, i) => {
+        if (status.readOnly) {
+          data[group][i] = data[group][i].map((v, j) => {
+            let res = mathEval(status.formula, dataMatch(j));
+            return res.toString() === "Infinity" || isNaN(res) ? "" : res;
+          });
+        }
+      });
+    });
+  };
+
   const buildTableData = () => {
     // create empty table
-    let table = [...Array(configOrderRows.length).keys()].map((i) =>
-      [...Array(columnTitles.length).keys()].map((j) => ``)
-    );
+    let table = {};
+    Object.entries(configOrderRows).forEach(([group, groupConfig]) => {
+      table[group] = [...Array(groupConfig.rows.length).keys()].map((i) =>
+        [...Array(columnTitles.length).keys()].map((j) => ``)
+      );
+    });
 
     data.measures.forEach((m) => {
       let col = getColumnFromDate(m.created_date);
       let type = Object.values(statusMeasuresInterface).find(
         (status) => status.dbValue === Number(m.status_type)
       );
-      let row = configOrderRows.findIndex((i) => i === type);
-      if (row !== -1) table[row][col] = m.value;
+      let group = type.group;
+      if (!group) return;
+      let row = configOrderRows[group].rows.findIndex((i) => i === type);
+      if (row === -1) return;
+      table[group][row][col] = m.value;
     });
+
+    completeReadOnlyRows(table);
+
     setTableData(_.cloneDeep(table));
     setSavedTableData(_.cloneDeep(table));
   };
@@ -313,12 +363,13 @@ function MeasuresTable({
     }
   };
 
-  const makeColumnEditable = (row, col) => {
+  const makeColumnEditable = (group, row, col) => {
     if (!readOnly) {
       // let values = tableData.map((row) => row[col]);
       // change values only if we select another col than precedently
       if (col !== selectedCol) {
         setTableData(_.cloneDeep(savedTableData));
+        setSelectedGroup(group);
         setSelectedRow(row);
         setSelectedCol(col);
       }
@@ -327,32 +378,39 @@ function MeasuresTable({
 
   const cancelEdit = () => {
     setSelectedCol(null);
+    setSelectedGroup(null);
     setTableData(_.cloneDeep(savedTableData));
   };
 
-  const onEditableCellChange = (row, col, valueType) => {
+  const onEditableCellChange = (group, row, col, valueType) => {
     return (event) => {
       if (valueType === "number" && event.target.value === "") {
         return;
       }
       let temData = _.cloneDeep(tableData);
-      temData[row][col] = event.target.value;
+      temData[group][row][col] = event.target.value;
       setTableData(_.cloneDeepWith(temData));
     };
   };
 
-  const updateTableData = (formData) => {
+  const updateTableData = (updatedData) => {
     let temTableData = _.cloneDeep(tableData);
-    Object.entries(formData).forEach((e) => {
-      let [statusDbValue, value] = e;
-      let status = Object.values(statusMeasuresInterface).find(
-        (s) => s.dbValue.toString() === statusDbValue
-      );
-      if (status) {
-        let rwIndex = configOrderRows.findIndex((r) => r.id === status.id);
-        temTableData[rwIndex][selectedCol] = value;
-      }
+    updatedData.forEach((statusMeasure) => {
+      const { created_date, value, status_type } = statusMeasure;
+
+      let col = getColumnFromDate(created_date);
+      let row;
+      let group = Object.keys(configOrderRows).find((k) => {
+        row = configOrderRows[k].rows.findIndex(
+          (statusConfig) => statusConfig.dbValue === Number(status_type)
+        );
+        return row !== -1;
+      });
+
+      temTableData[group][row][col] = value;
     });
+
+    completeReadOnlyRows(temTableData);
 
     setTableData(_.cloneDeep(temTableData));
     setSavedTableData(_.cloneDeep(temTableData));
@@ -364,21 +422,20 @@ function MeasuresTable({
 
     let tDate = getDateFromColumn(selectedCol).toJSON().split("T")[0];
 
-    let values = tableData.map((row) => row[selectedCol]);
-    let savedValues = savedTableData.map((row) => row[selectedCol]);
+    let values = tableData[selectedGroup].map((row) => row[selectedCol]);
+    let savedValues = savedTableData[selectedGroup].map(
+      (row) => row[selectedCol]
+    );
 
-    // const savedData = {}; // describe the former data of the column, for FailureChange callback
     const newData = {}; // describe the former data of the column, for FailureChange callback
     const jsonData = []; // describe the data to send to backend (only changed value, with right format)
     values.forEach((v, i) => {
-      let statusType = configOrderRows[i];
-      let dbStatusType = statusType.dbValue;
-      // let savedValue = savedValues[i];
-      // savedValue = statusType.valueType === "number" ? Number(savedValue) : (statusType.valueType === "string" ? savedValue.trim() : savedValue);
+      let statusType = configOrderRows[selectedGroup].rows[i];
+      if (statusType.readOnly) return;
 
-      // savedData[configOrderRows[i].dbValue] = savedValue;
+      let dbStatusType = statusType.dbValue;
       v = statusType.valueType === "string" ? v.trim() : v;
-      newData[configOrderRows[i].dbValue] = v;
+      newData[configOrderRows[selectedGroup].rows[i].id] = v;
       if (v === savedValues[i]) return;
       let value = statusType.valueType === "number" ? Number(v) : v;
 
@@ -407,7 +464,8 @@ function MeasuresTable({
       .then((res) => {
         console.log(res);
         setLoadingUpdate(false);
-        updateTableData(data);
+        updateTableData(res.data);
+        //TODO technically, its better to put res.data in onMeasureSubmit
         onMeasureSubmit(newData, tDate);
         setSelectedCol(null);
       })
@@ -421,91 +479,166 @@ function MeasuresTable({
   tableData || buildTableData();
   rowTitles || buildRowTitles();
   return (
-    <TableContainer component={Paper}>
-      <Table className={classes.table} aria-label="customized table">
-        <TableHead>
-          <TableRow>
-            <StyledTableCell></StyledTableCell>
-            {columnTitles.map((c, j) => (
-              <StyledTableCell key={`${c.sum}`} align="center">
-                <Typography>{c.sum}</Typography>
-                <br />
-                <Typography>{c.full}</Typography>
-                {selectedCol === j ? (
-                  <React.Fragment>
-                    <br />
-                    <IconButton
-                      aria-label="save"
-                      color="primary"
-                      onClick={cancelEdit}
-                    >
-                      <CancelIcon fontSize="large" />
-                    </IconButton>
-                    <IconButton
-                      aria-label="save"
-                      color="primary"
-                      onClick={submitEdit}
-                    >
-                      <SaveIcon fontSize="large" />
-                    </IconButton>
-                    {loadingUpdate && (
-                      <CircularProgress
-                        size={24}
-                        className={classes.buttonProgress}
-                      />
-                    )}
-                  </React.Fragment>
-                ) : (
-                  <></>
-                )}
-              </StyledTableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {!tableData ||
-            tableData
-              .filter((row) => !readOnly || row.find((c) => c)) // display only not empty rows when readOnly
-              .map((row, i) => (
-                <StyledTableRow key={`${rowTitles[i]}`}>
-                  <StyledTableCell>{rowTitles[i]}</StyledTableCell>
-
-                  {row.map((cell, j) => (
-                    <Tooltip
-                      key={`${rowTitles[i]}-${j}`}
-                      title={configOrderRows[i].fullName}
-                      arrow
-                    >
-                      <StyledTableCell
-                        align="center"
-                        onDoubleClick={() => makeColumnEditable(i, j)}
-                        key={`${rowTitles[i]}-${j}`}
+    <Box
+      style={{
+        padding: "5px",
+        margin: "15px",
+        backgroundColor: "white",
+        borderRadius: "10px",
+      }}
+    >
+      <Typography>Nombre de jours à afficher</Typography>
+      <Slider
+        defaultValue={Math.min(
+          nbDaysToDisplay ? nbDaysToDisplay : columnTitles.length,
+          columnTitles.length
+        )}
+        aria-labelledby="discrete-slider"
+        valueLabelDisplay="auto"
+        step={1}
+        marks
+        min={2}
+        max={columnTitles.length}
+        onChange={(e, val) => {
+          localStorage.setItem(
+            readOnly ? "nbDaysToDisplayGarde" : "nbDaysToDisplay",
+            val
+          );
+          setNbDaysToDisplay(val);
+        }}
+      />
+      <TableContainer className={classes.globalTableContainer}>
+        <Table stickyHeader aria-label="customized table">
+          <TableHead>
+            <TableRow>
+              <TableCell
+                className={`${classes.tableHead} ${classes.firstCol}`}
+              ></TableCell>
+              <TableCell className={`${classes.tableHead}`}>Type</TableCell>
+              {columnTitles.slice(-nbDaysToDisplay).map((c, j) => (
+                <TableCell
+                  className={`${classes.tableHead} ${classes.tableTitleCell}`}
+                  key={`${c.sum}`}
+                  align="center"
+                >
+                  {c.sum}
+                  <br />
+                  {c.full}
+                  {selectedCol === j ? (
+                    <React.Fragment>
+                      <br />
+                      <IconButton
+                        aria-label="save"
+                        color="primary"
+                        onClick={cancelEdit}
                       >
-                        {selectedCol === j ? (
-                          <EditableCell
-                            statusType={configOrderRows[i]}
-                            autoFocus={i === selectedRow}
-                            value={`${cell}`}
-                            onChange={onEditableCellChange(
-                              i,
-                              j,
-                              configOrderRows[i].valueType
-                            )}
-                            onKeyDown={handleKeyPress}
-                          />
-                        ) : (
-                          `${cell} ${measureAddedInfo(
-                            configOrderRows[i],
-                            cell
-                          )}`
-                        )}
-                      </StyledTableCell>
-                    </Tooltip>
-                  ))}
-                </StyledTableRow>
+                        <CancelIcon fontSize="large" />
+                      </IconButton>
+                      <IconButton
+                        aria-label="save"
+                        color="primary"
+                        onClick={submitEdit}
+                      >
+                        <SaveIcon fontSize="large" />
+                      </IconButton>
+                      {loadingUpdate && (
+                        <CircularProgress
+                          size={24}
+                          className={classes.buttonProgress}
+                        />
+                      )}
+                    </React.Fragment>
+                  ) : (
+                    <></>
+                  )}
+                </TableCell>
               ))}
-        </TableBody>
-      </Table>
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {!tableData ||
+              Object.entries(tableData).map(([group, rows]) => {
+                // display only not empty rows when readOnly
+                let filteredRws = rows.filter(
+                  (row) => !readOnly || row.find((c) => c)
+                );
+                return (
+                  <React.Fragment>
+                    {filteredRws.length === 0 || (
+                      <TableCell
+                        className={`${classes.tableCell} ${classes.firstCol}`}
+                        rowSpan={filteredRws.length + 1}
+                      >
+                        {rowIcons[group]}
+                      </TableCell>
+                    )}
+                    {filteredRws.map((row, i) => (
+                      <TableRow
+                        className={classes.tableRow}
+                        key={`${rowTitles[group][i]}`}
+                      >
+                        <TableCell
+                          className={`${classes.tableCell} ${classes.tableTitleCell}`} 
+                        >
+                          {rowTitles[group][i]}
+                        </TableCell>
+                        {row.slice(-nbDaysToDisplay).map((cell, j) => {
+                          let actualDataCol = row.length - nbDaysToDisplay + j;
+                          return (
+                            <Tooltip
+                              key={`${rowTitles[group][i]}-${j}`}
+                              title={configOrderRows[group].rows[i].fullName}
+                              arrow
+                            >
+                              <TableCell
+                                className={classes.tableCell}
+                                align="center"
+                                onDoubleClick={() =>
+                                  makeColumnEditable(group, i, actualDataCol)
+                                }
+                              >
+                                {selectedCol === actualDataCol &&
+                                group === selectedGroup &&
+                                !configOrderRows[group].rows[i].readOnly ? (
+                                  <EditableCell
+                                    statusType={configOrderRows[group].rows[i]}
+                                    autoFocus={i === selectedRow}
+                                    value={`${cell}`}
+                                    onChange={onEditableCellChange(
+                                      group,
+                                      i,
+                                      actualDataCol,
+                                      configOrderRows[group].rows[i].valueType
+                                    )}
+                                    onKeyDown={handleKeyPress}
+                                  />
+                                ) : (
+                                  `${cell} ${measureAddedInfo(
+                                    configOrderRows[group].rows[i],
+                                    cell
+                                  )}`
+                                )}
+                              </TableCell>
+                            </Tooltip>
+                          );
+                        })}
+                      </TableRow>
+                    ))}
+                  </React.Fragment>
+                );
+              })}
+          </TableBody>
+        </Table>
+
+        <Table stickyHeader aria-label="customized table">
+          <TableHead>
+            <TableRow></TableRow>
+          </TableHead>
+
+          <TableBody></TableBody>
+        </Table>
+      </TableContainer>
 
       <Snackbar
         open={snackbarOpen}
@@ -521,7 +654,7 @@ function MeasuresTable({
           {infoMsg}
         </MuiAlert>
       </Snackbar>
-    </TableContainer>
+    </Box>
   );
 }
 

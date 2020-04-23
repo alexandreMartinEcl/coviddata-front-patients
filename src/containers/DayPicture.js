@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import * as _ from "lodash";
+import { evaluate as mathEval } from "mathjs";
 
 import { MeasuresTable, EditableText, CheckList } from "./Components";
 
@@ -101,6 +102,14 @@ const failureProposerCriteria = {
         statusMeasureType: statusMeasuresInterface.vent,
         relation: "ne",
         value: "VS",
+        ifNull: false,
+      },
+    ],
+    [
+      {
+        statusMeasureType: statusMeasuresInterface.p_f,
+        relation: "lt",
+        value: 300,
         ifNull: false,
       },
     ],
@@ -206,12 +215,24 @@ function DayPicture({ data = {}, reFetch, patientId, readOnly }) {
         if (
           failureCriteria.find((criteriaSet, i) => {
             return criteriaSet.every((criterium) => {
-              let toCompare =
-                newColumnData[criterium.statusMeasureType.dbValue];
-              toCompare =
-                criterium.statusMeasureType.valueType === "number"
-                  ? Number(toCompare)
-                  : toCompare;
+              let toCompare;
+              if (criterium.statusMeasureType.readOnly) {
+                toCompare = mathEval(
+                  criterium.statusMeasureType.formula,
+                  newColumnData
+                );
+                toCompare =
+                  toCompare.toString() === "Infinity" || isNaN(toCompare)
+                    ? null
+                    : toCompare;
+                console.log("Eval", toCompare);
+              } else {
+                toCompare = newColumnData[criterium.statusMeasureType.id];
+                toCompare =
+                  criterium.statusMeasureType.valueType === "number"
+                    ? Number(toCompare)
+                    : toCompare;
+              }
               if (!toCompare) {
                 return criterium.ifNull;
               } else if (Array.isArray(criterium.value)) {
@@ -395,8 +416,8 @@ function DayPicture({ data = {}, reFetch, patientId, readOnly }) {
               patientId={patientId}
               data={dataMeasures}
               reFetch={reFetch}
-              forcedTableData={childTableData}
-              updateParentTableData={setChildTableData}
+              // forcedTableData={childTableData}
+              // updateParentTableData={setChildTableData}
               onMeasureSubmit={suggestFailureChange}
               readOnly={readOnly}
             />

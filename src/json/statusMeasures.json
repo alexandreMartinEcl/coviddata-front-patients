@@ -1,16 +1,16 @@
 {
   "p_f": {
-    "name": "P/F (Ratio pression artérielle sur fraction inspirée)",
     "dbValue": 0,
     "id": "p_f",
     "fullName": "Ratio pression artérielle sur fraction inspirée",
     "group": "lung",
     "unit": "",
     "small": "P/F",
-    "valueType": "number"
+    "valueType": "number",
+    "readOnly": true,
+    "formula": "pa_o2/fio2"
   },
   "nad": {
-    "name": "NAD (Noradrénaline)",
     "dbValue": 1,
     "id": "nad",
     "fullName": "Noradrénaline",
@@ -20,7 +20,6 @@
     "valueType": "number"
   },
   "creat": {
-    "name": "Créatinémie",
     "dbValue": 2,
     "id": "creat",
     "fullName": "Créatinémie",
@@ -30,7 +29,6 @@
     "valueType": "number"
   },
   "dv": {
-    "name": "DV ",
     "dbValue": 3,
     "id": "dv",
     "fullName": "Decubitus ventral",
@@ -40,7 +38,6 @@
     "valueType": "number"
   },
   "vent": {
-    "name": "Mode ventilatoire",
     "dbValue": 4,
     "id": "vent",
     "fullName": "Mode ventilatoire",
@@ -59,47 +56,42 @@
     "enum": ["VPC", "VAC", "VSAI", "VS", "opti", "CPAP"]
   },
   "seda": {
-    "name": "Sédation",
     "dbValue": 5,
     "id": "seda",
     "fullName": "Sédation",
-    "group": "lung",
+    "group": "brain",
     "unit": "",
     "small": "Sédation",
     "valueType": "string"
   },
   "antib": {
-    "name": "Antibiotiques",
     "dbValue": 6,
     "id": "antib",
     "fullName": "Antibiotiques",
-    "group": "",
+    "group": "infectious",
     "unit": "",
     "small": "Antib.",
     "valueType": "string"
   },
   "prelev": {
-    "name": "Type de prélèvements",
     "dbValue": 7,
     "id": "prelev",
     "fullName": "Type de prélèvements",
-    "group": "",
+    "group": "infectious",
     "unit": "",
     "small": "Prélèvements",
     "valueType": "string"
   },
   "germes": {
-    "name": "Germes",
     "dbValue": 8,
     "id": "germes",
     "fullName": "Germes",
-    "group": "",
+    "group": "infectious",
     "unit": "",
     "small": "Germes",
     "valueType": "string"
   },
   "curar": {
-    "name": "Curares",
     "dbValue": 9,
     "id": "curar",
     "fullName": "Curares",
@@ -109,7 +101,6 @@
     "valueType": "string"
   },
   "lactat": {
-    "name": "Lactatémie",
     "dbValue": 10,
     "id": "lactat",
     "fullName": "Lactatémie",
@@ -119,7 +110,6 @@
     "valueType": "number"
   },
   "eer": {
-    "name": "Epuration extrarénale",
     "dbValue": 11,
     "id": "eer",
     "fullName": "Epuration extrarénale",
@@ -131,7 +121,6 @@
     "enum": ["HémoF", "Dial", "HémodiaF", ""]
   },
   "t_p": {
-    "name": "Taux de prothrombine",
     "dbValue": 12,
     "id": "t_p",
     "fullName": "Taux de prothrombine",
@@ -141,7 +130,6 @@
     "valueType": "number"
   },
   "adren": {
-    "name": "Adrénaline",
     "dbValue": 13,
     "id": "adren",
     "fullName": "Adrénaline",
@@ -151,7 +139,6 @@
     "valueType": "number"
   },
   "dobut": {
-    "name": "Dobutamine",
     "dbValue": 14,
     "id": "dobut",
     "fullName": "Dobutamine",
@@ -161,7 +148,6 @@
     "valueType": "number"
   },
   "plaqu": {
-    "name": "Plaquettes",
     "dbValue": 15,
     "id": "plaqu",
     "fullName": "Plaquettes",
@@ -171,13 +157,39 @@
     "valueType": "number"
   },
   "glasgow": {
-    "name": "Glasgow",
     "dbValue": 16,
     "id": "glasgow",
     "fullName": "Glasgow",
     "group": "brain",
     "unit": "",
     "small": "Glasgow",
+    "valueType": "number"
+  },
+  "o_2": {
+    "dbValue": 17,
+    "id": "o_2",
+    "fullName": "Débit de dioxygène inspiré",
+    "group": "lung",
+    "unit": "l/min",
+    "small": "O2 inspi",
+    "valueType": "number"
+  },
+  "fio2": {
+    "dbValue": 18,
+    "id": "fio2",
+    "fullName": "Fraction de dioxygène inspirée",
+    "group": "lung",
+    "unit": "",
+    "small": "FiO2",
+    "valueType": "number"
+  },
+  "pa_o2": {
+    "dbValue": 19,
+    "id": "pa_o2",
+    "fullName": "Pression artérielle",
+    "group": "lung",
+    "unit": "",
+    "small": "PaO2",
     "valueType": "number"
   }
 }
