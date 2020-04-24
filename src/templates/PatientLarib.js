@@ -13,6 +13,7 @@ export default function PatientTemplate({ changeMode, gardeMode, components }) {
     RecentDiseaseHistory,
     Evolution,
     TodoList,
+    LatText,
     DayPicture,
   } = components;
 
@@ -22,14 +23,7 @@ export default function PatientTemplate({ changeMode, gardeMode, components }) {
 
   return (
     <Grid container spacing={2}>
-      <Grid
-        item
-        xs={12}
-        sm={12}
-        container
-        justify="space-around"
-        alignItems="center"
-      >
+      <Grid item xs={12} sm={12} container justify="space-around">
         <Grid xs={3} sm={3} item>
           <Link to="/">
             <Button variant="contained">Retour</Button>
@@ -48,6 +42,10 @@ export default function PatientTemplate({ changeMode, gardeMode, components }) {
 
         <Grid xs={3} sm={3} item>
           <TodoList />
+        </Grid>
+
+        <Grid xs={3} sm={3} item>
+          <LatText />
         </Grid>
       </Grid>
 

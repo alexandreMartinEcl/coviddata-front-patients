@@ -31,12 +31,12 @@ import { manageError } from "../shared/utils/tools";
 const useStyles = makeStyles((theme) => ({
   boldHeader: {
     fontWeight: "bold",
-    marginRight: "5px"
+    marginRight: "5px",
   },
   italicComplement: {
     fontStyle: "italic",
-    marginLeft: "5px"
-  }
+    marginLeft: "5px",
+  },
 }));
 
 export default function PatientHeader({
@@ -215,15 +215,29 @@ export default function PatientHeader({
           }}
         >
           <Grid container spacing={1}>
-          <Typography onDoubleClick={onDoubleClick} variant={variant} className={classes.boldHeader} {...props}>
-            {label}: {" "}
-          </Typography>
-          <Typography onDoubleClick={onDoubleClick} variant={variant} {...props}>
-            {value}
-          </Typography>
-          <Typography onDoubleClick={onDoubleClick} variant={variant} className={classes.italicComplement} {...props}>
-            {infoToAdd}
-          </Typography>
+            <Typography
+              onDoubleClick={onDoubleClick}
+              variant={variant}
+              className={classes.boldHeader}
+              {...props}
+            >
+              {label}:{" "}
+            </Typography>
+            <Typography
+              onDoubleClick={onDoubleClick}
+              variant={variant}
+              {...props}
+            >
+              {value}
+            </Typography>
+            <Typography
+              onDoubleClick={onDoubleClick}
+              variant={variant}
+              className={classes.italicComplement}
+              {...props}
+            >
+              {infoToAdd}
+            </Typography>
           </Grid>
         </Box>
       );
@@ -255,7 +269,7 @@ export default function PatientHeader({
       />
     );
   };
-  
+
   return (
     <React.Fragment>
       <Box

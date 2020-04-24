@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
+import defaultLAT from "../shared/files/defaultLAT";
 
 import PatientTemplate from "../templates/PatientLarib";
 import {
@@ -12,6 +13,7 @@ import {
 } from "./Components";
 
 import { ToWatchIcon } from "../shared/icons/index";
+import FormatListNumberedIcon from "@material-ui/icons/FormatListNumbered";
 import theme from "../theme";
 // import { useTheme } from "@material-ui/core";
 
@@ -177,6 +179,9 @@ function PatientLarib({ data = {}, reFetch }) {
   const { todo_list, last_edited_todo_list } = data;
   const dataTodo = { text: todo_list, lastEdited: last_edited_todo_list };
 
+  const { treatment_limitations, last_edited_treatment_limitations } = data;
+  const dataLAT = { text: todo_list, lastEdited: last_edited_todo_list };
+
   const { unit_stays } = data;
   if (unit_stays && unit_stays.length) {
     dataPatientInfo.hospitalisationDate = new Date(
@@ -288,6 +293,26 @@ function PatientLarib({ data = {}, reFetch }) {
         field="todo_list"
         reFetch={reFetch}
         readOnly={gardeMode}
+        withMarkdown
+        buttonIcon={<FormatListNumberedIcon />}
+        defaultText={`- [ ] A faire\n- [x] Fait`}
+        defaultNewLine={`\n- [ ] `}
+        {...props}
+      />
+    ),
+    LatText: (props) => (
+      <EditableText
+        patientId={id}
+        label="Modalités d'application des LAT"
+        title="LAT"
+        extensibleElseDial={false}
+        data={dataLAT}
+        field="treatment_limitations"
+        reFetch={reFetch}
+        readOnly={gardeMode}
+        withMarkdown
+        defaultText={defaultLAT}
+        buttonIcon={<FormatListNumberedIcon />}
         {...props}
       />
     ),

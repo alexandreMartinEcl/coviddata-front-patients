@@ -1,10 +1,10 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import FormatListNumberedIcon from "@material-ui/icons/FormatListNumbered";
 import axios from "axios";
 import config from "../../config";
 
+import ReactMarkdown from "react-markdown";
 import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -17,8 +17,8 @@ import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelActions from "@material-ui/core/ExpansionPanelActions";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import SaveIcon from "@material-ui/icons/Save";
 import HistoryIcon from "@material-ui/icons/History";
+import SaveIcon from "@material-ui/icons/Save";
 import CancelIcon from "@material-ui/icons/Cancel";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
@@ -26,7 +26,7 @@ import { dateTimeToStr } from "../../shared/utils/date";
 
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
-import { Box } from "@material-ui/core";
+import { Box, Grid } from "@material-ui/core";
 import { manageError } from "../../shared/utils/tools";
 
 const useStyles = makeStyles((theme) => ({
@@ -38,6 +38,23 @@ const useStyles = makeStyles((theme) => ({
   column: {
     flexBasis: "33.33%",
   },
+  dialogMarkdownBox: {
+    borderColor: theme.palette.secondary.light,
+    borderRadius: "10px",
+  },
+  button: {
+    [theme.breakpoints.down("ms")]: {
+      fontSize: 20,
+    },
+    "& icon": {
+      [theme.breakpoints.down("ms")]: {
+        width: "10px",
+        height: "10px",
+      },
+      width: "20px",
+      height: "20px",
+    },
+  },
 }));
 
 export default function EditableText({
@@ -48,6 +65,10 @@ export default function EditableText({
   data = {},
   field,
   reFetch,
+  buttonIcon,
+  withMarkdown = false,
+  defaultNewLine = "",
+  defaultText = "",
   readOnly,
 }) {
   const classes = useStyles();
@@ -96,6 +117,33 @@ export default function EditableText({
 
   const onChangeText = (event) => {
     setText(event.target.value);
+  };
+
+  /**
+   *
+   * @param {KeyboardEvent} event
+   */
+  const handleKeyPress = (event) => {
+    switch (event.key) {
+      case "Enter":
+        let txt = event.target.value;
+        let selectionStart = event.target.selectionStart;
+
+        txt =
+          txt.slice(0, event.target.selectionStart) +
+          defaultNewLine +
+          txt.slice(event.target.selectionEnd);
+        event.target.value = txt;
+        onChangeText(event);
+
+        event.target.selectionStart = selectionStart + defaultNewLine.length;
+        event.target.selectionEnd = event.target.selectionStart;
+        //TODO this will prevent UNDO step (if we do Ctrl+z after this event, will not undo it)
+        event.preventDefault();
+        break;
+      default:
+        return;
+    }
   };
 
   const updateState = (resData) => {
@@ -147,18 +195,36 @@ export default function EditableText({
             <Typography>{title}</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
-            <TextField
-              margin="dense"
-              id="todo_text"
-              //            label={label}
-              type="text"
-              value={text}
-              fullWidth
-              onChange={onChangeText}
-              disabled={readOnly}
-              multiline
-              variant="outlined"
-            />
+            <Grid container>
+              {(!readOnly || !withMarkdown) && (
+                <Grid item xs={12} sm={withMarkdown ? 6 : 12}>
+                  <TextField
+                    margin="dense"
+                    id="todo_text"
+                    //            label={label}
+                    type="text"
+                    value={text || defaultText}
+                    fullWidth
+                    onChange={onChangeText}
+                    onKeyPress={
+                      defaultNewLine
+                        ? handleKeyPress
+                        : () => {
+                            return;
+                          }
+                    }
+                    disabled={readOnly}
+                    multiline
+                    variant="outlined"
+                  />
+                </Grid>
+              )}
+              {withMarkdown && (
+                <Grid item xs={12} sm={6}>
+                  <ReactMarkdown source={text || defaultText} />
+                </Grid>
+              )}
+            </Grid>
           </ExpansionPanelDetails>
           <ExpansionPanelActions>
             <div className={classes.column}>
@@ -200,29 +266,46 @@ export default function EditableText({
         color="primary"
         variant="contained"
         onClick={openEditDial}
-        startIcon={<FormatListNumberedIcon />}
+        className={classes.button}
+        startIcon={buttonIcon}
       >
-        Todo list
+        {title}
       </Button>
-      <Dialog
-        open={editDial}
-        onClose={closeEditDial}
-        aria-labelledby="form-dialog-title"
-      >
+      <Dialog open={editDial} onClose={closeEditDial} maxWidth="lg">
         <DialogTitle id="form-dialog-title">{title}</DialogTitle>
         <DialogContent>
-          <TextField
-            margin="dense"
-            id="textField"
-            label={label}
-            type="text"
-            value={text}
-            fullWidth
-            onChange={onChangeText}
-            disabled={readOnly}
-            multiline
-            variant="outlined"
-          />
+          <Grid container>
+            {(!readOnly || !withMarkdown) && (
+              <Grid item xs={12} sm={withMarkdown ? 6 : 12}>
+                <TextField
+                  margin="dense"
+                  id="textField"
+                  label={title}
+                  type="text"
+                  value={text || defaultText}
+                  fullWidth
+                  onChange={onChangeText}
+                  onKeyPress={
+                    defaultNewLine
+                      ? handleKeyPress
+                      : () => {
+                          return;
+                        }
+                  }
+                  disabled={readOnly}
+                  multiline
+                  variant="outlined"
+                />
+              </Grid>
+            )}
+            {withMarkdown && (
+              <Grid item xs={12} sm={6}>
+                <Box border={1} className={classes.dialogMarkdownBox}>
+                  <ReactMarkdown source={text || defaultText} />
+                </Box>
+              </Grid>
+            )}
+          </Grid>
           Mise à jour: {lastEdited || data.lastEdited}
         </DialogContent>
         {readOnly ? (

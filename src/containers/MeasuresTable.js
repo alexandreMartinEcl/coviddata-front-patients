@@ -579,7 +579,7 @@ function MeasuresTable({
                         key={`${rowTitles[group][i]}`}
                       >
                         <TableCell
-                          className={`${classes.tableCell} ${classes.tableTitleCell}`} 
+                          className={`${classes.tableCell} ${classes.tableTitleCell}`}
                         >
                           {rowTitles[group][i]}
                         </TableCell>
