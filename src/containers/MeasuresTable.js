@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import axios from "axios";
 import config from "../config";
 import * as _ from "lodash";
@@ -21,7 +21,6 @@ import {
   MenuItem,
   IconButton,
   CircularProgress,
-  Grid,
   Box,
   Slider,
 } from "@material-ui/core";
@@ -92,6 +91,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+/**
+ * Keys MUST match with statusMeasures' .group (if not, it won't be correctly checked for failures)
+ * TODO should be better (given information is dupplciated)
+ */
 const configOrderRows = {
   lung: {
     title: "Poumons",
@@ -102,6 +105,7 @@ const configOrderRows = {
       statusMeasuresInterface.pa_o2,
       statusMeasuresInterface.fio2,
       statusMeasuresInterface.curar,
+      statusMeasuresInterface.dv,
     ],
     id: "lung",
   },
@@ -466,13 +470,21 @@ function MeasuresTable({
         setLoadingUpdate(false);
         updateTableData(res.data);
         //TODO technically, its better to put res.data in onMeasureSubmit
-        onMeasureSubmit(newData, tDate);
+        onMeasureSubmit(newData, tDate, selectedGroup);
         setSelectedCol(null);
       })
       .catch((err) => {
+        console.log(err);
         setLoadingUpdate(false);
         manageError(err.response, uiInform);
       });
+  };
+
+  const getActualNbDaysToDisplay = () => {
+    return Math.min(
+      nbDaysToDisplay ? nbDaysToDisplay : columnTitles.length,
+      columnTitles.length
+    );
   };
 
   columnTitles || buildColumnTitles();
@@ -489,10 +501,7 @@ function MeasuresTable({
     >
       <Typography>Nombre de jours à afficher</Typography>
       <Slider
-        defaultValue={Math.min(
-          nbDaysToDisplay ? nbDaysToDisplay : columnTitles.length,
-          columnTitles.length
-        )}
+        defaultValue={getActualNbDaysToDisplay()}
         aria-labelledby="discrete-slider"
         valueLabelDisplay="auto"
         step={1}
@@ -515,7 +524,7 @@ function MeasuresTable({
                 className={`${classes.tableHead} ${classes.firstCol}`}
               ></TableCell>
               <TableCell className={`${classes.tableHead}`}>Type</TableCell>
-              {columnTitles.slice(-nbDaysToDisplay).map((c, j) => (
+              {columnTitles.slice(-getActualNbDaysToDisplay()).map((c, j) => (
                 <TableCell
                   className={`${classes.tableHead} ${classes.tableTitleCell}`}
                   key={`${c.sum}`}
@@ -583,46 +592,51 @@ function MeasuresTable({
                         >
                           {rowTitles[group][i]}
                         </TableCell>
-                        {row.slice(-nbDaysToDisplay).map((cell, j) => {
-                          let actualDataCol = row.length - nbDaysToDisplay + j;
-                          return (
-                            <Tooltip
-                              key={`${rowTitles[group][i]}-${j}`}
-                              title={configOrderRows[group].rows[i].fullName}
-                              arrow
-                            >
-                              <TableCell
-                                className={classes.tableCell}
-                                align="center"
-                                onDoubleClick={() =>
-                                  makeColumnEditable(group, i, actualDataCol)
-                                }
+                        {row
+                          .slice(-getActualNbDaysToDisplay())
+                          .map((cell, j) => {
+                            let actualDataCol =
+                              row.length - getActualNbDaysToDisplay() + j;
+                            return (
+                              <Tooltip
+                                key={`${rowTitles[group][i]}-${j}`}
+                                title={configOrderRows[group].rows[i].fullName}
+                                arrow
                               >
-                                {selectedCol === actualDataCol &&
-                                group === selectedGroup &&
-                                !configOrderRows[group].rows[i].readOnly ? (
-                                  <EditableCell
-                                    statusType={configOrderRows[group].rows[i]}
-                                    autoFocus={i === selectedRow}
-                                    value={`${cell}`}
-                                    onChange={onEditableCellChange(
-                                      group,
-                                      i,
-                                      actualDataCol,
-                                      configOrderRows[group].rows[i].valueType
-                                    )}
-                                    onKeyDown={handleKeyPress}
-                                  />
-                                ) : (
-                                  `${cell} ${measureAddedInfo(
-                                    configOrderRows[group].rows[i],
-                                    cell
-                                  )}`
-                                )}
-                              </TableCell>
-                            </Tooltip>
-                          );
-                        })}
+                                <TableCell
+                                  className={classes.tableCell}
+                                  align="center"
+                                  onDoubleClick={() =>
+                                    makeColumnEditable(group, i, actualDataCol)
+                                  }
+                                >
+                                  {selectedCol === actualDataCol &&
+                                  group === selectedGroup &&
+                                  !configOrderRows[group].rows[i].readOnly ? (
+                                    <EditableCell
+                                      statusType={
+                                        configOrderRows[group].rows[i]
+                                      }
+                                      autoFocus={i === selectedRow}
+                                      value={`${cell}`}
+                                      onChange={onEditableCellChange(
+                                        group,
+                                        i,
+                                        actualDataCol,
+                                        configOrderRows[group].rows[i].valueType
+                                      )}
+                                      onKeyDown={handleKeyPress}
+                                    />
+                                  ) : (
+                                    `${cell} ${measureAddedInfo(
+                                      configOrderRows[group].rows[i],
+                                      cell
+                                    )}`
+                                  )}
+                                </TableCell>
+                              </Tooltip>
+                            );
+                          })}
                       </TableRow>
                     ))}
                   </React.Fragment>

@@ -180,7 +180,10 @@ function PatientLarib({ data = {}, reFetch }) {
   const dataTodo = { text: todo_list, lastEdited: last_edited_todo_list };
 
   const { treatment_limitations, last_edited_treatment_limitations } = data;
-  const dataLAT = { text: todo_list, lastEdited: last_edited_todo_list };
+  const dataLAT = {
+    text: treatment_limitations,
+    lastEdited: last_edited_treatment_limitations,
+  };
 
   const { unit_stays } = data;
   if (unit_stays && unit_stays.length) {

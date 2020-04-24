@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import * as _ from "lodash";
 import { evaluate as mathEval } from "mathjs";
 
@@ -154,6 +154,18 @@ const failureProposerCriteria = {
   ],
 };
 
+// TODO quick fix, should be refactored later with suggestFailureChange
+// because group can be found in criterium.statusMeasureType.group
+const interfaceGroupFailureCriteria = {
+  lung: "lung_failure",
+  kidney: "kidney_failure",
+  heart: "heart_failure",
+  metabolic: "bio_chemical_failure",
+  brain: "brain_failure",
+  liver: "liver_failure",
+  hematologic: "hematologic_failure",
+};
+
 const compare = (relation, valLeft, valRight) => {
   switch (relation) {
     case "equ":
@@ -175,8 +187,6 @@ const compare = (relation, valLeft, valRight) => {
 
 function DayPicture({ data = {}, reFetch, patientId, readOnly }) {
   const classes = useStyles();
-
-  const [childTableData, setChildTableData] = useState(null);
 
   const [failureChange, setFailureChange] = React.useState({});
   const [failureWarnDial, setFailureWarnDial] = React.useState(false);
@@ -206,56 +216,59 @@ function DayPicture({ data = {}, reFetch, patientId, readOnly }) {
     hematologic_failure,
   };
 
-  const suggestFailureChange = (newColumnData, columnDate) => {
+  const suggestFailureChange = (newColumnData, columnDate, statusGroup) => {
     let temData = {};
     if (!isSameDay(new Date(), columnDate)) return;
 
-    Object.entries(failureProposerCriteria).forEach(
-      ([failure, failureCriteria]) => {
-        if (
-          failureCriteria.find((criteriaSet, i) => {
-            return criteriaSet.every((criterium) => {
-              let toCompare;
-              if (criterium.statusMeasureType.readOnly) {
-                toCompare = mathEval(
-                  criterium.statusMeasureType.formula,
-                  newColumnData
-                );
-                toCompare =
-                  toCompare.toString() === "Infinity" || isNaN(toCompare)
-                    ? null
-                    : toCompare;
-                console.log("Eval", toCompare);
-              } else {
-                toCompare = newColumnData[criterium.statusMeasureType.id];
-                toCompare =
-                  criterium.statusMeasureType.valueType === "number"
-                    ? Number(toCompare)
-                    : toCompare;
-              }
-              if (!toCompare) {
-                return criterium.ifNull;
-              } else if (Array.isArray(criterium.value)) {
-                return criterium.value.find((v) =>
-                  compare(criterium.relation, toCompare, v)
-                );
-              } else {
-                return compare(criterium.relation, toCompare, criterium.value);
-              }
-            });
-          })
-        ) {
-          temData[failure] = true;
-        } else {
-          temData[failure] = false;
-        }
-      }
-    );
+    let failure = interfaceGroupFailureCriteria[statusGroup];
+    let failureCriteria = failure ? failureProposerCriteria[failure] : null;
+    if (!failureCriteria) return;
 
-    console.log(temData);
-    if (!_.isEqual(dataFailures, temData)) {
+    if (
+      failureCriteria.find((criteriaSet, i) => {
+        return criteriaSet.every((criterium) => {
+          let toCompare;
+          if (criterium.statusMeasureType.readOnly) {
+            toCompare = mathEval(
+              criterium.statusMeasureType.formula,
+              newColumnData
+            );
+            toCompare =
+              toCompare.toString() === "Infinity" || isNaN(toCompare)
+                ? null
+                : toCompare;
+          } else {
+            toCompare = newColumnData[criterium.statusMeasureType.id];
+            toCompare =
+              criterium.statusMeasureType.valueType === "number"
+                ? Number(toCompare)
+                : toCompare;
+          }
+          if (!toCompare) {
+            return criterium.ifNull;
+          } else if (Array.isArray(criterium.value)) {
+            return criterium.value.find((v) =>
+              compare(criterium.relation, toCompare, v)
+            );
+          } else {
+            return compare(criterium.relation, toCompare, criterium.value);
+          }
+        });
+      })
+    ) {
+      temData[failure] = true;
+    } else {
+      temData[failure] = false;
+    }
+
+    let oldData = _.cloneDeep(
+      Object.keys(failureChange).length ? failureChange : dataFailures
+    );
+    let newData = _.cloneDeep(oldData);
+    Object.assign(newData, temData);
+    if (!_.isEqual(newData, oldData)) {
       setFailureWarnDial(true);
-      setFailureChange(_.cloneDeep(temData));
+      setFailureChange(_.cloneDeep(newData));
     }
   };
 

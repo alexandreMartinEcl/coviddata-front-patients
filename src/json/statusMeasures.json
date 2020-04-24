@@ -35,7 +35,7 @@
     "group": "",
     "unit": "",
     "small": "DV",
-    "valueType": "number"
+    "valueType": "string"
   },
   "vent": {
     "dbValue": 4,

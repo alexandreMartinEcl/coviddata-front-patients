@@ -10,8 +10,6 @@ import HistoryIcon from "@material-ui/icons/History";
 import SaveIcon from "@material-ui/icons/Save";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
-import { cloneSchema } from "../shared/utils/schema";
-import addPatientBasicFormSchema from "../json/schemaPatientBasic.json";
 import { getAge, dateToDayStep } from "../shared/utils/date";
 import * as _ from "lodash";
 import {
