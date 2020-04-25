@@ -12,9 +12,12 @@ import {
   DayPicture,
 } from "./Components";
 
-import { ToWatchIcon } from "../shared/icons/index";
-import FormatListNumberedIcon from "@material-ui/icons/FormatListNumbered";
+import { ToWatchIcon, LatIcon, TodoListIcon } from "../shared/icons/index";
 import theme from "../theme";
+import {
+  howManyUnfilledTasksInMarkdown,
+  howManyFilledTasksInMarkdown,
+} from "../shared/utils/tools";
 // import { useTheme } from "@material-ui/core";
 
 function PatientLarib({ data = {}, reFetch }) {
@@ -297,7 +300,8 @@ function PatientLarib({ data = {}, reFetch }) {
         reFetch={reFetch}
         readOnly={gardeMode}
         withMarkdown
-        buttonIcon={<FormatListNumberedIcon />}
+        buttonIcon={<TodoListIcon style={{ width: "20px", height: "20px" }} />}
+        badgeCounter={howManyUnfilledTasksInMarkdown}
         defaultText={`- [ ] A faire\n- [x] Fait`}
         defaultNewLine={`\n- [ ] `}
         {...props}
@@ -314,8 +318,9 @@ function PatientLarib({ data = {}, reFetch }) {
         reFetch={reFetch}
         readOnly={gardeMode}
         withMarkdown
+        badgeCounter={howManyFilledTasksInMarkdown}
         defaultText={defaultLAT}
-        buttonIcon={<FormatListNumberedIcon />}
+        buttonIcon={<LatIcon style={{ width: "20px", height: "20px" }} />}
         {...props}
       />
     ),

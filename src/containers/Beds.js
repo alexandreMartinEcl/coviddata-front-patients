@@ -22,7 +22,10 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import { cloneSchema, flat } from "../shared/utils/schema";
 import ReaTabs from "../components/ReaTabs";
 import Form from "../components/Form";
-import { manageError } from "../shared/utils/tools";
+import {
+  manageError,
+  howManyUnfilledTasksInMarkdown,
+} from "../shared/utils/tools";
 
 import { getAge, dateToDayStep } from "../shared/utils/date";
 import addPatientBasicFormSchema from "../json/schemaPatientBasic.json";
@@ -49,7 +52,9 @@ import {
   HematologicFailureIcon,
   BedIcon,
   ToWatchIcon,
+  TodoListIcon,
 } from "../shared/icons/index";
+import { EditableText } from "./Components";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -132,6 +137,9 @@ const icons = {
   bed: <BedIcon color="secondary" style={{ width: "30px", height: "100%" }} />,
   toWatch: (
     <ToWatchIcon color="secondary" style={{ width: "30px", height: "100%" }} />
+  ),
+  todoList: (
+    <TodoListIcon color="secondary" style={{ width: "30px", height: "100%" }} />
   ),
 };
 
@@ -257,6 +265,14 @@ function Beds({ data, reFetch, ...props }) {
       "hematologic_failure",
     ].filter((k) => patient[k]);
 
+    const iconsToDisplay = toDisplay.map((k) => {
+      return (
+        <Grid key={k} item xs={4}>
+          {icons[k]}
+        </Grid>
+      );
+    });
+
     return toDisplay.length ? (
       <Grid
         container
@@ -264,16 +280,39 @@ function Beds({ data, reFetch, ...props }) {
         justify="flex-start"
         style={{ width: "120px" }}
       >
-        {toDisplay.map((k) => {
-          return (
-            <Grid key={k} item xs={4}>
-              {icons[k]}
-            </Grid>
-          );
-        })}
+        {iconsToDisplay}
       </Grid>
     ) : (
       <></>
+    );
+  };
+
+  const buildTodoIcon = (patient) => {
+    const { todo_list, last_edited_todo_list } = patient;
+    const dataTodo = { text: todo_list, lastEdited: last_edited_todo_list };
+    const nbTasks = howManyUnfilledTasksInMarkdown(todo_list);
+
+    if (!nbTasks) return;
+    return (
+      <EditableText
+        label="Liste à penser pour le patient"
+        extensibleElseDial={false}
+        data={dataTodo}
+        readOnly={true}
+        withMarkdown
+        customButton={(props) => (
+          <IconButton variant="contained">
+            <TodoListIcon
+              color="primary"
+              style={{ width: "30px", height: "30px" }}
+              {...props}
+            />
+          </IconButton>
+        )}
+        badgeCounter={howManyUnfilledTasksInMarkdown}
+        defaultText={`- [ ] A faire\n- [x] Fait`}
+        defaultNewLine={`\n- [ ] `}
+      />
     );
   };
 
@@ -484,6 +523,8 @@ function Beds({ data, reFetch, ...props }) {
         />
         {buildFailuresIconsGrids(patient)}
         <ListItemSecondaryAction className={classes.listItemSecAction}>
+          {buildTodoIcon(patient)}
+
           <IconButton
             onClick={() =>
               handleRemoveOpen(idStay, displayName(first_name, family_name))

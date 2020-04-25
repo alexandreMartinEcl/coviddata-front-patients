@@ -13,6 +13,8 @@ import HemodynamicFailureIconA from "./hemodynamic_failure";
 import ToWatchIconA from "./to_watch";
 import BedIconA from "./bed";
 import InfectiousIconA from "./infectious";
+import LatIconA from "./lat_icon";
+import TodoListIconA from "./todo_list_icon";
 
 export const HeartFailureIcon = HeartFailureIconA;
 export const BioChemicalFailureIcon = BioChemicalFailureIconA;
@@ -25,3 +27,5 @@ export const HemodynamicFailureIcon = HemodynamicFailureIconA;
 export const ToWatchIcon = ToWatchIconA;
 export const BedIcon = BedIconA;
 export const InfectiousIcon = InfectiousIconA;
+export const TodoListIcon = TodoListIconA;
+export const LatIcon = LatIconA;

@@ -128,10 +128,12 @@
   "last_edited_recent_disease_history": null,
   "evolution": "",
   "last_edited_evolution": null,
-  "todo_list": "",
+  "todo_list": "- [ ] Ceci\n- [ ] Puis Cela\n- [x] Mais ca c'est fait déjà\n",
   "last_edited_todo_list": null,
   "day_notice": "",
   "last_edited_day_notice": null,
+  "treatment_limitations": "",
+  "last_edited_treatment_limitations": null,
   "assigned_caregivers": [],
   "hospitalisation_cause": "Détresse respiratoire aigu sur Covid",
 

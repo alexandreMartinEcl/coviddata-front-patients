@@ -152,7 +152,7 @@
     "id": "plaqu",
     "fullName": "Plaquettes",
     "group": "hematologic",
-    "unit": "u/mm^3",
+    "unit": "/mm3",
     "small": "Plaqu",
     "valueType": "number"
   },

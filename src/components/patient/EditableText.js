@@ -26,7 +26,7 @@ import { dateTimeToStr } from "../../shared/utils/date";
 
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
-import { Box, Grid } from "@material-ui/core";
+import { Box, Grid, Badge } from "@material-ui/core";
 import { manageError } from "../../shared/utils/tools";
 
 const useStyles = makeStyles((theme) => ({
@@ -42,19 +42,6 @@ const useStyles = makeStyles((theme) => ({
     borderColor: theme.palette.secondary.light,
     borderRadius: "10px",
   },
-  button: {
-    [theme.breakpoints.down("ms")]: {
-      fontSize: 20,
-    },
-    "& icon": {
-      [theme.breakpoints.down("ms")]: {
-        width: "10px",
-        height: "10px",
-      },
-      width: "20px",
-      height: "20px",
-    },
-  },
 }));
 
 export default function EditableText({
@@ -66,13 +53,16 @@ export default function EditableText({
   field,
   reFetch,
   buttonIcon,
+  customButton,
   withMarkdown = false,
+  badgeCounter,
   defaultNewLine = "",
   defaultText = "",
   readOnly,
 }) {
   const classes = useStyles();
   const [editDial, setEditDial] = React.useState(false);
+  const [badgeCount, setBadgeCount] = React.useState(null);
 
   const [savedText, setSavedText] = React.useState(data.text || "");
   const [text, setText] = React.useState(data.text || "");
@@ -119,6 +109,28 @@ export default function EditableText({
     setText(event.target.value);
   };
 
+  const OpenButton = (props) => {
+    let SimpleButton = customButton
+      ? customButton
+      : (_props) => (
+          <Button
+            color="primary"
+            variant="contained"
+            startIcon={buttonIcon}
+            {..._props}
+          >
+            {title}
+          </Button>
+        );
+    return badgeCount ? (
+      <Badge color="secondary" badgeContent={badgeCount}>
+        <SimpleButton {...props} />
+      </Badge>
+    ) : (
+      <SimpleButton {...props} />
+    );
+  };
+
   /**
    *
    * @param {KeyboardEvent} event
@@ -149,7 +161,14 @@ export default function EditableText({
   const updateState = (resData) => {
     setSavedText(resData[field]);
     setText(resData[field]);
+    buildBadgeCount(resData[field]);
     setLastEdited(dateTimeToStr(resData[`last_edited_${field}`]));
+  };
+
+  const buildBadgeCount = (str) => {
+    if (!badgeCounter) return;
+
+    setBadgeCount(badgeCounter(str));
   };
 
   const onSubmitTodoList = () => {
@@ -182,6 +201,7 @@ export default function EditableText({
       });
   };
 
+  (badgeCounter && badgeCount !== null) || buildBadgeCount(text);
   return extensibleElseDial ? (
     <React.Fragment>
       <Box style={{ margin: "1px", padding: "2px" }}>
@@ -220,7 +240,7 @@ export default function EditableText({
                 </Grid>
               )}
               {withMarkdown && (
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={readOnly ? 12 : 6}>
                   <ReactMarkdown source={text || defaultText} />
                 </Grid>
               )}
@@ -262,15 +282,7 @@ export default function EditableText({
     </React.Fragment>
   ) : (
     <React.Fragment>
-      <Button
-        color="primary"
-        variant="contained"
-        onClick={openEditDial}
-        className={classes.button}
-        startIcon={buttonIcon}
-      >
-        {title}
-      </Button>
+      <OpenButton onClick={openEditDial} />
       <Dialog open={editDial} onClose={closeEditDial} maxWidth="lg">
         <DialogTitle id="form-dialog-title">{title}</DialogTitle>
         <DialogContent>
@@ -299,7 +311,7 @@ export default function EditableText({
               </Grid>
             )}
             {withMarkdown && (
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={readOnly ? 12 : 6}>
                 <Box border={1} className={classes.dialogMarkdownBox}>
                   <ReactMarkdown source={text || defaultText} />
                 </Box>

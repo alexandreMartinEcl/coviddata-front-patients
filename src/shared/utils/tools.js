@@ -37,3 +37,11 @@ export function manageError(errResp, uiInform) {
 
   uiInform && uiInform(errMsg, "error");
 }
+
+export function howManyUnfilledTasksInMarkdown(txt) {
+  return txt.split("- [ ]").length - 1;
+}
+
+export function howManyFilledTasksInMarkdown(txt) {
+  return txt.split("[x]").length - 1;
+}
