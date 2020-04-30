@@ -26,6 +26,12 @@ import {
   makeStyles,
 } from "@material-ui/core";
 
+import {
+  submitFailureChecklist,
+  submitEditableText,
+} from "../repository/patient.repository";
+import { manageError } from "../shared/utils/tools";
+
 const useStyles = makeStyles((theme) => ({
   label: {
     backgroundColor: "white",
@@ -154,16 +160,109 @@ const failureProposerCriteria = {
   ],
 };
 
+const describeCriterium = (criterium, between) => {
+  if (Array.isArray(criterium)) {
+    return criterium.map((c) => describeCriterium(c, " ET ")).join(between);
+  }
+  switch (criterium.relation) {
+    case "equ":
+      return `${criterium.statusMeasureType.small} = ${
+        criterium.value === "" ? "''" : criterium.value
+        }`;
+    case "ne":
+      return `${criterium.statusMeasureType.small} != ${
+        criterium.value === "" ? "''" : criterium.value
+        }`;
+    case "gt":
+      return `${criterium.statusMeasureType.small} > ${
+        criterium.value === "" ? "''" : criterium.value
+        }`;
+    case "lt":
+      return `${criterium.statusMeasureType.small} < ${
+        criterium.value === "" ? "''" : criterium.value
+        }`;
+    case "gte":
+      return `${criterium.statusMeasureType.small} ≥ ${
+        criterium.value === "" ? "''" : criterium.value
+        }`;
+    case "lte":
+      return `${criterium.statusMeasureType.small} ≤ ${
+        criterium.value === "" ? "''" : criterium.value
+        }`;
+    default:
+      return;
+  }
+};
+
+const failuresInterface = {
+  heart_failure: `Défaillance cardiaque\n(${describeCriterium(
+    failureProposerCriteria.heart_failure,
+    " OU "
+  )})`,
+  bio_chemical_failure: `Défaillance métabolique\n(${describeCriterium(
+    failureProposerCriteria.bio_chemical_failure,
+    " OU "
+  )})`,
+  brain_failure: `Défaillance neurologique\n(${describeCriterium(
+    failureProposerCriteria.brain_failure,
+    " OU "
+  )})`,
+  lung_failure: `Défaillance pulmonaire\n(${describeCriterium(
+    failureProposerCriteria.lung_failure,
+    " OU "
+  )})`,
+  kidney_failure: `Défaillance rénale\n(${describeCriterium(
+    failureProposerCriteria.kidney_failure,
+    " OU "
+  )})`,
+  liver_failure: `Défaillance hépatique\n(${describeCriterium(
+    failureProposerCriteria.liver_failure,
+    " OU "
+  )})`,
+  hematologic_failure: `Défaillance hématologique\n(${describeCriterium(
+    failureProposerCriteria.hematologic_failure,
+    " OU "
+  )})`,
+};
+
+const failuresIcons = {
+  heart_failure: (
+    <HeartFailureIcon style={{ width: "50px", height: "50px" }} />
+  ),
+  bio_chemical_failure: (
+    <BioChemicalFailureIcon style={{ width: "50px", height: "50px" }} />
+  ),
+  brain_failure: (
+    <BrainFailureIcon style={{ width: "50px", height: "50px" }} />
+  ),
+  lung_failure: <LungFailureIcon style={{ width: "50px", height: "50px" }} />,
+  kidney_failure: (
+    <KidneyFailureIcon style={{ width: "50px", height: "50px" }} />
+  ),
+  liver_failure: (
+    <LiverFailureIcon style={{ width: "50px", height: "50px" }} />
+  ),
+  hematologic_failure: (
+    <HematologicFailureIcon style={{ width: "50px", height: "50px" }} />
+  ),
+};
+
 // TODO quick fix, should be refactored later with suggestFailureChange
 // because group can be found in criterium.statusMeasureType.group
 const interfaceGroupFailureCriteria = {
-  lung: "lung_failure",
-  kidney: "kidney_failure",
-  heart: "heart_failure",
-  metabolic: "bio_chemical_failure",
-  brain: "brain_failure",
-  liver: "liver_failure",
-  hematologic: "hematologic_failure",
+  lung: { failure: "lung_failure", name: "Défaillance pulmonaire" },
+  kidney: { failure: "kidney_failure", name: "Défaillance rénale" },
+  heart: { failure: "heart_failure", name: "Défaillance cardiaque" },
+  metabolic: {
+    failure: "bio_chemical_failure",
+    name: "Défaillance métabolique",
+  },
+  brain: { failure: "brain_failure", name: "Défaillance cérébrale" },
+  liver: { failure: "liver_failure", name: "Défaillance hépatique" },
+  hematologic: {
+    failure: "hematologic_failure",
+    name: "Défaillance hématologique",
+  },
 };
 
 const compare = (relation, valLeft, valRight) => {
@@ -185,42 +284,25 @@ const compare = (relation, valLeft, valRight) => {
   }
 };
 
-function DayPicture({ data = {}, reFetch, patientId, readOnly }) {
+const DayPicture = ({
+  reFetch,
+  patientId,
+  readOnly,
+  parentUiInform,
+  data,
+  // setParentData,
+  mapResToData,
+}) => {
   const classes = useStyles();
+  const [dataCopy, setDataCopy] = React.useState(_.cloneDeep(data));
 
-  const [failureChange, setFailureChange] = React.useState({});
   const [failureWarnDial, setFailureWarnDial] = React.useState(false);
-
-  const { day_notice, last_edited_day_notice } = data;
-  const dataDayNotice = {
-    text: day_notice,
-    lastEdited: last_edited_day_notice,
-  };
-
-  const {
-    heart_failure,
-    bio_chemical_failure,
-    brain_failure,
-    lung_failure,
-    kidney_failure,
-    liver_failure,
-    hematologic_failure,
-  } = data;
-  const dataFailures = {
-    heart_failure,
-    bio_chemical_failure,
-    brain_failure,
-    lung_failure,
-    kidney_failure,
-    liver_failure,
-    hematologic_failure,
-  };
 
   const suggestFailureChange = (newColumnData, columnDate, statusGroup) => {
     let temData = {};
     if (!isSameDay(new Date(), columnDate)) return;
 
-    let failure = interfaceGroupFailureCriteria[statusGroup];
+    let failure = interfaceGroupFailureCriteria[statusGroup].failure;
     let failureCriteria = failure ? failureProposerCriteria[failure] : null;
     if (!failureCriteria) return;
 
@@ -261,120 +343,28 @@ function DayPicture({ data = {}, reFetch, patientId, readOnly }) {
       temData[failure] = false;
     }
 
-    let oldData = _.cloneDeep(
-      Object.keys(failureChange).length ? failureChange : dataFailures
-    );
-    let newData = _.cloneDeep(oldData);
-    Object.assign(newData, temData);
+    let oldData = _.cloneDeep(dataCopy.failuresData);
+
+    let newData = Object.assign(_.cloneDeep(oldData), temData);
     if (!_.isEqual(newData, oldData)) {
-      setFailureWarnDial(true);
-      setFailureChange(_.cloneDeep(newData));
+      let failureName = interfaceGroupFailureCriteria[statusGroup].name;
+      parentUiInform && parentUiInform(
+        `${failureName} ${temData[failure] ? "détectée" : "retirée"}`,
+        "success"
+      );
+
+      submitFailureChecklist(patientId)(
+        newData,
+        (res) => {
+          console.log("Data returned:", res);
+          let temData = mapResToData ? mapResToData.failuresData(res.data) : res.data;
+          setDataCopy(Object.assign(_.cloneDeep(dataCopy), {failuresData: temData}));
+          console.log("Data returnedset:", Object.assign(_.cloneDeep(dataCopy), {failuresData: temData}));
+        },
+        (err) => manageError(err, console.error)
+      );
     }
   };
-
-  const describeCriterium = (criterium, between) => {
-    if (Array.isArray(criterium)) {
-      return criterium.map((c) => describeCriterium(c, " ET ")).join(between);
-    }
-    switch (criterium.relation) {
-      case "equ":
-        return `${criterium.statusMeasureType.small} = ${
-          criterium.value === "" ? "''" : criterium.value
-        }`;
-      case "ne":
-        return `${criterium.statusMeasureType.small} != ${
-          criterium.value === "" ? "''" : criterium.value
-        }`;
-      case "gt":
-        return `${criterium.statusMeasureType.small} > ${
-          criterium.value === "" ? "''" : criterium.value
-        }`;
-      case "lt":
-        return `${criterium.statusMeasureType.small} < ${
-          criterium.value === "" ? "''" : criterium.value
-        }`;
-      case "gte":
-        return `${criterium.statusMeasureType.small} ≥ ${
-          criterium.value === "" ? "''" : criterium.value
-        }`;
-      case "lte":
-        return `${criterium.statusMeasureType.small} ≤ ${
-          criterium.value === "" ? "''" : criterium.value
-        }`;
-      default:
-        return;
-    }
-  };
-
-  const failuresInterface = {
-    heart_failure: `Défaillance cardiaque\n(${describeCriterium(
-      failureProposerCriteria.heart_failure,
-      " OU "
-    )})`,
-    bio_chemical_failure: `Défaillance métabolique\n(${describeCriterium(
-      failureProposerCriteria.bio_chemical_failure,
-      " OU "
-    )})`,
-    brain_failure: `Défaillance neurologique\n(${describeCriterium(
-      failureProposerCriteria.brain_failure,
-      " OU "
-    )})`,
-    lung_failure: `Défaillance pulmonaire\n(${describeCriterium(
-      failureProposerCriteria.lung_failure,
-      " OU "
-    )})`,
-    kidney_failure: `Défaillance rénale\n(${describeCriterium(
-      failureProposerCriteria.kidney_failure,
-      " OU "
-    )})`,
-    liver_failure: `Défaillance hépatique\n(${describeCriterium(
-      failureProposerCriteria.liver_failure,
-      " OU "
-    )})`,
-    hematologic_failure: `Défaillance hématologique\n(${describeCriterium(
-      failureProposerCriteria.hematologic_failure,
-      " OU "
-    )})`,
-  };
-
-  const failuresIcons = {
-    heart_failure: (
-      <HeartFailureIcon style={{ width: "50px", height: "50px" }} />
-    ),
-    bio_chemical_failure: (
-      <BioChemicalFailureIcon style={{ width: "50px", height: "50px" }} />
-    ),
-    brain_failure: (
-      <BrainFailureIcon style={{ width: "50px", height: "50px" }} />
-    ),
-    lung_failure: <LungFailureIcon style={{ width: "50px", height: "50px" }} />,
-    kidney_failure: (
-      <KidneyFailureIcon style={{ width: "50px", height: "50px" }} />
-    ),
-    liver_failure: (
-      <LiverFailureIcon style={{ width: "50px", height: "50px" }} />
-    ),
-    hematologic_failure: (
-      <HematologicFailureIcon style={{ width: "50px", height: "50px" }} />
-    ),
-  };
-
-  let dataMeasures;
-  const { status_measures, unit_stays } = data;
-  dataMeasures = { measures: status_measures };
-  if (unit_stays && unit_stays.length) {
-    dataMeasures.hospitalisationDate = new Date(
-      Math.min(...unit_stays.map((s) => new Date(s.start_date)))
-    );
-    dataMeasures.hospitalisationEndDate = unit_stays.filter(
-      (s) => !s.is_finished
-    ).length
-      ? null
-      : new Date(Math.max(...unit_stays.map((s) => new Date(s.end_date))));
-  }
-  if (data.weight_kg) {
-    dataMeasures.weight_kg = data.weight_kg;
-  }
 
   return (
     <React.Fragment>
@@ -401,38 +391,34 @@ function DayPicture({ data = {}, reFetch, patientId, readOnly }) {
                 patientId={patientId}
                 label="Décrit l'état du patient à ce jour"
                 title="Notes du jour"
-                extensibleElseDial={true}
-                data={dataDayNotice}
-                field="day_notice"
-                reFetch={reFetch}
+                variant="extensible"
+                data={dataCopy.dayNoticeData}
                 readOnly={readOnly}
+                parentUiInform={parentUiInform}
+                mapResToData={mapResToData.dayNoticeData}
+                processSubmit={submitEditableText("day_notice", patientId)}
               />
             </Grid>
           </Grid>
 
           <Grid xs={12} sm={4} item>
             <CheckList
-              patientId={patientId}
+              labels={failuresInterface}
               title="Défaillances"
-              data={{ checks: dataFailures }}
-              dataInterface={failuresInterface}
-              suggestedData={failureChange}
-              setSuggestedData={setFailureChange}
+              data={dataCopy.failuresData}
               customIcons={failuresIcons}
               readOnly={true}
-              forceUpdate={true}
             />
           </Grid>
 
           <Grid xs={12} sm={12} item>
             <MeasuresTable
               patientId={patientId}
-              data={dataMeasures}
+              data={dataCopy.statusMeasuresData}
               reFetch={reFetch}
-              // forcedTableData={childTableData}
-              // updateParentTableData={setChildTableData}
               onMeasureSubmit={suggestFailureChange}
               readOnly={readOnly}
+              parentUiInform={parentUiInform}
             />
           </Grid>
         </Grid>

@@ -12,9 +12,10 @@
         "Ventilation Spontanée Aide Inspiratoire",
         "Ventilation Spontanée",
         "Optiflow",
-        "Ventilation en Pression Positive Continue"
+        "Ventilation en Pression Positive Continue",
+        ""
       ],
-      "enum": ["VPC", "VAC", "VSAI", "VS", "opti", "CPAP"]
+      "enum": ["VPC", "VAC", "VSAI", "VS", "opti", "CPAP", ""]
     },
     "0": {
       "title": "Ratio pression artérielle sur fraction inspirée",
@@ -43,7 +44,7 @@
     "11": {
       "title": "Epuration extrarénale",
       "type": "string",
-      "enumNames": ["Hémofiltration", "Dialyse", "Hémodiafiltration", "Non"],
+      "enumNames": ["Hémofiltration", "Dialyse", "Hémodiafiltration", ""],
       "enum": ["HémoF", "Dial", "HémodiaF", ""]
     },
     "10": {

@@ -15,6 +15,7 @@ import BedIconA from "./bed";
 import InfectiousIconA from "./infectious";
 import LatIconA from "./lat_icon";
 import TodoListIconA from "./todo_list_icon";
+import MovePatientIconA from "./move_patient";
 
 export const HeartFailureIcon = HeartFailureIconA;
 export const BioChemicalFailureIcon = BioChemicalFailureIconA;
@@ -29,3 +30,4 @@ export const BedIcon = BedIconA;
 export const InfectiousIcon = InfectiousIconA;
 export const TodoListIcon = TodoListIconA;
 export const LatIcon = LatIconA;
+export const MovePatientIcon = MovePatientIconA;

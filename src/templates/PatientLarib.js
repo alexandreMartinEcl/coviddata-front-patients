@@ -15,6 +15,7 @@ export default function PatientTemplate({ changeMode, gardeMode, components }) {
     TodoList,
     LatText,
     DayPicture,
+    Snackbar,
   } = components;
 
   let modeButtonText = gardeMode ? "Mode garde" : "Mode normal";
@@ -103,6 +104,7 @@ export default function PatientTemplate({ changeMode, gardeMode, components }) {
       <Grid item xs={12} sm={12}>
         <DayPicture />
       </Grid>
+      <Snackbar />
     </Grid>
   );
 }

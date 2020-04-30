@@ -5,17 +5,16 @@ import PatientA from "../containers/Patient";
 import PatientLaribA from "../containers/PatientLarib";
 import PatientsTableA from "../containers/PatientsTable";
 import PatientContentA from "../containers/PatientContent";
-import PatientHeaderA from "../containers/PatientHeader";
-import SimpleSelectA from "../components/patient/SimpleSelect";
-import CheckListA from "../components/patient/CheckList";
+import DemographicDisplayA from "../components/containers/DemographicDisplay";
+import SimpleSelectA from "../components/containers/SimpleSelect";
+import CheckListA from "../components/containers/CheckList";
 import PatientEditA from "../containers/PatientEdit";
 import VentilationsTableA from "../containers/VentilationsTable";
 import VentilationEditA from "../containers/VentilationEdit";
-import oldMeasuresTableA from "../containers/old_MeasuresTable";
-import MeasuresTableA from "../containers/MeasuresTable";
+import MeasuresTableA from "../components/MeasuresTable";
 import DayPictureA from "../containers/DayPicture";
-import EditableTextA from "../components/patient/EditableText";
-import ListLabelsA from "../components/patient/ListLabels";
+import EditableTextA from "../components/containers/EditableText";
+import ListLabelsA from "../components/containers/ListLabels";
 import withDataFromFetch from "../shared/HOCs/withDataFromFetch";
 import Container from "@material-ui/core/Container";
 import config from "../config";
@@ -37,7 +36,7 @@ export const SimpleSelect = SimpleSelectA;
 
 export const CheckList = CheckListA;
 
-export const PatientHeader = PatientHeaderA;
+export const DemographicDisplay = DemographicDisplayA;
 
 export const EditableText = EditableTextA;
 
@@ -45,7 +44,6 @@ export const ListLabels = ListLabelsA;
 
 export const DayPicture = DayPictureA;
 
-export const oldMeasuresTable = oldMeasuresTableA;
 export const MeasuresTable = MeasuresTableA;
 
 export const BedsB = (props) => withData(BedsA, props, config.path.bed);

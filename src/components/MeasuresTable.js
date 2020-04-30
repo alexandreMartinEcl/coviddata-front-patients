@@ -12,7 +12,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 
-import { getFormatDateFromFirst, setToMidnight } from "../shared/utils/date";
+import { getFormatDateFromFirst, nbDaysBetween } from "../shared/utils/date";
 import {
   Typography,
   Tooltip,
@@ -28,8 +28,6 @@ import SaveIcon from "@material-ui/icons/Save";
 import CancelIcon from "@material-ui/icons/Cancel";
 import statusMeasuresInterface from "../json/statusMeasures.json";
 
-import Snackbar from "@material-ui/core/Snackbar";
-import MuiAlert from "@material-ui/lab/Alert";
 import { manageError } from "../shared/utils/tools";
 
 import {
@@ -52,8 +50,8 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.primary.dark,
     color: theme.palette.common.white,
     minWidth: "150px",
-    [theme.breakpoints.down("ms")]: {
-      fontSize: 6,
+    [theme.breakpoints.down("sm")]: {
+      fontSize: 9,
       minWidth: "10px",
     },
   },
@@ -61,16 +59,16 @@ const useStyles = makeStyles((theme) => ({
     minWidth: "50px",
     width: "80px",
     maxWidth: "80px",
-    [theme.breakpoints.down("ms")]: {
-      minWidth: "10px",
-      width: "10px",
-      maxWidth: "10px",
+    [theme.breakpoints.down("sm")]: {
+      minWidth: "25px",
+      width: "25px",
+      maxWidth: "50px",
     },
   },
   tableCell: {
     fontSize: 14,
-    [theme.breakpoints.down("ms")]: {
-      fontSize: 5,
+    [theme.breakpoints.down("sm")]: {
+      fontSize: 8,
     },
   },
   tableTitleCell: {
@@ -84,9 +82,9 @@ const useStyles = makeStyles((theme) => ({
   rowIcon: {
     width: "50px",
     height: "50px",
-    [theme.breakpoints.down("ms")]: {
-      width: "5px",
-      height: "5px",
+    [theme.breakpoints.down("sm")]: {
+      width: "25px",
+      height: "25px",
     },
   },
 }));
@@ -176,6 +174,7 @@ function MeasuresTable({
   forcedTableData,
   updateParentTableData,
   readOnly,
+  parentUiInform,
   ...props
 }) {
   const classes = useStyles();
@@ -193,26 +192,6 @@ function MeasuresTable({
   );
 
   const [loadingUpdate, setLoadingUpdate] = React.useState(false);
-  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const [snackbarSeverity, setSnackbarSeverity] = React.useState(false);
-  const [infoMsg, setInfoMsg] = React.useState("");
-
-  /**
-   * Display information snackbar
-   * @param {string} msg
-   * @param {string} infoType either 'success', 'error', 'info' or 'warning'
-   */
-  const uiInform = (msg, infoType) => {
-    setInfoMsg(msg);
-    setSnackbarSeverity(infoType);
-    setSnackbarOpen(true);
-  };
-
-  const closeSnackBar = (event, reason) => {
-    setSnackbarOpen(false);
-    setInfoMsg("");
-  };
-
   const handleKeyPress = (event) => {
     switch (event.key) {
       case "Enter":
@@ -246,12 +225,10 @@ function MeasuresTable({
     lastMeasureDate = data.hospitalisationEndDate
       ? new Date(data.hospitalisationEndDate)
       : new Date();
-    lastMeasureDate = setToMidnight(lastMeasureDate);
 
     firstMeasureDate = new Date(data.hospitalisationDate);
-    firstMeasureDate = setToMidnight(firstMeasureDate);
 
-    let nbDays = Math.round((lastMeasureDate - firstMeasureDate) / 86400000);
+    let nbDays = nbDaysBetween(firstMeasureDate, lastMeasureDate);
 
     let nbColumns = nbDays + 1;
 
@@ -455,29 +432,34 @@ function MeasuresTable({
 
     console.log("Sending to " + url);
     console.log(jsonData);
-    axios({
-      method: "post",
-      url,
-      data: jsonData,
-      ...config.axios,
-      headers: {
-        "Content-Type": "Application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-    })
-      .then((res) => {
-        console.log(res);
-        setLoadingUpdate(false);
-        updateTableData(res.data);
-        //TODO technically, its better to put res.data in onMeasureSubmit
-        onMeasureSubmit(newData, tDate, selectedGroup);
-        setSelectedCol(null);
-      })
-      .catch((err) => {
-        console.log(err);
-        setLoadingUpdate(false);
-        manageError(err.response, uiInform);
-      });
+
+    setLoadingUpdate(false);
+    onMeasureSubmit(newData, tDate, selectedGroup);
+    setSelectedCol(null);
+    //
+    // axios({
+    // method: "post",
+    // url,
+    // data: jsonData,
+    // ...config.axios,
+    // headers: {
+    // "Content-Type": "Application/json",
+    // "Access-Control-Allow-Origin": "*",
+    // },
+    // })
+    // .then((res) => {
+    // console.log(res);
+    // setLoadingUpdate(false);
+    // updateTableData(res.data);
+    // TODO technically, its better to put res.data in onMeasureSubmit
+    // onMeasureSubmit(newData, tDate, selectedGroup);
+    // setSelectedCol(null);
+    // })
+    // .catch((err) => {
+    // console.log(err);
+    // setLoadingUpdate(false);
+    // manageError(err.response, parentUiInform);
+    // });
   };
 
   const getActualNbDaysToDisplay = () => {
@@ -524,44 +506,49 @@ function MeasuresTable({
                 className={`${classes.tableHead} ${classes.firstCol}`}
               ></TableCell>
               <TableCell className={`${classes.tableHead}`}>Type</TableCell>
-              {columnTitles.slice(-getActualNbDaysToDisplay()).map((c, j) => (
-                <TableCell
-                  className={`${classes.tableHead} ${classes.tableTitleCell}`}
-                  key={`${c.sum}`}
-                  align="center"
-                >
-                  {c.sum}
-                  <br />
-                  {c.full}
-                  {selectedCol === j ? (
-                    <React.Fragment>
-                      <br />
-                      <IconButton
-                        aria-label="save"
-                        color="primary"
-                        onClick={cancelEdit}
-                      >
-                        <CancelIcon fontSize="large" />
-                      </IconButton>
-                      <IconButton
-                        aria-label="save"
-                        color="primary"
-                        onClick={submitEdit}
-                      >
-                        <SaveIcon fontSize="large" />
-                      </IconButton>
-                      {loadingUpdate && (
-                        <CircularProgress
-                          size={24}
-                          className={classes.buttonProgress}
-                        />
-                      )}
-                    </React.Fragment>
-                  ) : (
-                    <></>
-                  )}
-                </TableCell>
-              ))}
+              {columnTitles.slice(-getActualNbDaysToDisplay()).map((c, j) => {
+                let actualDataCol =
+                  columnTitles.length - getActualNbDaysToDisplay() + j;
+
+                return (
+                  <TableCell
+                    className={`${classes.tableHead} ${classes.tableTitleCell}`}
+                    key={`${c.sum}`}
+                    align="center"
+                  >
+                    {c.sum}
+                    <br />
+                    {c.full}
+                    {selectedCol === actualDataCol ? (
+                      <React.Fragment>
+                        <br />
+                        <IconButton
+                          aria-label="save"
+                          color="primary"
+                          onClick={cancelEdit}
+                        >
+                          <CancelIcon fontSize="large" />
+                        </IconButton>
+                        <IconButton
+                          aria-label="save"
+                          color="primary"
+                          onClick={submitEdit}
+                        >
+                          <SaveIcon fontSize="large" />
+                        </IconButton>
+                        {loadingUpdate && (
+                          <CircularProgress
+                            size={24}
+                            className={classes.buttonProgress}
+                          />
+                        )}
+                      </React.Fragment>
+                    ) : (
+                      <></>
+                    )}
+                  </TableCell>
+                );
+              })}
             </TableRow>
           </TableHead>
 
@@ -653,21 +640,6 @@ function MeasuresTable({
           <TableBody></TableBody>
         </Table>
       </TableContainer>
-
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={closeSnackBar}
-      >
-        <MuiAlert
-          elevation={6}
-          variant="filled"
-          onClose={closeSnackBar}
-          severity={snackbarSeverity}
-        >
-          {infoMsg}
-        </MuiAlert>
-      </Snackbar>
     </Box>
   );
 }
