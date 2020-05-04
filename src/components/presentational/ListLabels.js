@@ -100,12 +100,12 @@ const EditableLabelTexFields = ({
       return (
         <React.Fragment>
           <TextField
-            onChange={onChangeLabels(index)}
+            onChange={onChangeLabels(index, "title")}
             type="text"
             value={item.title}
           />
           <TextField
-            onChange={onChangeLabels(index)}
+            onChange={onChangeLabels(index, "value")}
             type="text"
             multiline
             value={item.value}
@@ -123,34 +123,6 @@ const EditableLabelTexFields = ({
       );
   }
 };
-
-const EditableLabelComponent = ({
-  labelVariant,
-  item,
-  index,
-  classes,
-  removeEditedLabel,
-  onChangeLabels,
-}) => (
-  <Grid key={index}>
-    <EditableLabelTexFields
-      onChangeLabels={onChangeLabels}
-      labelVariant={labelVariant}
-      item={item}
-      index={index}
-    />
-    <Button
-      variant="contained"
-      color="secondary"
-      className={classes.button}
-      startIcon={<RemoveIcon />}
-      onClick={() => removeEditedLabel(index)}
-    >
-      Retirer
-    </Button>
-    <Divider vertical />
-  </Grid>
-);
 
 const DialActions = ({ onCancel, onSubmit, loading, classes }) => (
   <Grid container justify="space-around" space={1}>
@@ -229,22 +201,29 @@ const EditButtonBox = ({ onClick, classes }) => (
 const EditableLabels = ({
   editedLabels,
   labelVariant,
-  variantLabelContent,
   removeEditedLabel,
   onChangeLabels,
   classes,
 }) =>
-  editedLabels.map((item, i) => (
-    <EditableLabelComponent
-      key={i}
-      labelVariant={labelVariant}
-      item={item}
-      index={i}
-      variantLabelContent={variantLabelContent}
-      classes={classes}
-      removeEditedLabel={removeEditedLabel}
-      onChangeLabels={onChangeLabels}
-    />
+  editedLabels.map((item, index) => (
+    <Grid key={index}>
+      <EditableLabelTexFields
+        onChangeLabels={onChangeLabels}
+        labelVariant={labelVariant}
+        item={item}
+        index={index}
+      />
+      <Button
+        variant="contained"
+        color="secondary"
+        className={classes.button}
+        startIcon={<RemoveIcon />}
+        onClick={() => removeEditedLabel(index)}
+      >
+        Retirer
+    </Button>
+      <Divider vertical />
+    </Grid>
   ));
 
 const Labels = ({ labels, labelVariant, variantLabelContent, classes }) =>
@@ -259,12 +238,12 @@ const Labels = ({ labels, labelVariant, variantLabelContent, classes }) =>
       />
     ))
   ) : (
-    <LabelComponent
-      labelVariant={labelVariant}
-      variantLabelContent={variantLabelContent}
-      classes={classes}
-    />
-  );
+      <LabelComponent
+        labelVariant={labelVariant}
+        variantLabelContent={variantLabelContent}
+        classes={classes}
+      />
+    );
 
 const TitleBox = ({ title, classes }) => (
   <Box className={classes.labelTitle}>
@@ -272,22 +251,81 @@ const TitleBox = ({ title, classes }) => (
   </Box>
 );
 
-const ListLabels = ({
-  isEmpty,
+export const LabelListDial = ({
   title,
   labelVariant,
-  labels,
-  readOnly,
   editedLabels,
   addEditedLabel,
   onChangeLabels,
   removeEditedLabel,
   dialOpen,
-  openEditDial,
   closeEditDial,
   cancelEditDial,
   onSubmitLabels,
   loading,
+}) => {
+  const classes = useStyles();
+  const th = useTheme();
+  const isUpSm = useMediaQuery(th.breakpoints.up("sm"));
+  const variantLabelContent = isUpSm ? "body1" : "body2";
+
+  return (
+    <LabelsDialog
+      title={title}
+      editedLabels={editedLabels}
+      addEditedLabel={addEditedLabel}
+      open={dialOpen}
+      onClose={closeEditDial}
+      content={
+        <EditableLabels
+          editedLabels={editedLabels}
+          labelVariant={labelVariant}
+          variantLabelContent={variantLabelContent}
+          removeEditedLabel={removeEditedLabel}
+          onChangeLabels={onChangeLabels}
+          classes={classes}
+        />
+      }
+      actions={
+        <DialActions
+          onCancel={cancelEditDial}
+          onSubmit={onSubmitLabels}
+          loading={loading}
+          classes={classes}
+        />
+      }
+      classes={classes}
+    />
+  )
+}
+
+LabelListDial.propTypes = {
+  isEmpty: PropTypes.bool,
+  title: PropTypes.string.isRequired,
+  editedLabels: PropTypes.array,
+  addEditedLabel: PropTypes.func,
+  onChangeLabels: PropTypes.func,
+  removeEditedLabel: PropTypes.func,
+  dialOpen: PropTypes.bool,
+  closeEditDial: PropTypes.func,
+  cancelEditDial: PropTypes.func,
+  onSubmitLabels: PropTypes.func,
+  loading: PropTypes.bool,
+}
+
+LabelListDial.defaultProps = {
+  editedLabels: [],
+  dialOpen: false,
+  loading: false,
+}
+
+export const ListLabelPresentational = ({
+  isEmpty,
+  title,
+  labelVariant,
+  labels,
+  readOnly,
+  openEditDial,
 }) => {
   const classes = useStyles();
   const th = useTheme();
@@ -326,65 +364,24 @@ const ListLabels = ({
               )}
             </Grid>
           </Grid>
-
-          <LabelsDialog
-            title={title}
-            editedLabels={editedLabels}
-            addEditedLabel={addEditedLabel}
-            open={dialOpen}
-            onClose={closeEditDial}
-            content={
-              <EditableLabels
-                editedLabels={editedLabels}
-                labelVariant={labelVariant}
-                variantLabelContent={variantLabelContent}
-                removeEditedLabel={removeEditedLabel}
-                onChangeLabels={onChangeLabels}
-                classes={classes}
-              />
-            }
-            actions={
-              <DialActions
-                onCancel={cancelEditDial}
-                onSubmit={onSubmitLabels}
-                loading={loading}
-                classes={classes}
-              />
-            }
-            classes={classes}
-          />
         </Grid>
       </Box>
     )
   );
 };
 
-ListLabels.propTypes = {
+ListLabelPresentational.propTypes = {
   isEmpty: PropTypes.bool,
   title: PropTypes.string.isRequired,
   labelVariant: PropTypes.oneOf(["double", "single"]),
   labels: PropTypes.array,
   readOnly: PropTypes.bool,
-  editedLabels: PropTypes.array,
-  addEditedLabel: PropTypes.func,
-  onChangeLabels: PropTypes.func,
-  removeEditedLabel: PropTypes.func,
-  dialOpen: PropTypes.bool,
   openEditDial: PropTypes.func,
-  closeEditDial: PropTypes.func,
-  cancelEditDial: PropTypes.func,
-  onSubmitLabels: PropTypes.func,
-  loading: PropTypes.bool,
 };
 
-ListLabels.defaultProps = {
+ListLabelPresentational.defaultProps = {
   isEmpty: false,
   labelVariant: "single",
   labels: [],
   readOnly: false,
-  editedLabels: [],
-  dialOpen: false,
-  loading: false,
 };
-
-export default ListLabels;

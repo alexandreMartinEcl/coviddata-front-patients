@@ -51,8 +51,8 @@ const checkAddPatientForm = (form) => {
   return (
     (!form.NIP_id || form.NIP_id.match(/^[0-9]*$/g)) &&
     (!form.stay_start_date || new Date(form.stay_start_date) <= new Date()) &&
-    (!form.family_name || form.family_name.match(/^[a-zA-Z\-\']*$/g)) &&
-    (!form.first_name || form.first_name.match(/^[a-zA-Z\-\']*$/g)) &&
+    (!form.family_name || form.family_name.match(/^[a-zA-Z\-']*$/g)) &&
+    (!form.first_name || form.first_name.match(/^[a-zA-Z\-']*$/g)) &&
     (!form.birthDate || new Date(form.birthDate) <= new Date()) &&
     (!form.weight_kg || form.weight_kg.match(/^[0-9]{0,3}(\.[0-9]{0,3})?$/g)) &&
     (!form.size_cm || form.size_cm.match(/^[0-9]{0,3}(\.[0-9]{0,2})?$/g))

@@ -51,13 +51,13 @@ const DemographicDisplay = ({
     }
   };
 
-  const makeUnEditable = () => {
+  const makeUneditable = () => {
     setIsEditable(false);
   };
 
   const onCancel = () => {
     setEditedData(_.cloneDeep(data));
-    makeUnEditable();
+    makeUneditable();
   };
 
   const onFieldChange = (field) => {
@@ -69,7 +69,6 @@ const DemographicDisplay = ({
       } else {
         temEditedData[field] = event.target.value;
       }
-      setCellFocus(field);
       setEditedData(_.cloneDeep(temEditedData));
     };
   };
@@ -89,7 +88,7 @@ const DemographicDisplay = ({
     parentUiInform &&
       parentUiInform(`Infos démographiques mises à jour`, "success");
     setLoading(false);
-    makeUnEditable();
+    makeUneditable();
     let newData = mapResToData ? mapResToData(res.data) : res.data;
     if (setParentData) {
       setParentData(Object.assign(_.cloneDeep(dataCopy), newData));

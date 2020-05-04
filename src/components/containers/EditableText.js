@@ -43,7 +43,7 @@ const EditableText = ({
     setEditedData(
       Object.assign(_.cloneDeep(editedData), { text: dataCopy.text })
     );
-    closeEditDial();
+    variant !== "extensible" && closeEditDial();
   };
 
   const openEditDial = () => {

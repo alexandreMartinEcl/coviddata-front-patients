@@ -386,7 +386,7 @@ export const getDetectionData = (fullData) => {
             : false;
         temInterface[`detections_ER_weekly_${i + 1}`] = `Détection ER semaine ${
           i + 1
-        }`;
+          }`;
         temInterface[
           `detections_orl_weekly_${i + 1}`
         ] = `Détection Orl semaine ${i + 1}`;
@@ -414,9 +414,8 @@ export const getAntecedentsData = (fullData) => {
   }
 
   let antecedentsIsEmpty =
-    Object.keys(temList).length === 0 ||
-    (Object.keys(temList).length === 1 &&
-      Object.keys(temList)[0] === "Inconnus");
+    temList.length === 0 ||
+    (temList.length === 1 && temList[0].title === "Inconnus");
   return { listItems: temList, isEmpty: antecedentsIsEmpty };
 };
 

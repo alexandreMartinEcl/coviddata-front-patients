@@ -161,8 +161,8 @@ const EditableCell = ({ statusType, ...props }) => {
       ))}
     </Select>
   ) : (
-    <TextField type={statusType.valueType} {...props} />
-  );
+      <TextField type={statusType.valueType} {...props} />
+    );
 };
 
 function MeasuresTable({
@@ -316,7 +316,7 @@ function MeasuresTable({
         if (Number(data.weight_kg) && Number(measureValue)) {
           return `(${
             Number(measureValue) / Number(data.weight_kg).toFixed(2)
-          } mg/kg/h)`;
+            } mg/kg/h)`;
         } else {
           return "";
         }
@@ -433,33 +433,33 @@ function MeasuresTable({
     console.log("Sending to " + url);
     console.log(jsonData);
 
-    setLoadingUpdate(false);
-    onMeasureSubmit(newData, tDate, selectedGroup);
-    setSelectedCol(null);
-    //
-    // axios({
-    // method: "post",
-    // url,
-    // data: jsonData,
-    // ...config.axios,
-    // headers: {
-    // "Content-Type": "Application/json",
-    // "Access-Control-Allow-Origin": "*",
-    // },
-    // })
-    // .then((res) => {
-    // console.log(res);
     // setLoadingUpdate(false);
-    // updateTableData(res.data);
-    // TODO technically, its better to put res.data in onMeasureSubmit
     // onMeasureSubmit(newData, tDate, selectedGroup);
     // setSelectedCol(null);
-    // })
-    // .catch((err) => {
-    // console.log(err);
-    // setLoadingUpdate(false);
-    // manageError(err.response, parentUiInform);
-    // });
+
+    axios({
+      method: "post",
+      url,
+      data: jsonData,
+      ...config.axios,
+      headers: {
+        "Content-Type": "Application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+    })
+      .then((res) => {
+        console.log(res);
+        setLoadingUpdate(false);
+        updateTableData(res.data);
+        // TODO technically, its better to put res.data in onMeasureSubmit
+        onMeasureSubmit(newData, tDate, selectedGroup);
+        setSelectedCol(null);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoadingUpdate(false);
+        manageError(err.response, parentUiInform);
+      });
   };
 
   const getActualNbDaysToDisplay = () => {
@@ -522,20 +522,24 @@ function MeasuresTable({
                     {selectedCol === actualDataCol ? (
                       <React.Fragment>
                         <br />
-                        <IconButton
-                          aria-label="save"
-                          color="primary"
-                          onClick={cancelEdit}
-                        >
-                          <CancelIcon fontSize="large" />
-                        </IconButton>
-                        <IconButton
-                          aria-label="save"
-                          color="primary"
-                          onClick={submitEdit}
-                        >
-                          <SaveIcon fontSize="large" />
-                        </IconButton>
+                        <Tooltip title="Annuler (Echap)" arrow>
+                          <IconButton
+                            aria-label="save"
+                            color="primary"
+                            onClick={cancelEdit}
+                          >
+                            <CancelIcon fontSize="large" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Enregistrer (Entrée)" arrow>
+                          <IconButton
+                            aria-label="save"
+                            color="primary"
+                            onClick={submitEdit}
+                          >
+                            <SaveIcon fontSize="large" />
+                          </IconButton>
+                        </Tooltip>
                         {loadingUpdate && (
                           <CircularProgress
                             size={24}
@@ -544,8 +548,8 @@ function MeasuresTable({
                         )}
                       </React.Fragment>
                     ) : (
-                      <></>
-                    )}
+                        <></>
+                      )}
                   </TableCell>
                 );
               })}
@@ -598,28 +602,28 @@ function MeasuresTable({
                                   }
                                 >
                                   {selectedCol === actualDataCol &&
-                                  group === selectedGroup &&
-                                  !configOrderRows[group].rows[i].readOnly ? (
-                                    <EditableCell
-                                      statusType={
-                                        configOrderRows[group].rows[i]
-                                      }
-                                      autoFocus={i === selectedRow}
-                                      value={`${cell}`}
-                                      onChange={onEditableCellChange(
-                                        group,
-                                        i,
-                                        actualDataCol,
-                                        configOrderRows[group].rows[i].valueType
-                                      )}
-                                      onKeyDown={handleKeyPress}
-                                    />
-                                  ) : (
-                                    `${cell} ${measureAddedInfo(
-                                      configOrderRows[group].rows[i],
-                                      cell
-                                    )}`
-                                  )}
+                                    group === selectedGroup &&
+                                    !configOrderRows[group].rows[i].readOnly ? (
+                                      <EditableCell
+                                        statusType={
+                                          configOrderRows[group].rows[i]
+                                        }
+                                        autoFocus={i === selectedRow}
+                                        value={`${cell}`}
+                                        onChange={onEditableCellChange(
+                                          group,
+                                          i,
+                                          actualDataCol,
+                                          configOrderRows[group].rows[i].valueType
+                                        )}
+                                        onKeyDown={handleKeyPress}
+                                      />
+                                    ) : (
+                                      `${cell} ${measureAddedInfo(
+                                        configOrderRows[group].rows[i],
+                                        cell
+                                      )}`
+                                    )}
                                 </TableCell>
                               </Tooltip>
                             );

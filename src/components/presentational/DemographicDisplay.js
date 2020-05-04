@@ -183,21 +183,17 @@ const DemographicDisplay = ({
 }) => {
   const classes = useStyles();
 
-  const MyDataCell = ({ field, label, ...props }) => (
-    <DataCell
-      classes={classes}
-      label={label}
-      editable={isEditable}
-      variant={variantHeaderContent}
-      autoFocus={cellFocus === field}
-      onChange={onFieldChange(field)}
-      onKeyDown={handleKeyPress}
-      onDoubleClick={() => {
-        makeEditable && makeEditable(field);
-      }}
-      {...props}
-    />
-  );
+  const baseProps = (field) => ({
+    classes: classes,
+    editable: isEditable,
+    variant: variantHeaderContent,
+    autoFocus: cellFocus === field,
+    onChange: onFieldChange(field),
+    onKeyDown: handleKeyPress,
+    onDoubleClick: () => {
+      makeEditable && makeEditable(field);
+    }
+  });
 
   return (
     <React.Fragment>
@@ -215,8 +211,8 @@ const DemographicDisplay = ({
           </Grid>
 
           <Grid item xs={12} sm={12}>
-            <MyDataCell
-              field="hospitalisation_cause"
+            <DataCell
+              {...baseProps("hospitalisation_cause")}
               label="Motif d'admission"
               dataType={{ valueType: "string" }}
               value={hospitalisationCause}
@@ -225,8 +221,8 @@ const DemographicDisplay = ({
           </Grid>
 
           <Grid item xs={12} sm={12}>
-            <MyDataCell
-              field="current_unit_stay/start_date"
+            <DataCell
+              {...baseProps("current_unit_stay/start_date")}
               label="En réanimation depuis le"
               dataType={{ valueType: "date" }}
               value={unitStay.start_date}
@@ -239,32 +235,32 @@ const DemographicDisplay = ({
           <Grid item xs={12} container space={2}>
             <Grid item xs={6} sm={6} container direction="column">
               <Grid item>
-                <MyDataCell
-                  field="NIP_id"
+                <DataCell
+                  {...baseProps("NIP_id")}
                   label="NIP"
                   dataType={{ valueType: "string" }}
                   value={nipId}
                 />
               </Grid>
               <Grid item>
-                <MyDataCell
-                  field="family_name"
+                <DataCell
+                  {...baseProps("family_name")}
                   label="Nom"
                   dataType={{ valueType: "string" }}
                   value={familyName}
                 />
               </Grid>
               <Grid item>
-                <MyDataCell
-                  field="first_name"
+                <DataCell
+                  {...baseProps("first_name")}
                   label="Prénom"
                   dataType={{ valueType: "string" }}
                   value={firstName}
                 />
               </Grid>
               <Grid item>
-                <MyDataCell
-                  field="sex"
+                <DataCell
+                  {...baseProps("sex")}
                   label="Sexe"
                   dataType={{
                     valueType: "string",
@@ -278,8 +274,17 @@ const DemographicDisplay = ({
 
             <Grid item xs={6} sm={6} container direction="column">
               <Grid item>
-                <MyDataCell
-                  field="birth_date"
+                {/* <TextField
+                  type="date"
+                  label="Test"
+                  value={birthDate}
+                  variant="outlined"
+                  style={{ margin: "4px", width: "95%" }}
+                  // autoFocus
+                  onChange={onFieldChange("birth_date")}
+                /> */}
+                <DataCell
+                {...baseProps("birth_date")}
                   label="Naissance"
                   dataType={{ valueType: "date" }}
                   value={birthDate}
@@ -287,16 +292,16 @@ const DemographicDisplay = ({
                 />
               </Grid>
               <Grid item>
-                <MyDataCell
-                  field="weight_kg"
+                <DataCell
+                  {...baseProps("weight_kg")}
                   label="Poids (kg)"
                   dataType={{ valueType: "number" }}
                   value={weight}
                 />
               </Grid>
               <Grid item>
-                <MyDataCell
-                  field="size_cm"
+                <DataCell
+                  {...baseProps("size_cm")}
                   label="Taille (cm)"
                   dataType={{ valueType: "number" }}
                   infoToAdd={toAddSize}

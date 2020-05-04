@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import * as _ from "lodash";
 
-import ListLabelPresentational from "../presentational/ListLabels";
+import { ListLabelPresentational, LabelListDial } from "../presentational/ListLabels";
 
 import { manageError } from "../../shared/utils/tools";
 
@@ -111,12 +111,16 @@ const ListLabels = ({
         labelVariant={labelVariant}
         labels={dataCopy.listItems}
         readOnly={readOnly}
+        openEditDial={openEditDial}
+      />
+      <LabelListDial
+        title={title}
+        labelVariant={labelVariant}
         editedLabels={editedData.listItems}
         addEditedLabel={addEditedLabel}
         onChangeLabels={onChangeLabels}
         removeEditedLabel={removeEditedLabel}
         dialOpen={dialOpen}
-        openEditDial={openEditDial}
         closeEditDial={closeEditDial}
         cancelEditDial={cancelEditDial}
         onSubmitLabels={onSubmit}
