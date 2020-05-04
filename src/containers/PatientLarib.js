@@ -1,10 +1,12 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import * as _ from "lodash";
+import { connect } from "react-redux";
+
+import { uiInform } from "../store/actions";
 
 import defaultLAT from "../shared/files/defaultLAT";
 import PatientTemplate from "../templates/PatientLarib";
-
 
 import {
   DemographicDisplay,
@@ -28,35 +30,22 @@ import {
   submitLabelList,
   submitSimpleSelect,
   submitDemographicData,
+  getDemographicData,
+  getSeverity,
+  getDetectionData,
+  getAntecedentsData,
+  getFailuresData,
+  getTextData,
+  getStatusMeasuresData,
+  getAllergiesData,
 } from "../repository/patient.repository";
-import SnackBar from "../components/SnackBar";
 
-function PatientLarib({ data = {}, reFetch }) {
+function PatientLarib({ data = {}, reFetch, uiInform }) {
   const { id } = useParams();
 
   const [gardeMode, setGardeMode] = React.useState(
     localStorage.getItem("gardeMode") === "true" || false
   );
-
-  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const [snackbarSeverity, setSnackbarSeverity] = React.useState();
-  const [infoMsg, setInfoMsg] = React.useState("");
-
-  /**
-   * Display information snackbar
-   * @param {string} msg
-   * @param {string} infoType either 'success', 'error', 'info' or 'warning'
-   */
-  const uiInform = (msg, infoType) => {
-    // setInfoMsg(msg);
-    // setSnackbarSeverity(infoType);
-    // setSnackbarOpen(true);
-  };
-
-  const closeSnackBar = () => {
-    setSnackbarOpen(false);
-    setInfoMsg("");
-  };
 
   const updateMode = (mode) => {
     switch (mode) {
@@ -71,49 +60,11 @@ function PatientLarib({ data = {}, reFetch }) {
       default:
         setGardeMode(false);
     }
+    reFetch();
   };
 
   // DEMOGRAPHIC
-  const getDemographicData = (fullData) => {
-    const {
-      first_name,
-      family_name,
-      birth_date,
-      weight_kg,
-      size_cm,
-      NIP_id,
-      sex,
-      current_unit_stay,
-      hospitalisation_cause,
-    } = fullData;
-    const temData = {
-      first_name,
-      family_name,
-      birth_date,
-      weight_kg,
-      size_cm,
-      NIP_id,
-      sex,
-      current_unit_stay,
-      hospitalisation_cause,
-    };
-
-    const { unit_stays } = fullData;
-    if (unit_stays && unit_stays.length) {
-      temData.hospitalisationDate = new Date(
-        Math.min(...unit_stays.map((s) => new Date(s.start_date)))
-      );
-    }
-    return _.cloneDeep(temData);
-  };
-
   let demographicData = getDemographicData(data);
-  // const [demographicData, setDemographicData] = React.useState(
-  //   getDemographicData(data)
-  // );
-  // const updateDemographicData = (newData) => {
-  //   setDemographicData(getDemographicData(newData));
-  // };
 
   // SEVERITY
   const severityValues = { 0: "Haute", 1: "Moyenne", 2: "Faible" };
@@ -156,224 +107,9 @@ function PatientLarib({ data = {}, reFetch }) {
     2: theme.palette.secondary.main,
   };
 
-  const getSeverity = (fullData) => ({ value: fullData.severity });
-  // const [severity, setSeverity] = React.useState(getSeverity(data));
-  // const updateSeverity = (newData) => {
-  //   setSeverity(_.cloneDeep(getSeverity(newData)));
-  // };
-
   // DETECTIONS
-  const getDetectionData = (fullData) => {
-    const {
-      detection_covid,
-      detection_orl_entree,
-      detection_ER_entree,
-      detections_orl_weekly,
-      detections_ER_weekly,
-    } = fullData;
-
-    const temData = {
-      detection_covid,
-      detection_orl_entree,
-      detection_ER_entree,
-    };
-
-    const temInterface = {
-      detection_covid: "Détection Covid",
-      detection_orl_entree: "Détection Orl d'entrée",
-      detection_ER_entree: "Détection ER d'entrée",
-    };
-
-    if (demographicData.hospitalisationDate) {
-      [
-        ...Array(
-          nbWeeksBetween(demographicData.hospitalisationDate, new Date())
-        ).keys(),
-      ].forEach((i) => {
-        temData[`detections_ER_weekly_${i + 1}`] =
-          detections_ER_weekly && detections_ER_weekly[i]
-            ? detections_ER_weekly[i]
-            : false;
-        temData[`detections_orl_weekly_${i + 1}`] =
-          detections_orl_weekly && detections_orl_weekly[i]
-            ? detections_orl_weekly[i]
-            : false;
-        temInterface[`detections_ER_weekly_${i + 1}`] = `Détection ER semaine ${
-          i + 1
-          }`;
-        temInterface[
-          `detections_orl_weekly_${i + 1}`
-        ] = `Détection Orl semaine ${i + 1}`;
-      });
-    }
-
-    return { dataCheckList: temData, depistageInterface: temInterface };
-  };
-
   let { dataCheckList, depistageInterface } = getDetectionData(data);
   const getDetectionCheckList = (data) => getDetectionData(data).dataCheckList;
-  // const [detectionData, setDetectionData] = React.useState(dataCheckList);
-
-  // const updateDetectionData = (newData) => {
-  //   setDetectionData(_.cloneDeep(getDetectionData(newData).dataCheckList));
-  // };
-
-  // ANTECEDENTS
-  const getAntecedentsData = (fullData) => {
-    let temList;
-    if (fullData.antecedents) {
-      try {
-        let temJson = JSON.parse(fullData.antecedents);
-        temList = Object.entries(temJson).map(([k, v]) => ({
-          title: k,
-          value: v,
-        }));
-      } catch (e) {
-        temList = [];
-      }
-    } else {
-      temList = [];
-    }
-
-    let antecedentsIsEmpty =
-      Object.keys(temList).length === 0 ||
-      (Object.keys(temList).length === 1 &&
-        Object.keys(temList)[0] === "Inconnus");
-    return { listItems: temList, isEmpty: antecedentsIsEmpty };
-  };
-
-  // const [antecedentsData, setAntecedentsData] = React.useState(
-  //   getAntecedentsData(data)
-  // );
-  // const updateAntecedentsData = (newData) => {
-  //   setAntecedentsData(newData);
-  // };
-
-  // ALLERGIES
-  const getAllergiesData = (fullData) => {
-    let temList;
-    if (fullData.allergies) {
-      try {
-        temList = JSON.parse(fullData.allergies);
-      } catch (e) {
-        temList = [];
-      }
-    } else {
-      temList = [];
-    }
-
-    let allergiesIsEmpty =
-      temList.length === 0 ||
-      (temList.length === 1 && temList[0] === "Inconnues");
-    return { listItems: temList, isEmpty: allergiesIsEmpty };
-  };
-
-  // const [allergiesData, setAllergiesData] = React.useState(
-  //   getAllergiesData(data)
-  // );
-
-  // const updateAllergiesData = (newData) => {
-  //   setAllergiesData(newData);
-  // };
-
-  const getTextData = (field) => (fullData) => {
-    let temDate = fullData[`last_edited_${field}`];
-    return {
-      text: fullData[field],
-      lastEdited: temDate ? new Date(temDate) : null,
-    };
-  };
-
-  // RECENT DISEASE HISTORY
-  // const [
-  //   recentDiseaseHistoryData,
-  //   setRecentDiseaseHistoryData,
-  // ] = React.useState(getTextData("recent_disease_history")(data));
-  // const updateRecentDiseaseHistoryData = (newData) => {
-  //   setRecentDiseaseHistoryData(newData);
-  // };
-
-  // EVOLUTION
-  // const [evolutionData, setEvolutionData] = React.useState(
-  //   getTextData("evolution")(data)
-  // );
-  // const updateEvolutionData = (newData) => {
-  //   setEvolutionData(newData);
-  // };
-
-  // TODO LIST
-  // const [todoListData, setTodoListData] = React.useState(
-  //   getTextData("todo_list")(data)
-  // );
-  // const updateTodoListData = (newData) => {
-  //   setTodoListData(newData);
-  // };
-
-  // TREATMENT LIMITATIONS
-  // const [
-  //   treatmentLimitationsData,
-  //   setTreatmentLimitationsData,
-  // ] = React.useState(getTextData("treatment_limitations")(data));
-  // const updateTreatmentLimitationsData = (newData) => {
-  //   setTreatmentLimitationsData(newData);
-  // };
-
-  // DAY_PICTURE
-  const getFailuresData = (fullData) => {
-    const {
-      heart_failure,
-      bio_chemical_failure,
-      brain_failure,
-      lung_failure,
-      kidney_failure,
-      liver_failure,
-      hematologic_failure,
-    } = fullData;
-
-    const temData = {
-      heart_failure,
-      bio_chemical_failure,
-      brain_failure,
-      lung_failure,
-      kidney_failure,
-      liver_failure,
-      hematologic_failure,
-    };
-
-    return temData;
-  };
-
-  const [failuresData, setFailuresData] = React.useState(getFailuresData(data));
-
-  const updateFailuresData = (newData) => {
-    setFailuresData(_.cloneDeep(getFailuresData(newData)));
-  };
-
-  // const [dayNoticeData, setDayNoticeData] = React.useState(
-  //   getTextData("day_notice")(data)
-  // );
-  // const updateDayNoticeData = (newData) => {
-  //   setDayNoticeData(newData);
-  // };
-
-  const getStatusMeasuresData = (fullData) => {
-    const { status_measures, unit_stays } = fullData;
-    let temData = { measures: status_measures };
-    if (unit_stays && unit_stays.length) {
-      temData.hospitalisationDate = new Date(
-        Math.min(...unit_stays.map((s) => new Date(s.start_date)))
-      );
-      temData.hospitalisationEndDate = unit_stays.filter(
-        (s) => !s.is_finished
-      ).length
-        ? null
-        : new Date(Math.max(...unit_stays.map((s) => new Date(s.end_date))));
-    }
-    if (fullData.weight_kg) {
-      temData.weight_kg = fullData.weight_kg;
-    }
-    return temData;
-  }
 
   const getDayPictureData = (fullData) => ({
     failuresData: getFailuresData(fullData),
@@ -454,7 +190,6 @@ function PatientLarib({ data = {}, reFetch }) {
     ),
     RecentDiseaseHistory: (props) => (
       <EditableText
-        patientId={id}
         label="Evénements récents"
         title="Histoire de la maladie récente"
         variant="extensible"
@@ -468,7 +203,6 @@ function PatientLarib({ data = {}, reFetch }) {
     ),
     Evolution: (props) => (
       <EditableText
-        patientId={id}
         label="Evolution du patient depuis le début de la réanimation"
         title="Evolution"
         variant="extensible"
@@ -482,7 +216,6 @@ function PatientLarib({ data = {}, reFetch }) {
     ),
     TodoList: (props) => (
       <EditableText
-        patientId={id}
         label="Liste à penser pour le patient"
         title="Todo list"
         variant="dial"
@@ -501,7 +234,6 @@ function PatientLarib({ data = {}, reFetch }) {
     ),
     LatText: (props) => (
       <EditableText
-        patientId={id}
         label="Modalités d'application des LAT"
         title="LAT"
         variant="dial"
@@ -532,15 +264,6 @@ function PatientLarib({ data = {}, reFetch }) {
         }}
       />
     ),
-    Snackbar: (props) => (
-      <SnackBar
-        open={snackbarOpen}
-        onClose={closeSnackBar}
-        severity={snackbarSeverity}
-        infoMsg={infoMsg}
-        {...props}
-      />
-    ),
   };
 
   return (
@@ -552,4 +275,10 @@ function PatientLarib({ data = {}, reFetch }) {
   );
 }
 
-export default PatientLarib;
+const mapStateToProps = (state, ownProps) => ({})
+
+const mapDispatchToProps = dispatch => ({
+  uiInform: (message, severity) => dispatch(uiInform(message, severity))
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(PatientLarib);

@@ -3,11 +3,19 @@ import PropTypes from "prop-types";
 import { Snackbar } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 
-export default function SnackBar({ open, severity, onClose, infoMsg }) {
+import { connect } from 'react-redux'
+import { clearSnackbar } from '../store/actions'
+
+const SnackBar = ({
+  open,
+  severity,
+  onClose,
+  infoMsg
+}) => {
   return (
     <Snackbar
       open={open}
-      autoHideDuration={severity === "success" ? 1000 : 4000}
+      autoHideDuration={severity === "success" ? 4000 : 4000}
       onClose={onClose}
     >
       <MuiAlert
@@ -35,3 +43,15 @@ SnackBar.defaultProps = {
   onClose: () => {},
   infoMsg: "",
 };
+
+const mapStateToProps = state => ({
+  open: state.uiReducer.snackbarOpen,
+  severity: state.uiReducer.snackbarSeverity,
+  infoMsg: state.uiReducer.snackbarMessage,
+})
+
+const mapDispatchToProps = dispatch => ({
+  onClose: () => dispatch(clearSnackbar())
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(SnackBar)

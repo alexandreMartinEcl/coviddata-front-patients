@@ -58,6 +58,8 @@ const TextDialog = ({
   ...props
 }) => {
   let alwaysAllowSubmit = ["checklist"].find((v) => v === interpretorVariant);
+  console.log(title, alwaysAllowSubmit, readOnly, interpretorVariant);
+  console.log((!readOnly || alwaysAllowSubmit) && actions);
   return (
     <Dialog {...props} maxWidth="lg">
       <DialogTitle id="form-dialog-title">{title}</DialogTitle>
@@ -66,7 +68,7 @@ const TextDialog = ({
         {content}
       </DialogContent>
       <DialogActions>
-        {(readOnly && !alwaysAllowSubmit) || actions}
+        {(!readOnly || alwaysAllowSubmit) && actions}
       </DialogActions>
     </Dialog>
   );

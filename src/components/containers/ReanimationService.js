@@ -74,12 +74,13 @@ const uiSchemaSwapBed = {
 
 function ReanimationService({
   serviceData,
-  setData,
+  setParentData,
   setPage,
   processSubmitSwap,
   parentUiInform,
   reFetch,
 }) {
+  const [dataCopy, setDataCopy] = React.useState(_.cloneDeep(serviceData));
   const [loading, setLoading] = React.useState(false);
   const [swapDialOpen, setSwapDialOpen] = React.useState(false);
   const [patientToMove, setPatientToMove] = React.useState();
@@ -166,7 +167,12 @@ function ReanimationService({
           temUnit.beds = newUnitData.beds;
         }
       });
-      setData(newServiceData);
+
+      if (setParentData) {
+        setParentData(Object.assign(_.cloneDeep(dataCopy), newServiceData));
+      } else {
+        setDataCopy(Object.assign(_.cloneDeep(dataCopy), newServiceData));
+      }
     };
   };
 
@@ -204,7 +210,7 @@ function ReanimationService({
           <ReanimationUnit
             key={unit.id}
             unitData={unit}
-            setData={setServiceData(unit.id)}
+            setParentData={setServiceData(unit.id)}
             onSwapPatient={launchPatientSwapDial}
             setPage={setPage}
             reFetch={reFetch}
@@ -221,10 +227,12 @@ function ReanimationService({
           uiSchema: uiSchemaSwapBed,
           formData: formData,
           onChange: updateFormData,
+          liveValidate: false,
         }}
         patient={patientToMove}
         swaping={formDataBedIdIsUsed(formData)}
         onCancel={closeSwapDial}
+        onClose={closeSwapDial}
         onSubmit={submitSwapDial}
         loading={loading}
         open={swapDialOpen}
@@ -235,7 +243,7 @@ function ReanimationService({
 
 ReanimationService.propTypes = {
   serviceData: PropTypes.object,
-  setData: PropTypes.func,
+  setParentData: PropTypes.func,
   setPage: PropTypes.func,
   processSubmitSwap: PropTypes.func,
   parentUiInform: PropTypes.func,

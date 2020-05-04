@@ -2,6 +2,7 @@ import axios from "axios";
 import config from "../config";
 import * as _ from "lodash";
 import { flat } from "../shared/utils/schema";
+import { nbWeeksBetween } from "../shared/utils/date";
 
 const DEV_MODE = process.env.REACT_APP_IS_DEV === "1";
 
@@ -312,3 +313,178 @@ export const submitAddPatient = (bedId) => {
       .catch(catchCb);
   };
 };
+
+export const getDemographicData = (patientData) => {
+  const {
+    first_name,
+    family_name,
+    birth_date,
+    weight_kg,
+    size_cm,
+    NIP_id,
+    sex,
+    current_unit_stay,
+    hospitalisation_cause,
+  } = patientData;
+  const temData = {
+    first_name,
+    family_name,
+    birth_date,
+    weight_kg,
+    size_cm,
+    NIP_id,
+    sex,
+    current_unit_stay,
+    hospitalisation_cause,
+  };
+
+  const { unit_stays } = patientData;
+  if (unit_stays && unit_stays.length) {
+    temData.hospitalisationDate = new Date(
+      Math.min(...unit_stays.map((s) => new Date(s.start_date)))
+    );
+  }
+  return _.cloneDeep(temData);
+};
+
+export const getSeverity = (fullData) => ({ value: fullData.severity });
+
+export const getDetectionData = (fullData) => {
+  const {
+    detection_covid,
+    detection_orl_entree,
+    detection_ER_entree,
+    detections_orl_weekly,
+    detections_ER_weekly,
+  } = fullData;
+
+  const temData = {
+    detection_covid,
+    detection_orl_entree,
+    detection_ER_entree,
+  };
+
+  const temInterface = {
+    detection_covid: "Détection Covid",
+    detection_orl_entree: "Détection Orl d'entrée",
+    detection_ER_entree: "Détection ER d'entrée",
+  };
+
+  let hospitalisationDate = getDemographicData(fullData).hospitalisationDate;
+  if (hospitalisationDate) {
+    [
+      ...Array(
+        nbWeeksBetween(hospitalisationDate, new Date())
+      ).keys(),
+    ].forEach((i) => {
+      temData[`detections_ER_weekly_${i + 1}`] =
+        detections_ER_weekly && detections_ER_weekly[i]
+          ? detections_ER_weekly[i]
+          : false;
+      temData[`detections_orl_weekly_${i + 1}`] =
+        detections_orl_weekly && detections_orl_weekly[i]
+          ? detections_orl_weekly[i]
+          : false;
+      temInterface[`detections_ER_weekly_${i + 1}`] = `Détection ER semaine ${
+        i + 1
+        }`;
+      temInterface[
+        `detections_orl_weekly_${i + 1}`
+      ] = `Détection Orl semaine ${i + 1}`;
+    });
+  }
+
+  return { dataCheckList: temData, depistageInterface: temInterface };
+};
+
+export const getAntecedentsData = (fullData) => {
+  let temList;
+  if (fullData.antecedents) {
+    try {
+      let temJson = JSON.parse(fullData.antecedents);
+      temList = Object.entries(temJson).map(([k, v]) => ({
+        title: k,
+        value: v,
+      }));
+    } catch (e) {
+      temList = [];
+    }
+  } else {
+    temList = [];
+  }
+
+  let antecedentsIsEmpty =
+    Object.keys(temList).length === 0 ||
+    (Object.keys(temList).length === 1 &&
+      Object.keys(temList)[0] === "Inconnus");
+  return { listItems: temList, isEmpty: antecedentsIsEmpty };
+};
+
+export const getAllergiesData = (fullData) => {
+  let temList;
+  if (fullData.allergies) {
+    try {
+      temList = JSON.parse(fullData.allergies);
+    } catch (e) {
+      temList = [];
+    }
+  } else {
+    temList = [];
+  }
+
+  let allergiesIsEmpty =
+    temList.length === 0 ||
+    (temList.length === 1 && temList[0] === "Inconnues");
+  return { listItems: temList, isEmpty: allergiesIsEmpty };
+};
+
+export const getTextData = (field) => (fullData) => {
+  let temDate = fullData[`last_edited_${field}`];
+  return {
+    text: fullData[field],
+    lastEdited: temDate ? new Date(temDate) : null,
+  };
+};
+
+export const getFailuresData = (fullData) => {
+  const {
+    heart_failure,
+    bio_chemical_failure,
+    brain_failure,
+    lung_failure,
+    kidney_failure,
+    liver_failure,
+    hematologic_failure,
+  } = fullData;
+
+  const temData = {
+    heart_failure,
+    bio_chemical_failure,
+    brain_failure,
+    lung_failure,
+    kidney_failure,
+    liver_failure,
+    hematologic_failure,
+  };
+
+  return temData;
+};
+
+export const getStatusMeasuresData = (fullData) => {
+  const { status_measures, unit_stays } = fullData;
+  let temData = { measures: status_measures };
+  if (unit_stays && unit_stays.length) {
+    temData.hospitalisationDate = new Date(
+      Math.min(...unit_stays.map((s) => new Date(s.start_date)))
+    );
+    temData.hospitalisationEndDate = unit_stays.filter(
+      (s) => !s.is_finished
+    ).length
+      ? null
+      : new Date(Math.max(...unit_stays.map((s) => new Date(s.end_date))));
+  }
+  if (fullData.weight_kg) {
+    temData.weight_kg = fullData.weight_kg;
+  }
+  return temData;
+}

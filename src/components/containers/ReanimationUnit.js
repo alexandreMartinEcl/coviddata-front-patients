@@ -20,9 +20,11 @@ const ReanimationUnit = ({
   reFetch,
   onSwapPatient,
   setPage,
-  setData,
+  setParentData,
   parentUiInform,
 }) => {
+  const [dataCopy, setDataCopy] = React.useState(_.cloneDeep(unitData));
+
   const computeNbSeverePatients = (beds) => {
     return beds.filter(
       (b) => b.current_stay && b.current_stay.patient.severity === 0
@@ -35,27 +37,32 @@ const ReanimationUnit = ({
 
   const setBedData = (bedId) => {
     return (newBedData) => {
-      let newUnitData = _.cloneDeep(unitData);
+      let newUnitData = _.cloneDeep(dataCopy);
       let bed = newUnitData.beds.find(b => b.id === bedId);
       Object.assign(bed, newBedData);
-      setData(newUnitData);
-    };
+      if (setParentData) {
+        setParentData(Object.assign(_.cloneDeep(dataCopy), newUnitData));
+      } else {
+        setDataCopy(Object.assign(_.cloneDeep(dataCopy), newUnitData));
+      }
+      };
   };
 
   return (
     <ReanimationUnitPresentational
-      name={unitData.name}
-      nbSevere={computeNbSeverePatients(unitData.beds)}
-      nbAvailable={computeNbAvailableBeds(unitData.beds)}
+      name={dataCopy.name}
+      nbSevere={computeNbSeverePatients(dataCopy.beds)}
+      nbAvailable={computeNbAvailableBeds(dataCopy.beds)}
       iconSevere={icons.toWatch}
       iconBed={icons.bed}
-      bedElements={unitData.beds
+      bedElements={dataCopy.beds
         .sort((a, b) => a.unit_index >= b.unit_index)
         .map((bed) => (
           <UnitBed
             key={bed.id}
             bedData={bed}
             setPage={setPage}
+            setParentData={setBedData(bed.id)}
             onSwapPatient={onSwapPatient}
             processSubmitAddPatient={submitAddPatient(bed.id)}
             processSubmitRemovePatient={submitFreeUpBed()}
@@ -66,11 +73,12 @@ const ReanimationUnit = ({
     />
   );
 };
+
 ReanimationUnit.propTypes = {
   unitData: PropTypes.object,
   reFetch: PropTypes.func,
   setPage: PropTypes.func,
-  setData: PropTypes.func,
+  setParentData: PropTypes.func,
   parentUiInform: PropTypes.func,
 };
 

@@ -45,6 +45,10 @@ function withDataFromFetch(Component, { url, config = {} }) {
       }
     }
 
+    const reFetch = () => {
+      process.env.REACT_APP_IS_DEV === "1" ? data = _.cloneDeep(data) : fetch();
+    }
+
     if (!data || loading)
       return <CircularProgress size={24} className={classes.buttonProgress} />;
     if (error) {
@@ -54,7 +58,7 @@ function withDataFromFetch(Component, { url, config = {} }) {
 
     console.log(`Data received from ${url}:`);
     console.log(data);
-    return <Component data={_.cloneDeep(data)} reFetch={fetch} {...props} />;
+    return <Component data={_.cloneDeep(data)} reFetch={reFetch} {...props} />;
   };
 }
 

@@ -30,7 +30,7 @@ import {
   TodoListIcon,
 } from "../../shared/icons/index";
 import { EditableText } from "../../containers/Components";
-import { submitEditableText } from "../../repository/patient.repository";
+import { submitEditableText, getTextData } from "../../repository/patient.repository";
 
 const icons = {
   heart_failure: (props) => <HeartFailureIcon {...props} />,
@@ -40,7 +40,32 @@ const icons = {
   kidney_failure: (props) => <KidneyFailureIcon {...props} />,
   liver_failure: (props) => <LiverFailureIcon {...props} />,
   hematologic_failure: (props) => <HematologicFailureIcon {...props} />,
-  todoList: (props) => <TodoListIcon />,
+  todoList: (props) => <TodoListIcon {...props} />,
+};
+
+//TOOD should be automated using jsonSchema but not that simple
+const checkAddPatientForm = (form) => {
+  return (
+    (!form.NIP_id || form.NIP_id.match(/^[0-9]*$/g))
+    && (!form.stay_start_date || new Date(form.stay_start_date) <= new Date())
+    && (!form.family_name || form.family_name.match(/^[a-zA-Z\-\']*$/g))
+    && (!form.first_name || form.first_name.match(/^[a-zA-Z\-\']*$/g))
+    && (!form.birthDate || new Date(form.birthDate) <= new Date())
+    && (!form.weight_kg || form.weight_kg.match(/^[0-9]{0,3}(\.[0-9]{0,3})?$/g))
+    && (!form.size_cm || form.size_cm.match(/^[0-9]{0,3}(\.[0-9]{0,2})?$/g))
+  );
+}
+
+const defaultFormData = {
+  NIP_id: "",
+  stay_start_date: new Date().toISOString().split("T")[0],
+  family_name: "",
+  first_name: "",
+  birth_date: "",
+  sex: "",
+  severity: "",
+  weight_kg: "",
+  size_cm: "",
 };
 
 function UnitBed({
@@ -49,19 +74,10 @@ function UnitBed({
   processSubmitAddPatient,
   processSubmitRemovePatient,
   onSwapPatient,
-  setData,
+  setParentData,
   parentUiInform,
 }) {
-  let {
-    id,
-    current_stay,
-    unit_index,
-    status
-  } = bedData;
-
-  const defaultFormData = {
-    stay_start_date: new Date().toISOString().split("T")[0],
-  };
+  const [dataCopy, setDataCopy] = React.useState(_.cloneDeep(bedData));
   const [formData, setFormData] = React.useState(defaultFormData);
 
   const [loading, setLoading] = React.useState(false);
@@ -69,6 +85,20 @@ function UnitBed({
   const [fullForm, setFullForm] = React.useState(
     localStorage.getItem("fullForm") === "true"
   );
+
+  const handleKeyPress = (event) => {
+    if (!dialOpen) return;
+    switch (event.key) {
+      case "Enter":
+        current_stay ? submitRemovePatientFromBed() : submitAddPatient();
+        break;
+      case "Escape":
+        closeDial();
+        break;
+      default:
+        return;
+    }
+  };
 
   const schemaAddPatient = cloneSchema(addPatientBasicFormSchema).schema;
   const schemaAddPatientSmall = _.cloneDeep(schemaAddPatient);
@@ -104,8 +134,12 @@ function UnitBed({
 
   const openDial = () => setDialOpen(true);
 
-  const updateFormData = (fData) => {
-    setFormData(Object.assign(_.cloneDeep(formData), fData.formData));
+  const updateFormData = ({ ...fData }) => {
+    if (!checkAddPatientForm(fData.formData)) {
+      setFormData(_.cloneDeep(formData))
+    } else {
+      setFormData(Object.assign(_.cloneDeep(formData), fData.formData));
+    }
   };
 
   const changeFullForm = () => {
@@ -119,14 +153,16 @@ function UnitBed({
     parentUiInform && parentUiInform(`Patient ajouté`, "success");
     setLoading(false);
     closeDial();
-    if (setData) {
-      let temData = _.cloneDeep(bedData)
-      let newPatientData = _.cloneDeep(res.data);
-      temData.current_stay = newPatientData.current_unit_stay;
-      delete newPatientData.current_unit_stay;
-      temData.current_stay.patient = newPatientData;
 
-      setData(temData);
+    let temData = _.cloneDeep(dataCopy)
+    let newPatientData = _.cloneDeep(res.data);
+    temData.current_stay = newPatientData.current_unit_stay;
+    delete newPatientData.current_unit_stay;
+    temData.current_stay.patient = newPatientData;
+    if (setParentData) {
+      setParentData(temData);
+    } else {
+      setDataCopy(temData);
     }
     fullForm || setPage(`/patient/${res.data.id}`);
   };
@@ -141,10 +177,19 @@ function UnitBed({
     setLoading(false);
     closeDial();
 
-    if (setData) {
-      let temData = _.cloneDeep(bedData)
+    let newBedData = Object.assign(_.cloneDeep(dataCopy), { current_stay: null });
+    if (setParentData) {
+      setParentData(newBedData);
+    } else {
+      setDataCopy(newBedData);
+    }
+
+    if (setParentData) {
+      let temData = _.cloneDeep(dataCopy)
       temData.current_stay = null;
-      setData(temData);
+      setParentData(temData);
+    } else {
+
     }
   };
 
@@ -165,14 +210,21 @@ function UnitBed({
       processSubmitRemovePatient(formData, onSubmitRemoveSuccess, onSubmitFail);
   };
 
-  const updateTodoList = (todoListData) => {
-    if (setData) {
-      let temData = _.cloneDeep(bedData);
-      temData.current_stay.patient.todo_list = todoListData.text;
-      temData.current_stay.patient.last_edited_todo_list = todoListData.lastEdited;
-      setData(temData);
-    }
-  }
+  // const updateTodoList = (todoListData) => {
+  //   if (setParentData) {
+  //     let temData = _.cloneDeep(dataCopy);
+  //     temData.current_stay.patient.todo_list = todoListData.text;
+  //     temData.current_stay.patient.last_edited_todo_list = todoListData.lastEdited;
+  //     setParentData(temData);
+  //   }
+  // }
+
+  let {
+    id,
+    current_stay,
+    unit_index,
+    status
+  } = dataCopy;
 
   const patient = !current_stay
     ? null
@@ -197,6 +249,7 @@ function UnitBed({
     : (iconprops) => (
       <EditableText
         label="Liste à penser pour le patient"
+        title="Todo list"
         variant="dial"
         data={{
           text: current_stay.patient.todo_list,
@@ -209,13 +262,13 @@ function UnitBed({
             {icons.todoList(iconprops)}
           </IconButton>
         )}
+        badgeCounter={howManyUnfilledTasksInMarkdown}
+        parentUiInform={parentUiInform}
+        mapResToData={getTextData("todo_list")}
         processSubmit={submitEditableText(
           "todo_list",
           current_stay.patient.id
         )}
-        setData={updateTodoList}
-        badgeCounter={howManyUnfilledTasksInMarkdown}
-        parentUiInform={parentUiInform}
       />
     );
 
@@ -253,15 +306,15 @@ function UnitBed({
         onCancel={cancelDial}
         removePatientFromBed={submitRemovePatientFromBed}
         addPatient={submitAddPatient}
-        formData={formData}
         loading={loading}
         formProps={{
           schema: fullForm ? schemaAddPatient : schemaAddPatientSmall,
           uiSchema: uiSchemaAddPatient,
-          formData: formData,
+          formData: _.cloneDeep(formData),
           onChange: updateFormData,
-          liveValidate: true,
+          liveValidate: false,
         }}
+        onKeyPress={handleKeyPress}
         fullForm={fullForm}
         changeFullForm={changeFullForm}
         open={dialOpen}
@@ -281,7 +334,7 @@ UnitBed.propTypes = {
   setPage: PropTypes.func,
   processSubmitAddPatient: PropTypes.func,
   processSubmitRemovePatient: PropTypes.func,
-  setData: PropTypes.func,
+  setParentData: PropTypes.func,
   parentUiInform: PropTypes.func,
 };
 

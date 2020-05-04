@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Redirect } from "react-router-dom";
 import * as _ from "lodash";
+import { connect } from "react-redux";
+
+import { uiInform } from "../store/actions";
 
 import ReanimationService from "../components/containers/ReanimationService";
 import ReanimationTabs from "../components/containers/ReaTabs";
@@ -12,29 +15,9 @@ import {
 import { submitMovePatient } from "../repository/bed.repository";
 import SnackBar from "../components/SnackBar";
 
-function ReanimationServices({ data, reFetch, ...props }) {
+function ReanimationServices({ data, reFetch, uiInform, ...props }) {
   const [page, setPage] = useState();
   const [reaServicesData, setReaServicesData] = useState(data.results);
-
-  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const [snackbarSeverity, setSnackbarSeverity] = React.useState();
-  const [infoMsg, setInfoMsg] = React.useState("");
-
-  /**
-   * Display information snackbar
-   * @param {string} msg
-   * @param {string} infoType either 'success', 'error', 'info' or 'warning'
-   */
-  const uiInform = (msg, infoType) => {
-    setInfoMsg(msg);
-    setSnackbarSeverity(infoType);
-    setSnackbarOpen(true);
-  };
-
-  const closeSnackBar = () => {
-    setSnackbarOpen(false);
-    setInfoMsg("");
-  };
 
   const updateData = (update) => {
     const temData = _.cloneDeep(reaServicesData);
@@ -105,15 +88,6 @@ function ReanimationServices({ data, reFetch, ...props }) {
         {...props}
       />
     ),
-    Snackbar: (props) => (
-      <SnackBar
-        open={snackbarOpen}
-        onClose={closeSnackBar}
-        severity={snackbarSeverity}
-        infoMsg={infoMsg}
-        {...props}
-      />
-    ),
   };
 
   return page ? (
@@ -122,5 +96,10 @@ function ReanimationServices({ data, reFetch, ...props }) {
     <BedsTemplate components={components} />
   );
 }
+const mapStateToProps = () => ({})
 
-export default ReanimationServices;
+const mapDispatchToProps = dispatch => ({
+  uiInform: (message, severity) => dispatch(uiInform(message, severity))
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(ReanimationServices);

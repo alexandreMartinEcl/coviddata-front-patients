@@ -61,7 +61,9 @@ const EditableText = ({
       } else {
         rows.splice(rowId, 1, row.replace("[x]", "[ ]"));
       }
-      setEditedData(Object.assign(_.cloneDeep(data), { text: rows.join(`\n`) }));
+      let newText = rows.join(`\n`);
+      setEditedData(Object.assign(_.cloneDeep(dataCopy), { text: newText }));
+      setChangeCheck(newText !== dataCopy.text)
     };
   };
   /**
