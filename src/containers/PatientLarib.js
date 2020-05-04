@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import { uiInform } from "../store/actions";
 
 import defaultLAT from "../shared/files/defaultLAT";
+import autoCompleteData from "../json/autoCompleteData.json";
 import PatientTemplate from "../templates/PatientLarib";
 
 import {
@@ -172,6 +173,7 @@ function PatientLarib({ data = {}, reFetch, uiInform }) {
         processSubmit={submitLabelList("antecedents", "double", id)}
         readOnly={gardeMode}
         parentUiInform={uiInform}
+        autoCompleteList={autoCompleteData.antecedents}
         {...props}
       />
     ),
@@ -184,6 +186,7 @@ function PatientLarib({ data = {}, reFetch, uiInform }) {
         processSubmit={submitLabelList("allergies", "single", id)}
         readOnly={gardeMode}
         parentUiInform={uiInform}
+        autoCompleteList={autoCompleteData.allergies}
         {...props}
       />
     ),

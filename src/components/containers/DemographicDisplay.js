@@ -83,7 +83,7 @@ const DemographicDisplay = ({
   };
 
   const onFieldChange = (field) => {
-    return ({target}) => {
+    return ({ target }) => {
       let { value } = target;
       if (!checkAddPatientForm(field, value)) return;
       let temEditedData = _.cloneDeep(editedData);

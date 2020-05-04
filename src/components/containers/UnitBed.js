@@ -20,13 +20,6 @@ import { useMediaQuery } from "@material-ui/core";
 import { useTheme } from "@material-ui/styles";
 
 import {
-  HeartFailureIcon,
-  BioChemicalFailureIcon,
-  BrainFailureIcon,
-  LungFailureIcon,
-  KidneyFailureIcon,
-  LiverFailureIcon,
-  HematologicFailureIcon,
   TodoListIcon,
 } from "../../shared/icons/index";
 import { EditableText } from "../../containers/Components";
@@ -34,17 +27,6 @@ import {
   submitEditableText,
   getTextData,
 } from "../../repository/patient.repository";
-
-const icons = {
-  heart_failure: (props) => <HeartFailureIcon {...props} />,
-  bio_chemical_failure: (props) => <BioChemicalFailureIcon {...props} />,
-  brain_failure: (props) => <BrainFailureIcon {...props} />,
-  lung_failure: (props) => <LungFailureIcon {...props} />,
-  kidney_failure: (props) => <KidneyFailureIcon {...props} />,
-  liver_failure: (props) => <LiverFailureIcon {...props} />,
-  hematologic_failure: (props) => <HematologicFailureIcon {...props} />,
-  todoList: (props) => <TodoListIcon {...props} />,
-};
 
 //TOOD should be automated using jsonSchema but not that simple
 const checkAddPatientForm = (form) => {
@@ -259,7 +241,7 @@ function UnitBed({
           interpretorVariant="checklist"
           customButton={(props) => (
             <IconButton variant="contained" {...props}>
-              {icons.todoList(iconprops)}
+              <TodoListIcon {...iconprops} />
             </IconButton>
           )}
           badgeCounter={howManyUnfilledTasksInMarkdown}
@@ -272,9 +254,7 @@ function UnitBed({
         />
       );
 
-  const failuresIcons = !current_stay
-    ? null
-    : [
+      const failures = current_stay && [
         "heart_failure",
         "bio_chemical_failure",
         "brain_failure",
@@ -282,19 +262,17 @@ function UnitBed({
         "kidney_failure",
         "liver_failure",
         "hematologic_failure",
-      ]
-        .filter((k) => current_stay.patient[k])
-        .map((k) => icons[k]);
-
+      ].filter((k) => current_stay.patient[k])
+    
   return (
     <React.Fragment>
       <UnitBedPresentational
         patient={patient}
+        failures={failures}
         patientStay={patientStay}
         bedId={id}
         unitIndex={unit_index}
         variantForBedItem={variantForBedItem}
-        failuresIcons={failuresIcons}
         buildTodoList={buildTodoList}
         bedStatus={bedStatusInterface[status]}
         handlePatientClick={handlePatientClick}

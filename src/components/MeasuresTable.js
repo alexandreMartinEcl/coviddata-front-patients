@@ -161,8 +161,8 @@ const EditableCell = ({ statusType, ...props }) => {
       ))}
     </Select>
   ) : (
-      <TextField type={statusType.valueType} {...props} />
-    );
+    <TextField type={statusType.valueType} {...props} />
+  );
 };
 
 function MeasuresTable({
@@ -316,7 +316,7 @@ function MeasuresTable({
         if (Number(data.weight_kg) && Number(measureValue)) {
           return `(${
             Number(measureValue) / Number(data.weight_kg).toFixed(2)
-            } mg/kg/h)`;
+          } mg/kg/h)`;
         } else {
           return "";
         }
@@ -548,8 +548,8 @@ function MeasuresTable({
                         )}
                       </React.Fragment>
                     ) : (
-                        <></>
-                      )}
+                      <></>
+                    )}
                   </TableCell>
                 );
               })}
@@ -602,28 +602,28 @@ function MeasuresTable({
                                   }
                                 >
                                   {selectedCol === actualDataCol &&
-                                    group === selectedGroup &&
-                                    !configOrderRows[group].rows[i].readOnly ? (
-                                      <EditableCell
-                                        statusType={
-                                          configOrderRows[group].rows[i]
-                                        }
-                                        autoFocus={i === selectedRow}
-                                        value={`${cell}`}
-                                        onChange={onEditableCellChange(
-                                          group,
-                                          i,
-                                          actualDataCol,
-                                          configOrderRows[group].rows[i].valueType
-                                        )}
-                                        onKeyDown={handleKeyPress}
-                                      />
-                                    ) : (
-                                      `${cell} ${measureAddedInfo(
-                                        configOrderRows[group].rows[i],
-                                        cell
-                                      )}`
-                                    )}
+                                  group === selectedGroup &&
+                                  !configOrderRows[group].rows[i].readOnly ? (
+                                    <EditableCell
+                                      statusType={
+                                        configOrderRows[group].rows[i]
+                                      }
+                                      autoFocus={i === selectedRow}
+                                      value={`${cell}`}
+                                      onChange={onEditableCellChange(
+                                        group,
+                                        i,
+                                        actualDataCol,
+                                        configOrderRows[group].rows[i].valueType
+                                      )}
+                                      onKeyDown={handleKeyPress}
+                                    />
+                                  ) : (
+                                    `${cell} ${measureAddedInfo(
+                                      configOrderRows[group].rows[i],
+                                      cell
+                                    )}`
+                                  )}
                                 </TableCell>
                               </Tooltip>
                             );

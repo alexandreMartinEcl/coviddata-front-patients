@@ -104,16 +104,16 @@ const EditableDataCell = ({
       ))}
     </Select>
   ) : (
-      <TextField
-        type={dataType.valueType}
-        label={label}
-        value={value}
-        variant="outlined"
-        multiline={multiline}
-        style={{ margin: "4px", width: "95%" }}
-        {...props}
-      />
-    );
+    <TextField
+      type={dataType.valueType}
+      label={label}
+      value={value}
+      variant="outlined"
+      multiline={multiline}
+      style={{ margin: "4px", width: "95%" }}
+      {...props}
+    />
+  );
 };
 
 const FixedDataCell = ({
@@ -152,8 +152,8 @@ const DataCell = ({ editable, ...props }) => {
   return editable ? (
     <EditableDataCell {...props} />
   ) : (
-      <FixedDataCell {...props} />
-    );
+    <FixedDataCell {...props} />
+  );
 };
 
 const DemographicDisplay = ({
@@ -191,7 +191,7 @@ const DemographicDisplay = ({
     onKeyDown: handleKeyPress,
     onDoubleClick: () => {
       makeEditable && makeEditable(field);
-    }
+    },
   });
 
   return (
@@ -281,7 +281,7 @@ const DemographicDisplay = ({
                   onChange={onFieldChange("birth_date")}
                 /> */}
                 <DataCell
-                {...baseProps("birth_date")}
+                  {...baseProps("birth_date")}
                   label="Naissance"
                   dataType={{ valueType: "date" }}
                   value={birthDate}
@@ -316,19 +316,19 @@ const DemographicDisplay = ({
             classes={classes}
           />
         ) : (
-            readOnly && (
-              <Button
-                size="small"
-                color="primary"
-                variant="contained"
-                startIcon={<AddIcon />}
-                style={{ margin: "2px" }}
-                onClick={makeEditable}
-              >
-                Modifier
-              </Button>
-            )
-          )}
+          readOnly && (
+            <Button
+              size="small"
+              color="primary"
+              variant="contained"
+              startIcon={<AddIcon />}
+              style={{ margin: "2px" }}
+              onClick={makeEditable}
+            >
+              Modifier
+            </Button>
+          )
+        )}
       </Box>
     </React.Fragment>
   );

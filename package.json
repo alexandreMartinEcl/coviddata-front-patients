@@ -5,7 +5,7 @@
   "dependencies": {
     "@material-ui/core": "^4.9.7",
     "@material-ui/icons": "^4.9.1",
-    "@material-ui/lab": "^4.0.0-alpha.48",
+    "@material-ui/lab": "^4.0.0-alpha.52",
     "@rjsf/core": "^2.0.0-alpha.4",
     "axios": "^0.19.2",
     "axios-hooks": "^1.9.0",

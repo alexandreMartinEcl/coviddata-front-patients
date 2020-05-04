@@ -1,10 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
+
 import Button from "@material-ui/core/Button";
 import AddIcon from "@material-ui/icons/AddCircle";
 import RemoveIcon from "@material-ui/icons/RemoveCircle";
 
+import Autocomplete from "@material-ui/lab/Autocomplete";
 import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -94,33 +96,33 @@ const EditableLabelTexFields = ({
   item,
   index,
   onChangeLabels,
+  autoCompleteList,
+  input,
+  onChangeInputs,
 }) => {
+  const baseProps = (key) => ({
+    freeSolo: true,
+    options: key ? autoCompleteList[key] : autoCompleteList,
+    value: key ? item[key] : item,
+    onChange: onChangeLabels(index, key),
+    inputValue: key ? input[key] : input,
+    onInputChange: onChangeInputs(index, key),
+    onBlur: (e) => {
+      onChangeLabels(index, key)(null, key ? input[key] : input);
+    },
+    renderInput: (params) => <TextField {...params} type="text" />,
+  });
+
   switch (labelVariant) {
     case "double":
       return (
         <React.Fragment>
-          <TextField
-            onChange={onChangeLabels(index, "title")}
-            type="text"
-            value={item.title}
-          />
-          <TextField
-            onChange={onChangeLabels(index, "value")}
-            type="text"
-            multiline
-            value={item.value}
-          />
+          <Autocomplete {...baseProps("title")} />
+          <Autocomplete {...baseProps("value")} />
         </React.Fragment>
       );
     default:
-      return (
-        <TextField
-          onChange={onChangeLabels(index)}
-          type="text"
-          multiline
-          value={item}
-        />
-      );
+      return <Autocomplete {...baseProps()} />;
   }
 };
 
@@ -203,6 +205,9 @@ const EditableLabels = ({
   labelVariant,
   removeEditedLabel,
   onChangeLabels,
+  autoCompleteList,
+  inputs,
+  onChangeInputs,
   classes,
 }) =>
   editedLabels.map((item, index) => (
@@ -212,6 +217,9 @@ const EditableLabels = ({
         labelVariant={labelVariant}
         item={item}
         index={index}
+        autoCompleteList={autoCompleteList}
+        input={inputs[index]}
+        onChangeInputs={onChangeInputs}
       />
       <Button
         variant="contained"
@@ -221,7 +229,7 @@ const EditableLabels = ({
         onClick={() => removeEditedLabel(index)}
       >
         Retirer
-    </Button>
+      </Button>
       <Divider vertical />
     </Grid>
   ));
@@ -238,12 +246,12 @@ const Labels = ({ labels, labelVariant, variantLabelContent, classes }) =>
       />
     ))
   ) : (
-      <LabelComponent
-        labelVariant={labelVariant}
-        variantLabelContent={variantLabelContent}
-        classes={classes}
-      />
-    );
+    <LabelComponent
+      labelVariant={labelVariant}
+      variantLabelContent={variantLabelContent}
+      classes={classes}
+    />
+  );
 
 const TitleBox = ({ title, classes }) => (
   <Box className={classes.labelTitle}>
@@ -263,6 +271,9 @@ export const LabelListDial = ({
   cancelEditDial,
   onSubmitLabels,
   loading,
+  autoCompleteList,
+  inputs,
+  onChangeInputs,
 }) => {
   const classes = useStyles();
   const th = useTheme();
@@ -283,6 +294,9 @@ export const LabelListDial = ({
           variantLabelContent={variantLabelContent}
           removeEditedLabel={removeEditedLabel}
           onChangeLabels={onChangeLabels}
+          autoCompleteList={autoCompleteList}
+          inputs={inputs}
+          onChangeInputs={onChangeInputs}
           classes={classes}
         />
       }
@@ -296,8 +310,8 @@ export const LabelListDial = ({
       }
       classes={classes}
     />
-  )
-}
+  );
+};
 
 LabelListDial.propTypes = {
   isEmpty: PropTypes.bool,
@@ -311,13 +325,13 @@ LabelListDial.propTypes = {
   cancelEditDial: PropTypes.func,
   onSubmitLabels: PropTypes.func,
   loading: PropTypes.bool,
-}
+};
 
 LabelListDial.defaultProps = {
   editedLabels: [],
   dialOpen: false,
   loading: false,
-}
+};
 
 export const ListLabelPresentational = ({
   isEmpty,

@@ -2,7 +2,10 @@ import React from "react";
 import PropTypes from "prop-types";
 import * as _ from "lodash";
 
-import { ListLabelPresentational, LabelListDial } from "../presentational/ListLabels";
+import {
+  ListLabelPresentational,
+  LabelListDial,
+} from "../presentational/ListLabels";
 
 import { manageError } from "../../shared/utils/tools";
 
@@ -15,10 +18,15 @@ const ListLabels = ({
   data,
   setParentData,
   mapResToData,
+  autoCompleteList,
 }) => {
   const [dataCopy, setDataCopy] = React.useState(_.cloneDeep(data));
   const [editedData, setEditedData] = React.useState(_.cloneDeep(data));
 
+  //specific to AutoComplete components
+  const [inputsData, setInputsData] = React.useState(
+    _.cloneDeep(data).listItems
+  );
   const [loading, setLoading] = React.useState(false);
   const [dialOpen, setDialOpen] = React.useState(false);
 
@@ -28,6 +36,7 @@ const ListLabels = ({
 
   const cancelEditDial = () => {
     setEditedData(_.cloneDeep(dataCopy));
+    setInputsData(dataCopy.listItems);
     closeEditDial();
   };
 
@@ -36,14 +45,14 @@ const ListLabels = ({
   };
 
   const onChangeLabels = (index, field) => {
-    return (event) => {
+    return (event, newValue) => {
       let temListItems = _.cloneDeep(editedData.listItems);
       switch (labelVariant) {
         case "double":
-          temListItems[index][field] = event.target.value;
+          temListItems[index][field] = newValue;
           break;
         default:
-          temListItems[index] = event.target.value;
+          temListItems[index] = newValue;
           break;
       }
       setEditedData(
@@ -52,28 +61,51 @@ const ListLabels = ({
     };
   };
 
+  const onChangeInputs = (index, field) => {
+    return (event, newValue) => {
+      let temInputs = _.cloneDeep(inputsData);
+      switch (labelVariant) {
+        case "double":
+          temInputs[index][field] = newValue;
+          break;
+        default:
+          temInputs[index] = newValue;
+          break;
+      }
+      setInputsData(Object.assign(_.cloneDeep(temInputs)));
+    };
+  };
+
   const removeEditedLabel = (index) => {
     let temListItems = _.cloneDeep(editedData.listItems);
+    let temInputs = _.cloneDeep(inputsData);
     temListItems.splice(index, 1);
+    temInputs.splice(index, 1);
     setEditedData(
       Object.assign(_.cloneDeep(editedData), { listItems: temListItems })
     );
+    setInputsData(_.cloneDeep(temInputs));
   };
 
   const addEditedLabel = () => {
     let temListItems = _.cloneDeep(editedData.listItems);
+    let temInputs = _.cloneDeep(inputsData);
     switch (labelVariant) {
       case "double":
         temListItems.push({ title: "", value: "" });
+        temInputs.push({ title: "", value: "" });
         setEditedData(
           Object.assign(_.cloneDeep(editedData), { listItems: temListItems })
         );
+        setInputsData(_.cloneDeep(temInputs));
         break;
       default:
         temListItems.push("");
+        temInputs.push("");
         setEditedData(
           Object.assign(_.cloneDeep(editedData), { listItems: temListItems })
         );
+        setInputsData(_.cloneDeep(temInputs));
         break;
     }
   };
@@ -125,6 +157,9 @@ const ListLabels = ({
         cancelEditDial={cancelEditDial}
         onSubmitLabels={onSubmit}
         loading={loading}
+        autoCompleteList={autoCompleteList}
+        inputs={inputsData}
+        onChangeInputs={onChangeInputs}
       />
     </React.Fragment>
   );
@@ -142,12 +177,14 @@ ListLabels.propTypes = {
   parentUiInform: PropTypes.func,
   mapResToData: PropTypes.func,
   readOnly: PropTypes.bool,
+  autocompleteList: PropTypes.array,
 };
 
 ListLabels.defaultProps = {
   labelVariant: "single",
   listItems: [],
   readOnly: false,
+  autocompleteList: [],
 };
 
 export default ListLabels;
