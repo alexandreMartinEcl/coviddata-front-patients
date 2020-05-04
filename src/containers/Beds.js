@@ -96,10 +96,13 @@ function ReanimationServices({ data, reFetch, uiInform, ...props }) {
     <BedsTemplate components={components} />
   );
 }
-const mapStateToProps = () => ({})
+const mapStateToProps = () => ({});
 
-const mapDispatchToProps = dispatch => ({
-  uiInform: (message, severity) => dispatch(uiInform(message, severity))
-})
+const mapDispatchToProps = (dispatch) => ({
+  uiInform: (message, severity) => dispatch(uiInform(message, severity)),
+});
 
-export default connect(mapStateToProps, mapDispatchToProps)(ReanimationServices);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ReanimationServices);

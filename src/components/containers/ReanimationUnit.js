@@ -3,16 +3,22 @@ import PropTypes from "prop-types";
 import * as _ from "lodash";
 
 import ReanimationUnitPresentational from "../presentational/ReanimationUnit";
-import { BedIcon, ToWatchIcon } from "../../shared/icons/index";
+import { BedIcon, ToWatchIcon, TodoListIcon } from "../../shared/icons/index";
 import { submitAddPatient } from "../../repository/patient.repository";
-import { submitFreeUpBed } from "../../repository/bed.repository";
+import {
+  submitFreeUpBed,
+  buildUnitTodoListSummary,
+} from "../../repository/bed.repository";
 import UnitBed from "./UnitBed";
+import EditableText from "./EditableText";
+import { IconButton } from "@material-ui/core";
+import { howManyUnfilledTasksInMarkdown } from "../../shared/utils/tools";
+import ReanimationService from "./ReanimationService";
 
 const icons = {
-  bed: <BedIcon color="secondary" style={{ width: "30px", height: "100%" }} />,
-  toWatch: (
-    <ToWatchIcon color="secondary" style={{ width: "30px", height: "100%" }} />
-  ),
+  bed: (props) => <BedIcon {...props} />,
+  toWatch: (props) => <ToWatchIcon {...props} />,
+  todoList: (props) => <TodoListIcon {...props} />,
 };
 
 const ReanimationUnit = ({
@@ -22,6 +28,7 @@ const ReanimationUnit = ({
   setPage,
   setParentData,
   parentUiInform,
+  gardeMode,
 }) => {
   const [dataCopy, setDataCopy] = React.useState(_.cloneDeep(unitData));
 
@@ -38,23 +45,43 @@ const ReanimationUnit = ({
   const setBedData = (bedId) => {
     return (newBedData) => {
       let newUnitData = _.cloneDeep(dataCopy);
-      let bed = newUnitData.beds.find(b => b.id === bedId);
+      let bed = newUnitData.beds.find((b) => b.id === bedId);
       Object.assign(bed, newBedData);
       if (setParentData) {
         setParentData(Object.assign(_.cloneDeep(dataCopy), newUnitData));
       } else {
         setDataCopy(Object.assign(_.cloneDeep(dataCopy), newUnitData));
       }
-      };
+    };
   };
+
+  const todoIcon = (unit) => (iconprops) => (
+    <EditableText
+      details={`Liste à penser pour l'unite ${unit.name}`}
+      title="Todo list"
+      variant="dial"
+      data={buildUnitTodoListSummary(unit)}
+      readOnly
+      interpretorVariant="markdown"
+      customButton={(props) => (
+        <IconButton variant="contained" {...props}>
+          {icons.todoList(iconprops)}
+        </IconButton>
+      )}
+      badgeCounter={howManyUnfilledTasksInMarkdown}
+      parentUiInform={parentUiInform}
+    />
+  );
 
   return (
     <ReanimationUnitPresentational
       name={dataCopy.name}
       nbSevere={computeNbSeverePatients(dataCopy.beds)}
       nbAvailable={computeNbAvailableBeds(dataCopy.beds)}
-      iconSevere={icons.toWatch}
-      iconBed={icons.bed}
+      IconSevere={icons.toWatch}
+      IconBed={icons.bed}
+      TodoListIcon={todoIcon(dataCopy)}
+      gardeMode={gardeMode}
       bedElements={dataCopy.beds
         .sort((a, b) => a.unit_index >= b.unit_index)
         .map((bed) => (
@@ -68,6 +95,7 @@ const ReanimationUnit = ({
             processSubmitRemovePatient={submitFreeUpBed()}
             setData={setBedData(bed.id)}
             parentUiInform={parentUiInform}
+            gardeMode={gardeMode}
           />
         ))}
     />
@@ -80,6 +108,10 @@ ReanimationUnit.propTypes = {
   setPage: PropTypes.func,
   setParentData: PropTypes.func,
   parentUiInform: PropTypes.func,
+  gardeMode: PropTypes.bool,
 };
 
+ReanimationUnit.defaultProps = {
+  gardeMode: false,
+};
 export default ReanimationUnit;

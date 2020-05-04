@@ -294,61 +294,68 @@ const ListLabels = ({
   const isUpSm = useMediaQuery(th.breakpoints.up("sm"));
   const variantLabelContent = isUpSm ? "body1" : "body2";
 
-  return (readOnly && isEmpty) || (
-    <Box border={1} className={classes.rootBox}>
-      <Grid container spacing={2} justify={"flex-start"} alignItems={"center"}>
-        <Grid item xs={12} sm={2}>
-          <TitleBox title={title} classes={classes} />
-        </Grid>
+  return (
+    (readOnly && isEmpty) || (
+      <Box border={1} className={classes.rootBox}>
         <Grid
-          item
           container
-          xs={12}
-          sm={10}
+          spacing={2}
           justify={"flex-start"}
           alignItems={"center"}
         >
-          <Labels
-            labels={labels}
-            labelVariant={labelVariant}
-            variantLabelContent={variantLabelContent}
-            classes={classes}
-          />
-          <Grid item xs={6} sm={4}>
-            {readOnly || (
-              <EditButtonBox onClick={openEditDial} classes={classes} />
-            )}
+          <Grid item xs={12} sm={2}>
+            <TitleBox title={title} classes={classes} />
           </Grid>
-        </Grid>
-
-        <LabelsDialog
-          title={title}
-          editedLabels={editedLabels}
-          addEditedLabel={addEditedLabel}
-          open={dialOpen}
-          onClose={closeEditDial}
-          content={
-            <EditableLabels
-              editedLabels={editedLabels}
+          <Grid
+            item
+            container
+            xs={12}
+            sm={10}
+            justify={"flex-start"}
+            alignItems={"center"}
+          >
+            <Labels
+              labels={labels}
               labelVariant={labelVariant}
               variantLabelContent={variantLabelContent}
-              removeEditedLabel={removeEditedLabel}
-              onChangeLabels={onChangeLabels}
               classes={classes}
             />
-          }
-          actions={
-            <DialActions
-              onCancel={cancelEditDial}
-              onSubmit={onSubmitLabels}
-              loading={loading}
-              classes={classes}
-            />
-          }
-          classes={classes}
-        />
-      </Grid>
-    </Box>
+            <Grid item xs={6} sm={4}>
+              {readOnly || (
+                <EditButtonBox onClick={openEditDial} classes={classes} />
+              )}
+            </Grid>
+          </Grid>
+
+          <LabelsDialog
+            title={title}
+            editedLabels={editedLabels}
+            addEditedLabel={addEditedLabel}
+            open={dialOpen}
+            onClose={closeEditDial}
+            content={
+              <EditableLabels
+                editedLabels={editedLabels}
+                labelVariant={labelVariant}
+                variantLabelContent={variantLabelContent}
+                removeEditedLabel={removeEditedLabel}
+                onChangeLabels={onChangeLabels}
+                classes={classes}
+              />
+            }
+            actions={
+              <DialActions
+                onCancel={cancelEditDial}
+                onSubmit={onSubmitLabels}
+                loading={loading}
+                classes={classes}
+              />
+            }
+            classes={classes}
+          />
+        </Grid>
+      </Box>
+    )
   );
 };
 

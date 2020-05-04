@@ -48,7 +48,7 @@ const SimpleSelect = ({
       processSubmit(event.target.value, onSubmitSuccess, onSubmitFail);
   };
 
-  console.log("Checking simple:", dataCopy)
+  console.log("Checking simple:", dataCopy);
   return (
     <React.Fragment>
       <SimpleSelectPresentational
@@ -67,7 +67,7 @@ const SimpleSelect = ({
 
 SimpleSelect.propTypes = {
   title: PropTypes.string.isRequired,
-  data: PropTypes.shape({value: PropTypes.string}),
+  data: PropTypes.shape({ value: PropTypes.string }),
   values: PropTypes.object,
   icons: PropTypes.object,
   colors: PropTypes.object,

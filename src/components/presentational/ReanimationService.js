@@ -7,6 +7,9 @@ import {
   Typography,
   Button,
   CircularProgress,
+  Tooltip,
+  Switch,
+  FormControlLabel,
 } from "@material-ui/core";
 import { FormDialog } from "../Form";
 
@@ -27,6 +30,10 @@ const useStyles = makeStyles((theme) => ({
     left: "50%",
     marginTop: -12,
     marginLeft: -12,
+  },
+  icon: {
+    width: "30px",
+    height: "100%",
   },
 }));
 
@@ -89,7 +96,13 @@ BedSwapDial.defaultProps = {
   swapDialOpen: false,
 };
 
-export const ReanimationServicePresentational = ({ infos, units }) => {
+export const ReanimationServicePresentational = ({
+  infos,
+  TodoListIcon,
+  units,
+  switchDisplayMode,
+  gardeMode,
+}) => {
   const classes = useStyles();
 
   return (
@@ -97,12 +110,32 @@ export const ReanimationServicePresentational = ({ infos, units }) => {
       <Box border={1} className={classes.infosBox}>
         <Grid container alignItems="center" justify="space-around">
           {infos.map((info) => (
-            <Grid key={info.title} item xs={12} sm>
+            <Grid key={info.title} item xs>
               <Typography variant="body1">
-                {info.icon} {info.title} {": "} {info.value}
+                <Tooltip title={info.title} arrow>
+                  <span>
+                    <info.icon color="secondary" className={classes.icon} />
+                    {info.value}
+                  </span>
+                </Tooltip>
               </Typography>
             </Grid>
           ))}
+          <Grid item xs>
+            <TodoListIcon color="secondary" className={classes.icon} />
+          </Grid>
+          <Grid item xs>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={gardeMode}
+                  onChange={switchDisplayMode}
+                  name="checkedA"
+                />
+              }
+              label="Mode garde"
+            />
+          </Grid>
         </Grid>
       </Box>
       {units}

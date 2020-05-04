@@ -5,7 +5,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
 
 import Paper from "@material-ui/core/Paper";
-import { ListSubheader, Grid } from "@material-ui/core";
+import { ListSubheader, Grid, Tooltip } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   unitTitle: {
@@ -15,15 +15,21 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     maxWidth: "500px",
   },
+  icon: {
+    width: "30px",
+    height: "100%",
+  },
 }));
 
 const ReanimationUnit = ({
   name,
   nbSevere,
   nbAvailable,
-  iconSevere,
-  iconBed,
+  IconSevere,
+  IconBed,
   bedElements,
+  TodoListIcon,
+  gardeMode,
 }) => {
   const classes = useStyles();
 
@@ -44,7 +50,14 @@ const ReanimationUnit = ({
                 </Grid>
                 <Grid item container xs>
                   <Grid item xs={6}>
-                    {iconSevere}
+                    <Tooltip title={"Patients à gravité haute"} arrow>
+                      <span>
+                        <IconSevere
+                          color="secondary"
+                          className={classes.icon}
+                        />
+                      </span>
+                    </Tooltip>
                   </Grid>
                   <Grid item xs={6}>
                     {nbSevere}
@@ -52,12 +65,21 @@ const ReanimationUnit = ({
                 </Grid>
                 <Grid item container xs>
                   <Grid item xs={6}>
-                    {iconBed}
+                    <Tooltip title={"Lits disponibles"} arrow>
+                      <span>
+                        <IconBed color="secondary" className={classes.icon} />
+                      </span>
+                    </Tooltip>
                   </Grid>
                   <Grid item xs={6}>
                     {nbAvailable}
                   </Grid>
                 </Grid>
+                {gardeMode || (
+                  <Grid item container xs>
+                    <TodoListIcon color="secondary" className={classes.icon} />
+                  </Grid>
+                )}
               </Grid>
             </ListSubheader>
           </React.Fragment>
@@ -76,6 +98,8 @@ ReanimationUnit.propTypes = {
   iconSevere: PropTypes.element,
   iconBed: PropTypes.element,
   bedElements: PropTypes.arrayOf(PropTypes.element),
+  TodoListIcon: PropTypes.node,
+  gardeMode: PropTypes.bool,
 };
 
 export default ReanimationUnit;

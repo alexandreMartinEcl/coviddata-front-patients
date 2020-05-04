@@ -5,7 +5,7 @@ const uiReducer = (state = {}, action) => {
         ...state,
         snackbarOpen: true,
         snackbarMessage: action.message,
-        snackbarSeverity: action.severity
+        snackbarSeverity: action.severity,
       };
     case "SNACKBAR_CLEAR":
       return {

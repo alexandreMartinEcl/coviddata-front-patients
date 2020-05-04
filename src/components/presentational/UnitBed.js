@@ -8,6 +8,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import AddIcon from "@material-ui/icons/AddCircle";
 import RemoveIcon from "@material-ui/icons/RemoveCircle";
 import IconButton from "@material-ui/core/IconButton";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 import { getAge, dateToDayStep } from "../../shared/utils/date";
 import {
@@ -17,10 +18,14 @@ import {
   DialogActions,
   Button,
   CircularProgress,
-  Input,
+  ExpansionPanelDetails,
+  ExpansionPanel,
+  ExpansionPanelSummary,
+  Box,
 } from "@material-ui/core";
 import { FormDialog } from "../Form";
 import MovePatientIcon from "../../shared/icons/move_patient";
+import { TodoListIcon } from "../../shared/icons";
 
 const useStyles = makeStyles((theme) => ({
   bedItem: {
@@ -71,7 +76,7 @@ const useStyles = makeStyles((theme) => ({
   },
   listItemSecAction: {
     width: "50%",
-    maxWidth: "100px",
+    maxWidth: "150px",
   },
   actionIcon: {
     width: "30px",
@@ -84,6 +89,10 @@ const useStyles = makeStyles((theme) => ({
     left: "50%",
     marginTop: -12,
     marginLeft: -12,
+  },
+  expansionSummary: {
+    paddingLeft: "10px",
+    paddingRight: "10px",
   },
 }));
 
@@ -103,7 +112,7 @@ const getSeverityClass = (patient, classes) => {
 const displayName = (patient) => {
   return `${patient.firstName} ${patient.lastName}${
     patient.sex ? ` (${patient.sex})` : ""
-    }`;
+  }`;
 };
 
 const getPatientAge = (patient) => {
@@ -137,23 +146,28 @@ const AddActions = ({
   loading,
   classes,
 }) => (
-    <React.Fragment>
-      <Button onClick={changeFullForm} variant="outlined" color="secondary">
-        {fullForm ? "Réduire" : "Détails"}
-      </Button>
-      <Button onClick={onCancel} variant="outlined" color="primary">
-        Annuler
+  <React.Fragment>
+    <Button onClick={changeFullForm} variant="outlined" color="secondary">
+      {fullForm ? "Réduire" : "Détails"}
     </Button>
-      {/* <Input type='submit'> */}
-        <Button type="submit" onClick={addPatient} variant="contained" color="primary">
-          {fullForm ? "Ajouter" : "Ajouter et ouvrir"}
-        </Button>
-      {/* </Input> */}
-      {loading && (
-        <CircularProgress size={24} className={classes.buttonProgress} />
-      )}
-    </React.Fragment>
-  );
+    <Button onClick={onCancel} variant="outlined" color="primary">
+      Annuler
+    </Button>
+    {/* <Input type='submit'> */}
+    <Button
+      type="submit"
+      onClick={addPatient}
+      variant="contained"
+      color="primary"
+    >
+      {fullForm ? "Ajouter" : "Ajouter et ouvrir"}
+    </Button>
+    {/* </Input> */}
+    {loading && (
+      <CircularProgress size={24} className={classes.buttonProgress} />
+    )}
+  </React.Fragment>
+);
 
 export const UnitBedDialog = ({
   patient,
@@ -190,24 +204,24 @@ export const UnitBedDialog = ({
       </DialogActions>
     </Dialog>
   ) : (
-      <FormDialog
-        formProps={{
-          liveValidate: true,
-          ...formProps,
-        }}
-        actions={
-          <AddActions
-            onCancel={onCancel}
-            addPatient={addPatient}
-            changeFullForm={changeFullForm}
-            fullForm={fullForm}
-            loading={loading}
-            classes={classes}
-          />
-        }
-        {...props}
-      />
-    );
+    <FormDialog
+      formProps={{
+        liveValidate: true,
+        ...formProps,
+      }}
+      actions={
+        <AddActions
+          onCancel={onCancel}
+          addPatient={addPatient}
+          changeFullForm={changeFullForm}
+          fullForm={fullForm}
+          loading={loading}
+          classes={classes}
+        />
+      }
+      {...props}
+    />
+  );
 };
 
 UnitBedDialog.propTypes = {
@@ -237,27 +251,27 @@ const EmptyBed = ({
   variantForBedItem,
   classes,
 }) => (
-    <ListItem
-      key={bedId}
-      role={undefined}
-      button
-      className={classes.bedItem}
-      onClick={() => handleDialOpen(bedId)}
-    >
-      <ListItemText primary={unitIndex} className={classes.bedIndex} />
-      <ListItemText
-        primary={bedStatus}
-        className={classes.patientDetails}
-        primaryTypographyProps={{ variant: variantForBedItem }}
-      />
-      <ListItemText primary={""} className={classes.otherDetails} />
-      <ListItemSecondaryAction className={classes.listItemSecAction}>
-        <IconButton onClick={() => handleDialOpen(bedId)} color="secondary">
-          <AddIcon fontSize="large" />
-        </IconButton>
-      </ListItemSecondaryAction>
-    </ListItem>
-  );
+  <ListItem
+    key={bedId}
+    role={undefined}
+    button
+    className={classes.bedItem}
+    onClick={() => handleDialOpen(bedId)}
+  >
+    <ListItemText primary={unitIndex} className={classes.bedIndex} />
+    <ListItemText
+      primary={bedStatus}
+      className={classes.patientDetails}
+      primaryTypographyProps={{ variant: variantForBedItem }}
+    />
+    <ListItemText primary={""} className={classes.otherDetails} />
+    <ListItemSecondaryAction className={classes.listItemSecAction}>
+      <IconButton onClick={() => handleDialOpen(bedId)} color="secondary">
+        <AddIcon fontSize="large" />
+      </IconButton>
+    </ListItemSecondaryAction>
+  </ListItem>
+);
 
 const FailuresIconsGrids = ({ failuresIcons, classes }) => {
   return (
@@ -278,7 +292,48 @@ const FailuresIconsGrids = ({ failuresIcons, classes }) => {
   );
 };
 
-const PatientBed = ({
+const GardePatientBed = ({
+  severityClass,
+  bedId,
+  unitIndex,
+  displayedName,
+  dateToDayStep,
+  failuresIcons,
+  TodoList,
+  classes,
+}) => (
+  <Box style={{ margin: "1px", padding: "2px" }}>
+    <ExpansionPanel key={bedId} defaultExpanded>
+      <ExpansionPanelSummary
+        expandIcon={<ExpandMoreIcon />}
+        className={`${severityClass} ${classes.expansionSummary}`}
+      >
+        <Grid container>
+          <Grid item xs>
+            {unitIndex}
+          </Grid>
+          <Grid item xs>
+            {displayedName}
+          </Grid>
+          <Grid item xs>
+            {dateToDayStep}
+          </Grid>
+          <Grid item xs>
+            <FailuresIconsGrids
+              failuresIcons={failuresIcons}
+              classes={classes}
+            />
+          </Grid>
+        </Grid>
+      </ExpansionPanelSummary>
+      <ExpansionPanelDetails>
+        <TodoList />
+      </ExpansionPanelDetails>
+    </ExpansionPanel>
+  </Box>
+);
+
+const BasicPatientBed = ({
   severityClass,
   bedId,
   unitIndex,
@@ -296,53 +351,57 @@ const PatientBed = ({
   onSwap,
   classes,
 }) => (
-    <ListItem
-      key={bedId}
-      button
-      className={severityClass}
-      onClick={() => handlePatientClick(patientId)}
-    >
-      <ListItemText primary={unitIndex} className={classes.bedIndex} />
+  <ListItem
+    key={bedId}
+    button
+    className={severityClass}
+    onClick={() => handlePatientClick(patientId)}
+  >
+    <ListItemText primary={unitIndex} className={classes.bedIndex} />
 
-      <ListItemText
-        primary={displayedName}
-        secondary={birthDateAndAge}
-        className={classes.patientDetails}
-        primaryTypographyProps={{ variant: variantForBedItem }}
-        secondaryTypographyProps={{ variant: variantForBedItem }}
-      />
-      <ListItemText
-        primary={dateToDayStep}
-        secondary={hospitalisationCause}
-        className={classes.otherDetails}
-        primaryTypographyProps={{ variant: variantForBedItem }}
-        secondaryTypographyProps={{ variant: variantForBedItem }}
-      />
-      <ListItemText
-        primary={
-          <FailuresIconsGrids failuresIcons={failuresIcons} classes={classes} />
-        }
-        // secondary={}
-        className={classes.thirdDetails}
-        primaryTypographyProps={{ variant: variantForBedItem }}
-        secondaryTypographyProps={{ variant: variantForBedItem }}
-      />
+    <ListItemText
+      primary={displayedName}
+      secondary={birthDateAndAge}
+      className={classes.patientDetails}
+      primaryTypographyProps={{ variant: variantForBedItem }}
+      secondaryTypographyProps={{ variant: variantForBedItem }}
+    />
+    <ListItemText
+      primary={dateToDayStep}
+      secondary={hospitalisationCause}
+      className={classes.otherDetails}
+      primaryTypographyProps={{ variant: variantForBedItem }}
+      secondaryTypographyProps={{ variant: variantForBedItem }}
+    />
+    <ListItemText
+      primary={
+        <FailuresIconsGrids failuresIcons={failuresIcons} classes={classes} />
+      }
+      className={classes.thirdDetails}
+      primaryTypographyProps={{ variant: variantForBedItem }}
+      secondaryTypographyProps={{ variant: variantForBedItem }}
+    />
+    <ListItemSecondaryAction className={classes.listItemSecAction}>
+      <TodoListIcon color="secondary" className={classes.actionIcon} />
+      <IconButton onClick={onSwap} color="secondary">
+        <MovePatientIcon className={classes.actionIcon} />
+      </IconButton>
+      <IconButton
+        onClick={() => handleDialOpen(stayId, displayedName)}
+        color="primary"
+      >
+        <RemoveIcon fontSize="large" className={classes.actionIcon} />
+      </IconButton>
+    </ListItemSecondaryAction>
+  </ListItem>
+);
 
-      <ListItemSecondaryAction className={classes.listItemSecAction}>
-        <TodoListIcon color="secondary" className={classes.actionIcon} />
-        <IconButton onClick={onSwap} color="secondary">
-          <MovePatientIcon className={classes.actionIcon} />
-        </IconButton>
-        <IconButton
-          onClick={() => handleDialOpen(stayId, displayedName)}
-          color="primary"
-        >
-          <RemoveIcon fontSize="large" className={classes.actionIcon} />
-        </IconButton>
-      </ListItemSecondaryAction>
-    </ListItem>
+const PatientBed = ({ gardeMode, buildTodoList, ...props }) =>
+  gardeMode ? (
+    <GardePatientBed TodoList={buildTodoList("")} {...props} />
+  ) : (
+    <BasicPatientBed TodoListIcon={buildTodoList("dial")} {...props} />
   );
-
 export const UnitBedPresentational = ({
   bedId,
   unitIndex,
@@ -350,11 +409,12 @@ export const UnitBedPresentational = ({
   variantForBedItem,
   failuresIcons,
   patientStay,
-  TodoListIcon,
+  buildTodoList,
   bedStatus,
   handlePatientClick,
   handleDialOpen,
   onSwapPatient,
+  gardeMode,
 }) => {
   const classes = useStyles();
 
@@ -373,22 +433,25 @@ export const UnitBedPresentational = ({
           failuresIcons={failuresIcons}
           patientId={patient.id}
           stayId={patientStay.id}
-          TodoListIcon={TodoListIcon}
+          buildTodoList={buildTodoList}
           handlePatientClick={handlePatientClick}
           handleDialOpen={handleDialOpen}
           onSwap={onSwapPatient(patient, patientStay)}
           classes={classes}
+          gardeMode={gardeMode}
         />
+      ) : gardeMode ? (
+        <></>
       ) : (
-          <EmptyBed
-            bedId={bedId}
-            handleDialOpen={handleDialOpen}
-            unitIndex={unitIndex}
-            bedStatus={bedStatus}
-            variantForBedItem={variantForBedItem}
-            classes={classes}
-          />
-        )}
+        <EmptyBed
+          bedId={bedId}
+          handleDialOpen={handleDialOpen}
+          unitIndex={unitIndex}
+          bedStatus={bedStatus}
+          variantForBedItem={variantForBedItem}
+          classes={classes}
+        />
+      )}
     </React.Fragment>
   );
 };
@@ -400,11 +463,14 @@ UnitBedPresentational.propTypes = {
   unitIndex: PropTypes.number.isRequired,
   variantForBedItem: PropTypes.string,
   failuresIcons: PropTypes.array,
-  TodoListIcon: PropTypes.node,
+  buildTodoList: PropTypes.func,
   bedStatus: PropTypes.oneOf(["Libre", "Indisponible"]),
   handlePatientClick: PropTypes.func,
   handleDialOpen: PropTypes.func,
   onSwapPatient: PropTypes.func,
+  gardeMode: PropTypes.bool,
 };
 
-UnitBedPresentational.defaultProps = {};
+UnitBedPresentational.defaultProps = {
+  gardeMode: false,
+};

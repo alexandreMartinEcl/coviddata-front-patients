@@ -30,7 +30,10 @@ import {
   TodoListIcon,
 } from "../../shared/icons/index";
 import { EditableText } from "../../containers/Components";
-import { submitEditableText, getTextData } from "../../repository/patient.repository";
+import {
+  submitEditableText,
+  getTextData,
+} from "../../repository/patient.repository";
 
 const icons = {
   heart_failure: (props) => <HeartFailureIcon {...props} />,
@@ -46,15 +49,15 @@ const icons = {
 //TOOD should be automated using jsonSchema but not that simple
 const checkAddPatientForm = (form) => {
   return (
-    (!form.NIP_id || form.NIP_id.match(/^[0-9]*$/g))
-    && (!form.stay_start_date || new Date(form.stay_start_date) <= new Date())
-    && (!form.family_name || form.family_name.match(/^[a-zA-Z\-\']*$/g))
-    && (!form.first_name || form.first_name.match(/^[a-zA-Z\-\']*$/g))
-    && (!form.birthDate || new Date(form.birthDate) <= new Date())
-    && (!form.weight_kg || form.weight_kg.match(/^[0-9]{0,3}(\.[0-9]{0,3})?$/g))
-    && (!form.size_cm || form.size_cm.match(/^[0-9]{0,3}(\.[0-9]{0,2})?$/g))
+    (!form.NIP_id || form.NIP_id.match(/^[0-9]*$/g)) &&
+    (!form.stay_start_date || new Date(form.stay_start_date) <= new Date()) &&
+    (!form.family_name || form.family_name.match(/^[a-zA-Z\-\']*$/g)) &&
+    (!form.first_name || form.first_name.match(/^[a-zA-Z\-\']*$/g)) &&
+    (!form.birthDate || new Date(form.birthDate) <= new Date()) &&
+    (!form.weight_kg || form.weight_kg.match(/^[0-9]{0,3}(\.[0-9]{0,3})?$/g)) &&
+    (!form.size_cm || form.size_cm.match(/^[0-9]{0,3}(\.[0-9]{0,2})?$/g))
   );
-}
+};
 
 const defaultFormData = {
   NIP_id: "",
@@ -76,6 +79,7 @@ function UnitBed({
   onSwapPatient,
   setParentData,
   parentUiInform,
+  gardeMode,
 }) {
   const [dataCopy, setDataCopy] = React.useState(_.cloneDeep(bedData));
   const [formData, setFormData] = React.useState(defaultFormData);
@@ -136,7 +140,7 @@ function UnitBed({
 
   const updateFormData = ({ ...fData }) => {
     if (!checkAddPatientForm(fData.formData)) {
-      setFormData(_.cloneDeep(formData))
+      setFormData(_.cloneDeep(formData));
     } else {
       setFormData(Object.assign(_.cloneDeep(formData), fData.formData));
     }
@@ -154,7 +158,7 @@ function UnitBed({
     setLoading(false);
     closeDial();
 
-    let temData = _.cloneDeep(dataCopy)
+    let temData = _.cloneDeep(dataCopy);
     let newPatientData = _.cloneDeep(res.data);
     temData.current_stay = newPatientData.current_unit_stay;
     delete newPatientData.current_unit_stay;
@@ -177,7 +181,9 @@ function UnitBed({
     setLoading(false);
     closeDial();
 
-    let newBedData = Object.assign(_.cloneDeep(dataCopy), { current_stay: null });
+    let newBedData = Object.assign(_.cloneDeep(dataCopy), {
+      current_stay: null,
+    });
     if (setParentData) {
       setParentData(newBedData);
     } else {
@@ -185,11 +191,10 @@ function UnitBed({
     }
 
     if (setParentData) {
-      let temData = _.cloneDeep(dataCopy)
+      let temData = _.cloneDeep(dataCopy);
       temData.current_stay = null;
       setParentData(temData);
     } else {
-
     }
   };
 
@@ -219,72 +224,67 @@ function UnitBed({
   //   }
   // }
 
-  let {
-    id,
-    current_stay,
-    unit_index,
-    status
-  } = dataCopy;
+  let { id, current_stay, unit_index, status } = dataCopy;
 
   const patient = !current_stay
     ? null
     : {
-      id: current_stay.patient.id,
-      firstName: current_stay.patient.first_name,
-      lastName: current_stay.patient.family_name,
-      sex: current_stay.patient.sex,
-      severity: severityInterface[current_stay.patient.severity],
-      birthDate: new Date(current_stay.patient.birth_date),
-      hospitalisationCause: current_stay.patient.hospitalisation_cause,
-    };
+        id: current_stay.patient.id,
+        firstName: current_stay.patient.first_name,
+        lastName: current_stay.patient.family_name,
+        sex: current_stay.patient.sex,
+        severity: severityInterface[current_stay.patient.severity],
+        birthDate: new Date(current_stay.patient.birth_date),
+        hospitalisationCause: current_stay.patient.hospitalisation_cause,
+      };
   const patientStay = !current_stay
     ? null
     : {
-      id: current_stay.id,
-      startDate: new Date(current_stay.start_date),
-    };
+        id: current_stay.id,
+        startDate: new Date(current_stay.start_date),
+      };
 
-  const todoIcon = !current_stay
+  const buildTodoList = !current_stay
     ? null
-    : (iconprops) => (
-      <EditableText
-        label="Liste à penser pour le patient"
-        title="Todo list"
-        variant="dial"
-        data={{
-          text: current_stay.patient.todo_list,
-          lastEdited: new Date(current_stay.patient.last_edited_todo_list),
-        }}
-        readOnly
-        interpretorVariant="checklist"
-        customButton={(props) => (
-          <IconButton variant="contained" {...props}>
-            {icons.todoList(iconprops)}
-          </IconButton>
-        )}
-        badgeCounter={howManyUnfilledTasksInMarkdown}
-        parentUiInform={parentUiInform}
-        mapResToData={getTextData("todo_list")}
-        processSubmit={submitEditableText(
-          "todo_list",
-          current_stay.patient.id
-        )}
-      />
-    );
+    : (variant) => (iconprops) => (
+        <EditableText
+          details={`Liste à penser pour le patient`}
+          title="Todo list"
+          variant={variant}
+          data={{
+            text: current_stay.patient.todo_list,
+            lastEdited: new Date(current_stay.patient.last_edited_todo_list),
+          }}
+          readOnly
+          interpretorVariant="checklist"
+          customButton={(props) => (
+            <IconButton variant="contained" {...props}>
+              {icons.todoList(iconprops)}
+            </IconButton>
+          )}
+          badgeCounter={howManyUnfilledTasksInMarkdown}
+          parentUiInform={parentUiInform}
+          mapResToData={getTextData("todo_list")}
+          processSubmit={submitEditableText(
+            "todo_list",
+            current_stay.patient.id
+          )}
+        />
+      );
 
   const failuresIcons = !current_stay
     ? null
     : [
-      "heart_failure",
-      "bio_chemical_failure",
-      "brain_failure",
-      "lung_failure",
-      "kidney_failure",
-      "liver_failure",
-      "hematologic_failure",
-    ]
-      .filter((k) => current_stay.patient[k])
-      .map((k) => icons[k]);
+        "heart_failure",
+        "bio_chemical_failure",
+        "brain_failure",
+        "lung_failure",
+        "kidney_failure",
+        "liver_failure",
+        "hematologic_failure",
+      ]
+        .filter((k) => current_stay.patient[k])
+        .map((k) => icons[k]);
 
   return (
     <React.Fragment>
@@ -295,11 +295,12 @@ function UnitBed({
         unitIndex={unit_index}
         variantForBedItem={variantForBedItem}
         failuresIcons={failuresIcons}
-        TodoListIcon={todoIcon}
+        buildTodoList={buildTodoList}
         bedStatus={bedStatusInterface[status]}
         handlePatientClick={handlePatientClick}
         handleDialOpen={openDial}
         onSwapPatient={onSwapPatient}
+        gardeMode={gardeMode}
       />
       <UnitBedDialog
         patient={patient}
@@ -336,6 +337,11 @@ UnitBed.propTypes = {
   processSubmitRemovePatient: PropTypes.func,
   setParentData: PropTypes.func,
   parentUiInform: PropTypes.func,
+  gardeMode: PropTypes.bool,
+};
+
+UnitBed.defaultProps = {
+  gardeMode: false,
 };
 
 export default UnitBed;

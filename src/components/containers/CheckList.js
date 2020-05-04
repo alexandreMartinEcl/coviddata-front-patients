@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import * as _ from "lodash";
 
-
 import CheckListPresentational from "../presentational/CheckList";
 
 import { manageError } from "../../shared/utils/tools";
@@ -63,7 +62,7 @@ const CheckList = ({
     processSubmit(_.cloneDeep(editedData), onSubmitSuccess, onSubmitFail);
   };
 
-  console.log(data, editedData)
+  console.log(data, editedData);
   return (
     <React.Fragment>
       <CheckListPresentational

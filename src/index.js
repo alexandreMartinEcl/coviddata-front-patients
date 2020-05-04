@@ -5,12 +5,12 @@ import Routes from "./components/Routes";
 import "./design.scss";
 import theme from "./theme";
 
-import rootReducer from './store/reducers'
+import rootReducer from "./store/reducers";
 import { createStore } from "redux";
 import { Provider } from "react-redux";
 import SnackBar from "./components/SnackBar";
 
-const store = createStore(rootReducer)
+const store = createStore(rootReducer);
 
 function Loading({ children }) {
   // // const {
@@ -39,7 +39,7 @@ function Init(props) {
       <ThemeProvider theme={theme}>
         <div style={{ backgroundColor: theme.palette.background.default }}>
           <Routes />
-          <SnackBar/>
+          <SnackBar />
         </div>
       </ThemeProvider>
     </Provider>

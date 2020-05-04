@@ -134,7 +134,7 @@ export const submitEditableText = (field, patientId) => {
         data: {
           [`${field}`]: text,
           [`last_edited_${field}`]: new Date(),
-        }
+        },
       });
       return;
     }
@@ -149,12 +149,14 @@ export const submitEditableText = (field, patientId) => {
         "Access-Control-Allow-Origin": "*",
       },
     })
-      .then(res => thenCb({
-        data: {
-          text: res.data[field],
-          lastEdited: res.data[`last_edited_${field}`]
-        }
-      }))
+      .then((res) =>
+        thenCb({
+          data: {
+            text: res.data[field],
+            lastEdited: res.data[`last_edited_${field}`],
+          },
+        })
+      )
       .catch(catchCb);
   };
 };
@@ -372,26 +374,24 @@ export const getDetectionData = (fullData) => {
 
   let hospitalisationDate = getDemographicData(fullData).hospitalisationDate;
   if (hospitalisationDate) {
-    [
-      ...Array(
-        nbWeeksBetween(hospitalisationDate, new Date())
-      ).keys(),
-    ].forEach((i) => {
-      temData[`detections_ER_weekly_${i + 1}`] =
-        detections_ER_weekly && detections_ER_weekly[i]
-          ? detections_ER_weekly[i]
-          : false;
-      temData[`detections_orl_weekly_${i + 1}`] =
-        detections_orl_weekly && detections_orl_weekly[i]
-          ? detections_orl_weekly[i]
-          : false;
-      temInterface[`detections_ER_weekly_${i + 1}`] = `Détection ER semaine ${
-        i + 1
+    [...Array(nbWeeksBetween(hospitalisationDate, new Date())).keys()].forEach(
+      (i) => {
+        temData[`detections_ER_weekly_${i + 1}`] =
+          detections_ER_weekly && detections_ER_weekly[i]
+            ? detections_ER_weekly[i]
+            : false;
+        temData[`detections_orl_weekly_${i + 1}`] =
+          detections_orl_weekly && detections_orl_weekly[i]
+            ? detections_orl_weekly[i]
+            : false;
+        temInterface[`detections_ER_weekly_${i + 1}`] = `Détection ER semaine ${
+          i + 1
         }`;
-      temInterface[
-        `detections_orl_weekly_${i + 1}`
-      ] = `Détection Orl semaine ${i + 1}`;
-    });
+        temInterface[
+          `detections_orl_weekly_${i + 1}`
+        ] = `Détection Orl semaine ${i + 1}`;
+      }
+    );
   }
 
   return { dataCheckList: temData, depistageInterface: temInterface };
@@ -477,9 +477,8 @@ export const getStatusMeasuresData = (fullData) => {
     temData.hospitalisationDate = new Date(
       Math.min(...unit_stays.map((s) => new Date(s.start_date)))
     );
-    temData.hospitalisationEndDate = unit_stays.filter(
-      (s) => !s.is_finished
-    ).length
+    temData.hospitalisationEndDate = unit_stays.filter((s) => !s.is_finished)
+      .length
       ? null
       : new Date(Math.max(...unit_stays.map((s) => new Date(s.end_date))));
   }
@@ -487,4 +486,4 @@ export const getStatusMeasuresData = (fullData) => {
     temData.weight_kg = fullData.weight_kg;
   }
   return temData;
-}
+};

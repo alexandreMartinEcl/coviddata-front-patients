@@ -10,6 +10,7 @@ import { manageError } from "../../shared/utils/tools";
 
 const EditableText = ({
   title,
+  details,
   variant,
   interpretorVariant,
   parentUiInform,
@@ -38,19 +39,24 @@ const EditableText = ({
   };
 
   const cancelEditDial = () => {
-    setEditedData(Object.assign(_.cloneDeep(editedData), { text: dataCopy.text }));
+    setChangeCheck(false);
+    setEditedData(
+      Object.assign(_.cloneDeep(editedData), { text: dataCopy.text })
+    );
     closeEditDial();
   };
 
   const openEditDial = () => {
     setDialOpen(true);
     setAutoFocus(true);
-  }
+  };
 
   const onChangeText = (event) => {
-    setChangeCheck(event.target.value !== dataCopy.text)
-    setEditedData(Object.assign(_.cloneDeep(editedData), { text: event.target.value }));
-  }
+    setChangeCheck(event.target.value !== dataCopy.text);
+    setEditedData(
+      Object.assign(_.cloneDeep(editedData), { text: event.target.value })
+    );
+  };
 
   const changeFromCheckList = (rowId) => {
     return (event) => {
@@ -63,7 +69,7 @@ const EditableText = ({
       }
       let newText = rows.join(`\n`);
       setEditedData(Object.assign(_.cloneDeep(dataCopy), { text: newText }));
-      setChangeCheck(newText !== dataCopy.text)
+      setChangeCheck(newText !== dataCopy.text);
     };
   };
   /**
@@ -121,13 +127,15 @@ const EditableText = ({
 
   const onSubmit = () => {
     setLoading(true);
-    processSubmit && processSubmit(editedData.text, onSubmitSuccess, onSubmitFail);
+    processSubmit &&
+      processSubmit(editedData.text, onSubmitSuccess, onSubmitFail);
   };
 
   return (
     <React.Fragment>
       <EditableTextPresentational
         title={title}
+        details={details}
         variant={variant}
         interpretorVariant={interpretorVariant}
         readOnly={readOnly}
@@ -154,7 +162,8 @@ const EditableText = ({
 
 EditableText.propTypes = {
   title: PropTypes.string,
-  variant: PropTypes.oneOf(["extensible", "dial"]),
+  details: PropTypes.string,
+  variant: PropTypes.oneOf(["extensible", "dial", ""]),
   interpretorVariant: PropTypes.oneOf(["markdown", "checklist", "none"]),
   data: PropTypes.shape({
     text: PropTypes.string,
@@ -173,7 +182,7 @@ EditableText.propTypes = {
 };
 
 EditableText.defaultProps = {
-  variant: "extensible",
+  variant: "",
   withMarkdown: false,
   readOnly: false,
   data: {},

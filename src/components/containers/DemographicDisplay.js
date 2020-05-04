@@ -137,7 +137,7 @@ const DemographicDisplay = ({
       />
     </React.Fragment>
   );
-}
+};
 
 DemographicDisplay.propTypes = {
   data: PropTypes.object,

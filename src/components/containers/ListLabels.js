@@ -22,7 +22,6 @@ const ListLabels = ({
   const [loading, setLoading] = React.useState(false);
   const [dialOpen, setDialOpen] = React.useState(false);
 
-
   const closeEditDial = () => {
     setDialOpen(false);
   };
@@ -47,14 +46,18 @@ const ListLabels = ({
           temListItems[index] = event.target.value;
           break;
       }
-      setEditedData(Object.assign(_.cloneDeep(editedData), { listItems: temListItems }));
+      setEditedData(
+        Object.assign(_.cloneDeep(editedData), { listItems: temListItems })
+      );
     };
   };
 
   const removeEditedLabel = (index) => {
     let temListItems = _.cloneDeep(editedData.listItems);
     temListItems.splice(index, 1);
-    setEditedData(Object.assign(_.cloneDeep(editedData), { listItems: temListItems }));
+    setEditedData(
+      Object.assign(_.cloneDeep(editedData), { listItems: temListItems })
+    );
   };
 
   const addEditedLabel = () => {
@@ -62,11 +65,15 @@ const ListLabels = ({
     switch (labelVariant) {
       case "double":
         temListItems.push({ title: "", value: "" });
-        setEditedData(Object.assign(_.cloneDeep(editedData), { listItems: temListItems }));
+        setEditedData(
+          Object.assign(_.cloneDeep(editedData), { listItems: temListItems })
+        );
         break;
       default:
         temListItems.push("");
-        setEditedData(Object.assign(_.cloneDeep(editedData), { listItems: temListItems }));
+        setEditedData(
+          Object.assign(_.cloneDeep(editedData), { listItems: temListItems })
+        );
         break;
     }
   };
@@ -92,7 +99,8 @@ const ListLabels = ({
 
   const onSubmit = () => {
     setLoading(true);
-    processSubmit && processSubmit(editedData.listItems, onSubmitSuccess, onSubmitFail);
+    processSubmit &&
+      processSubmit(editedData.listItems, onSubmitSuccess, onSubmitFail);
   };
 
   return (
@@ -123,7 +131,7 @@ ListLabels.propTypes = {
   labelVariant: PropTypes.oneOf(["double", "single"]),
   data: PropTypes.shape({
     listItems: PropTypes.array,
-    isEmpty: PropTypes.bool
+    isEmpty: PropTypes.bool,
   }),
   setParentData: PropTypes.func,
   processSubmit: PropTypes.func,

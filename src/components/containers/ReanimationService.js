@@ -7,15 +7,20 @@ import {
   BedSwapDial,
 } from "../presentational/ReanimationService";
 
-import { BedIcon, ToWatchIcon } from "../../shared/icons/index";
+import { BedIcon, ToWatchIcon, TodoListIcon } from "../../shared/icons/index";
 import ReanimationUnit from "./ReanimationUnit";
-import { manageError } from "../../shared/utils/tools";
+import {
+  manageError,
+  howManyUnfilledTasksInMarkdown,
+} from "../../shared/utils/tools";
+import { IconButton } from "@material-ui/core";
+import EditableText from "../containers/EditableText";
+import { buildReaServiceTodoListSummary } from "../../repository/bed.repository";
 
 const icons = {
-  bed: <BedIcon color="secondary" style={{ width: "30px", height: "100%" }} />,
-  toWatch: (
-    <ToWatchIcon color="secondary" style={{ width: "30px", height: "100%" }} />
-  ),
+  bed: (props) => <BedIcon {...props} />,
+  toWatch: (props) => <ToWatchIcon {...props} />,
+  todoList: (props) => <TodoListIcon {...props} />,
 };
 
 const schemaSwapBed = {
@@ -86,6 +91,14 @@ function ReanimationService({
   const [patientToMove, setPatientToMove] = React.useState();
   const [unitStayToUpdate, setUnitStayToUpdate] = React.useState();
   const [formData, setFormData] = React.useState({});
+  const [gardeMode, setGardeMode] = React.useState(
+    localStorage.getItem("gardeMode") === "true" || false
+  );
+
+  const switchDisplayMode = () => {
+    localStorage.setItem("gardeMode", !gardeMode);
+    setGardeMode(!gardeMode);
+  };
 
   const closeSwapDial = () => setSwapDialOpen(false);
 
@@ -152,7 +165,7 @@ function ReanimationService({
         value: computeNbSeverePatients(service),
       },
       {
-        title: "Lits libres",
+        title: "Lits disponibles",
         icon: icons.bed,
         value: computeNbAvailableBeds(service),
       },
@@ -202,10 +215,29 @@ function ReanimationService({
       );
   };
 
+  const todoIcon = (service) => (iconprops) => (
+    <EditableText
+      details={`Liste à penser pour le service ${service.name}`}
+      title="Todo list"
+      variant="dial"
+      data={buildReaServiceTodoListSummary(service)}
+      readOnly
+      interpretorVariant="markdown"
+      customButton={(props) => (
+        <IconButton variant="contained" {...props}>
+          {icons.todoList(iconprops)}
+        </IconButton>
+      )}
+      badgeCounter={howManyUnfilledTasksInMarkdown}
+      parentUiInform={parentUiInform}
+    />
+  );
+
   return (
     <React.Fragment>
       <ReanimationServicePresentational
         infos={buildInfos(serviceData)}
+        TodoListIcon={todoIcon(dataCopy)}
         units={serviceData.units.map((unit) => (
           <ReanimationUnit
             key={unit.id}
@@ -215,8 +247,11 @@ function ReanimationService({
             setPage={setPage}
             reFetch={reFetch}
             parentUiInform={parentUiInform}
+            gardeMode={gardeMode}
           />
         ))}
+        gardeMode={gardeMode}
+        switchDisplayMode={switchDisplayMode}
       />
       <BedSwapDial
         formProps={{

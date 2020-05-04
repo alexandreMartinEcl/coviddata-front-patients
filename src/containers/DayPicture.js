@@ -168,27 +168,27 @@ const describeCriterium = (criterium, between) => {
     case "equ":
       return `${criterium.statusMeasureType.small} = ${
         criterium.value === "" ? "''" : criterium.value
-        }`;
+      }`;
     case "ne":
       return `${criterium.statusMeasureType.small} != ${
         criterium.value === "" ? "''" : criterium.value
-        }`;
+      }`;
     case "gt":
       return `${criterium.statusMeasureType.small} > ${
         criterium.value === "" ? "''" : criterium.value
-        }`;
+      }`;
     case "lt":
       return `${criterium.statusMeasureType.small} < ${
         criterium.value === "" ? "''" : criterium.value
-        }`;
+      }`;
     case "gte":
       return `${criterium.statusMeasureType.small} ≥ ${
         criterium.value === "" ? "''" : criterium.value
-        }`;
+      }`;
     case "lte":
       return `${criterium.statusMeasureType.small} ≤ ${
         criterium.value === "" ? "''" : criterium.value
-        }`;
+      }`;
     default:
       return;
   }
@@ -226,22 +226,16 @@ const failuresInterface = {
 };
 
 const failuresIcons = {
-  heart_failure: (
-    <HeartFailureIcon style={{ width: "50px", height: "50px" }} />
-  ),
+  heart_failure: <HeartFailureIcon style={{ width: "50px", height: "50px" }} />,
   bio_chemical_failure: (
     <BioChemicalFailureIcon style={{ width: "50px", height: "50px" }} />
   ),
-  brain_failure: (
-    <BrainFailureIcon style={{ width: "50px", height: "50px" }} />
-  ),
+  brain_failure: <BrainFailureIcon style={{ width: "50px", height: "50px" }} />,
   lung_failure: <LungFailureIcon style={{ width: "50px", height: "50px" }} />,
   kidney_failure: (
     <KidneyFailureIcon style={{ width: "50px", height: "50px" }} />
   ),
-  liver_failure: (
-    <LiverFailureIcon style={{ width: "50px", height: "50px" }} />
-  ),
+  liver_failure: <LiverFailureIcon style={{ width: "50px", height: "50px" }} />,
   hematologic_failure: (
     <HematologicFailureIcon style={{ width: "50px", height: "50px" }} />
   ),
@@ -348,18 +342,26 @@ const DayPicture = ({
     let newData = Object.assign(_.cloneDeep(oldData), temData);
     if (!_.isEqual(newData, oldData)) {
       let failureName = interfaceGroupFailureCriteria[statusGroup].name;
-      parentUiInform && parentUiInform(
-        `${failureName} ${temData[failure] ? "détectée" : "retirée"}`,
-        "success"
-      );
+      parentUiInform &&
+        parentUiInform(
+          `${failureName} ${temData[failure] ? "détectée" : "retirée"}`,
+          "success"
+        );
 
       submitFailureChecklist(patientId)(
         newData,
         (res) => {
           console.log("Data returned:", res);
-          let temData = mapResToData ? mapResToData.failuresData(res.data) : res.data;
-          setDataCopy(Object.assign(_.cloneDeep(dataCopy), {failuresData: temData}));
-          console.log("Data returnedset:", Object.assign(_.cloneDeep(dataCopy), {failuresData: temData}));
+          let temData = mapResToData
+            ? mapResToData.failuresData(res.data)
+            : res.data;
+          setDataCopy(
+            Object.assign(_.cloneDeep(dataCopy), { failuresData: temData })
+          );
+          console.log(
+            "Data returnedset:",
+            Object.assign(_.cloneDeep(dataCopy), { failuresData: temData })
+          );
         },
         (err) => manageError(err, console.error)
       );
@@ -430,6 +432,6 @@ const DayPicture = ({
       </Dialog>
     </React.Fragment>
   );
-}
+};
 
 export default DayPicture;

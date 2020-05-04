@@ -80,10 +80,16 @@ const ReanimationTabs = ({
       let newServiceId = res.data.results[0].id;
       if (servicesIds.find((i) => newServiceId === i)) {
         parentUiInform &&
-          parentUiInform(`${res.data.results[0].name} a déjà été récupérée`, "warning");
+          parentUiInform(
+            `${res.data.results[0].name} a déjà été récupérée`,
+            "warning"
+          );
       } else {
         parentUiInform &&
-          parentUiInform(`${res.data.results[0].name} a été récupérée`, "success");
+          parentUiInform(
+            `${res.data.results[0].name} a été récupérée`,
+            "success"
+          );
         setData && setData(res.data.results[0]);
       }
       closeDial();

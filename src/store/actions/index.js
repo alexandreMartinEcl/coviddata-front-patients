@@ -1,5 +1,5 @@
-import uiSnackBar from './snackBarActions';
-import displaymode from './displayModes';
+import uiSnackBar from "./snackBarActions";
+import displaymode from "./displayModes";
 
 export const uiInform = uiSnackBar.uiInform;
 export const clearSnackbar = uiSnackBar.clearSnackbar;

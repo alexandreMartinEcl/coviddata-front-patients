@@ -17,7 +17,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SelectWithValues = ({ title, value, onChange, values, color , ...props}) => (
+const SelectWithValues = ({
+  title,
+  value,
+  onChange,
+  values,
+  color,
+  ...props
+}) => (
   <Select
     margin="dense"
     label={title}

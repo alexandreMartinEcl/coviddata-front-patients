@@ -3,11 +3,7 @@ import { Link } from "react-router-dom";
 import { Grid } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 
-const PatientLaribTemplate = ({
-  changeMode,
-  gardeMode,
-  components
-}) => {
+const PatientLaribTemplate = ({ changeMode, gardeMode, components }) => {
   const {
     PatientInfos,
     SeverityField,
@@ -111,6 +107,6 @@ const PatientLaribTemplate = ({
       {/* <Snackbar /> */}
     </Grid>
   );
-}
+};
 
-export default (PatientLaribTemplate)
+export default PatientLaribTemplate;

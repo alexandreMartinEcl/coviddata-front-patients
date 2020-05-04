@@ -18,8 +18,8 @@ export const submitAddReanimationService = () => {
       thenCb({
         data: {
           count: 1,
-          results: [jsonReas.results[1]]
-        }
+          results: [jsonReas.results[1]],
+        },
       });
       return;
     }

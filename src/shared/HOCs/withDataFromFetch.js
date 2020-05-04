@@ -46,8 +46,10 @@ function withDataFromFetch(Component, { url, config = {} }) {
     }
 
     const reFetch = () => {
-      process.env.REACT_APP_IS_DEV === "1" ? data = _.cloneDeep(data) : fetch();
-    }
+      process.env.REACT_APP_IS_DEV === "1"
+        ? (data = _.cloneDeep(data))
+        : fetch();
+    };
 
     if (!data || loading)
       return <CircularProgress size={24} className={classes.buttonProgress} />;

@@ -104,16 +104,16 @@ const EditableDataCell = ({
       ))}
     </Select>
   ) : (
-    <TextField
-      type={dataType.valueType}
-      label={label}
-      value={value}
-      variant="outlined"
-      multiline={multiline}
-      style={{ margin: "4px", width: "95%" }}
-      {...props}
-    />
-  );
+      <TextField
+        type={dataType.valueType}
+        label={label}
+        value={value}
+        variant="outlined"
+        multiline={multiline}
+        style={{ margin: "4px", width: "95%" }}
+        {...props}
+      />
+    );
 };
 
 const FixedDataCell = ({
@@ -152,8 +152,8 @@ const DataCell = ({ editable, ...props }) => {
   return editable ? (
     <EditableDataCell {...props} />
   ) : (
-    <FixedDataCell {...props} />
-  );
+      <FixedDataCell {...props} />
+    );
 };
 
 const DemographicDisplay = ({
@@ -203,6 +203,7 @@ const DemographicDisplay = ({
     <React.Fragment>
       <Box className={classes.rootBox}>
         <Grid container space={2}>
+          <Typography variant="h6">Séjour</Typography>
           <Grid item xs={12} sm={12}>
             <DataCell
               classes={classes}
@@ -231,10 +232,10 @@ const DemographicDisplay = ({
               value={unitStay.start_date}
               // value={hospitalisationDate}
               infoToAdd={`(${dateToDayStep(unitStay.start_date)})`}
-              // infoToAdd={`(${dateToDayStep(hospitalisationDate)})`}
+            // infoToAdd={`(${dateToDayStep(hospitalisationDate)})`}
             />
           </Grid>
-          <Typography>Informations démographiques</Typography>
+          <Typography variant="h6">Informations démographiques</Typography>
           <Grid item xs={12} container space={2}>
             <Grid item xs={6} sm={6} container direction="column">
               <Grid item>
@@ -313,19 +314,19 @@ const DemographicDisplay = ({
             classes={classes}
           />
         ) : (
-          readOnly && (
-            <Button
-              size="small"
-              color="primary"
-              variant="contained"
-              startIcon={<AddIcon />}
-              style={{ margin: "2px" }}
-              onClick={makeEditable}
-            >
-              Modifier
-            </Button>
-          )
-        )}
+            readOnly && (
+              <Button
+                size="small"
+                color="primary"
+                variant="contained"
+                startIcon={<AddIcon />}
+                style={{ margin: "2px" }}
+                onClick={makeEditable}
+              >
+                Modifier
+              </Button>
+            )
+          )}
       </Box>
     </React.Fragment>
   );

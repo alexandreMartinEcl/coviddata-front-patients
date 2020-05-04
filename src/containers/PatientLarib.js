@@ -115,7 +115,7 @@ function PatientLarib({ data = {}, reFetch, uiInform }) {
     failuresData: getFailuresData(fullData),
     dayNoticeData: getTextData("day_notice")(fullData),
     statusMeasuresData: getStatusMeasuresData(fullData),
-  })
+  });
 
   const components = {
     PatientInfos: (props) => (
@@ -145,37 +145,36 @@ function PatientLarib({ data = {}, reFetch, uiInform }) {
     Depistages: gardeMode
       ? (props) => <></>
       : (props) => (
-        <CheckList
-          labels={depistageInterface}
-          mapResToData={getDetectionCheckList}
-          processSubmit={submitDetectionChecklist(
-            demographicData
-              ? nbWeeksBetween(
-                demographicData.hospitalisationDate,
-                new Date()
-              )
-              : 1,
-            id
-          )}
-          title="Dépistages"
-          data={dataCheckList}
-          parentUiInform={uiInform}
-          {...props}
-        />
-      ),
-    Antecedents:
-      (props) => (
-        <ListLabels
-          title="Antécédents"
-          labelVariant="double"
-          data={getAntecedentsData(data)}
-          mapResToData={getAntecedentsData}
-          processSubmit={submitLabelList("antecedents", "double", id)}
-          readOnly={gardeMode}
-          parentUiInform={uiInform}
-          {...props}
-        />
-      ),
+          <CheckList
+            labels={depistageInterface}
+            mapResToData={getDetectionCheckList}
+            processSubmit={submitDetectionChecklist(
+              demographicData
+                ? nbWeeksBetween(
+                    demographicData.hospitalisationDate,
+                    new Date()
+                  )
+                : 1,
+              id
+            )}
+            title="Dépistages"
+            data={dataCheckList}
+            parentUiInform={uiInform}
+            {...props}
+          />
+        ),
+    Antecedents: (props) => (
+      <ListLabels
+        title="Antécédents"
+        labelVariant="double"
+        data={getAntecedentsData(data)}
+        mapResToData={getAntecedentsData}
+        processSubmit={submitLabelList("antecedents", "double", id)}
+        readOnly={gardeMode}
+        parentUiInform={uiInform}
+        {...props}
+      />
+    ),
     Allergies: (props) => (
       <ListLabels
         title="Allergies"
@@ -190,7 +189,7 @@ function PatientLarib({ data = {}, reFetch, uiInform }) {
     ),
     RecentDiseaseHistory: (props) => (
       <EditableText
-        label="Evénements récents"
+        details="Evénements récents"
         title="Histoire de la maladie récente"
         variant="extensible"
         data={getTextData("recent_disease_history")(data)}
@@ -203,7 +202,7 @@ function PatientLarib({ data = {}, reFetch, uiInform }) {
     ),
     Evolution: (props) => (
       <EditableText
-        label="Evolution du patient depuis le début de la réanimation"
+        details="Evolution du patient depuis le début de la réanimation"
         title="Evolution"
         variant="extensible"
         data={getTextData("evolution")(data)}
@@ -216,7 +215,7 @@ function PatientLarib({ data = {}, reFetch, uiInform }) {
     ),
     TodoList: (props) => (
       <EditableText
-        label="Liste à penser pour le patient"
+        details="Liste à penser pour le patient"
         title="Todo list"
         variant="dial"
         data={getTextData("todo_list")(data)}
@@ -234,7 +233,7 @@ function PatientLarib({ data = {}, reFetch, uiInform }) {
     ),
     LatText: (props) => (
       <EditableText
-        label="Modalités d'application des LAT"
+        details="Modalités d'application des LAT"
         title="LAT"
         variant="dial"
         data={getTextData("treatment_limitations")(data)}
@@ -260,7 +259,7 @@ function PatientLarib({ data = {}, reFetch, uiInform }) {
         mapResToData={{
           failuresData: getFailuresData,
           dayNoticeData: getTextData("day_notice"),
-          statusMeasuresData: getStatusMeasuresData,                
+          statusMeasuresData: getStatusMeasuresData,
         }}
       />
     ),
@@ -275,10 +274,10 @@ function PatientLarib({ data = {}, reFetch, uiInform }) {
   );
 }
 
-const mapStateToProps = (state, ownProps) => ({})
+const mapStateToProps = (state, ownProps) => ({});
 
-const mapDispatchToProps = dispatch => ({
-  uiInform: (message, severity) => dispatch(uiInform(message, severity))
-})
+const mapDispatchToProps = (dispatch) => ({
+  uiInform: (message, severity) => dispatch(uiInform(message, severity)),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(PatientLarib);

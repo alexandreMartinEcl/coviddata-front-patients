@@ -60,3 +60,56 @@ export const submitMovePatient = () => {
       .catch(catchCb);
   };
 };
+
+const basicBedInfo = (bed) => {
+  let patient = !bed.current_stay ? null : bed.current_stay.patient;
+  return !patient
+    ? ""
+    : `${bed.unit_index} - ${patient.first_name} ${patient.family_name}`;
+};
+
+const buildBedTodoListMarkdownSummary = (bed) => {
+  if (!bed.current_stay) return "";
+  let toBeDone = bed.current_stay.patient.todo_list
+    .split(`\n`)
+    .filter((r) => r.match(/^\- \[ \].*$/g))
+    .join(`\n`);
+  if (!toBeDone) return "";
+
+  return `#### ${basicBedInfo(bed)}\n${toBeDone}\n`;
+};
+
+export const buildUnitTodoListSummary = (unit) => {
+  let res = "";
+  let lastEdited;
+  unit.beds.forEach((bed) => {
+    if (!bed.current_stay) return "";
+    let patientLastEdited = new Date(
+      bed.current_stay.patient.last_edited_todo_list
+    );
+    if (!lastEdited || patientLastEdited > lastEdited)
+      lastEdited = patientLastEdited;
+
+    res = `${res}${buildBedTodoListMarkdownSummary(bed)}`;
+  });
+  return {
+    text: res,
+    lastEdited: lastEdited,
+  };
+};
+
+export const buildReaServiceTodoListSummary = (service) => {
+  let res = "";
+  let lastEdited;
+  service.units.forEach((unit) => {
+    let unitSummary = buildUnitTodoListSummary(unit);
+    if (!lastEdited || unitSummary.lastEdited > lastEdited)
+      lastEdited = unitSummary.lastEdited;
+
+    res = `${res}## ${unit.name}\n${unitSummary.text}`;
+  });
+  return {
+    text: res,
+    lastEdited: lastEdited,
+  };
+};

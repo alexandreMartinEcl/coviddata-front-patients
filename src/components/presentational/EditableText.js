@@ -49,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
 
 const TextDialog = ({
   title,
+  details,
   content,
   updateDate,
   readOnly,
@@ -58,11 +59,9 @@ const TextDialog = ({
   ...props
 }) => {
   let alwaysAllowSubmit = ["checklist"].find((v) => v === interpretorVariant);
-  console.log(title, alwaysAllowSubmit, readOnly, interpretorVariant);
-  console.log((!readOnly || alwaysAllowSubmit) && actions);
   return (
     <Dialog {...props} maxWidth="lg">
-      <DialogTitle id="form-dialog-title">{title}</DialogTitle>
+      <DialogTitle id="form-dialog-title">{details || title}</DialogTitle>
       <DialogContent>
         Mise à jour: {updateDate}
         {content}
@@ -86,7 +85,11 @@ const TextExpansionPanel = ({
   classes,
   ...props
 }) => (
-  <ExpansionPanel expanded={expanded} onChange={(e, expanded) => expanded ? onOpen() : onClose()} {...props}>
+  <ExpansionPanel
+    expanded={expanded}
+    onChange={(e, expanded) => (expanded ? onOpen() : onClose())}
+    {...props}
+  >
     <ExpansionPanelSummary
       expandIcon={<ExpandMoreIcon />}
       aria-controls="panel1c-content"
@@ -112,37 +115,38 @@ const TextActions = ({
   loading,
   changeCheck,
   classes,
-}) => changeCheck && (
-  <Grid container justify="space-around" space={1}>
-    <Grid item xs={5}>
-      <Button
-        size="small"
-        color="primary"
-        variant="outlined"
-        startIcon={variant === "restore" ? <HistoryIcon /> : <CancelIcon />}
-        style={{ margin: "2px" }}
-        onClick={onCancel}
-      >
-        {variant === "restore" ? "Rétablir" : "Annuler"}
-      </Button>
+}) =>
+  changeCheck && (
+    <Grid container justify="space-around" space={1}>
+      <Grid item xs={5}>
+        <Button
+          size="small"
+          color="primary"
+          variant="outlined"
+          startIcon={variant === "restore" ? <HistoryIcon /> : <CancelIcon />}
+          style={{ margin: "2px" }}
+          onClick={onCancel}
+        >
+          {variant === "restore" ? "Rétablir" : "Annuler"}
+        </Button>
+      </Grid>
+      <Grid item xs={7}>
+        <Button
+          size="small"
+          color="primary"
+          variant="contained"
+          startIcon={<SaveIcon />}
+          style={{ margin: "2px" }}
+          onClick={onSubmit}
+        >
+          Enregistrer
+        </Button>
+        {loading && (
+          <CircularProgress size={24} className={classes.buttonProgress} />
+        )}
+      </Grid>
     </Grid>
-    <Grid item xs={7}>
-      <Button
-        size="small"
-        color="primary"
-        variant="contained"
-        startIcon={<SaveIcon />}
-        style={{ margin: "2px" }}
-        onClick={onSubmit}
-      >
-        Enregistrer
-      </Button>
-      {loading && (
-        <CircularProgress size={24} className={classes.buttonProgress} />
-      )}
-    </Grid>
-  </Grid>
-);
+  );
 
 TextActions.propTypes = {
   onCancel: PropTypes.func,
@@ -181,18 +185,21 @@ const MarkdownToCheckList = ({ text, onChange }) => {
   return values.map(
     (val) =>
       val && (
-        <FormControlLabel
-          key={val.id}
-          control={
-            <Checkbox
-              name={val.label}
-              checked={val.value}
-              style={{ padding: "1px", paddingLeft: "9px" }}
-              onChange={onChange(val.id)}
-            />
-          }
-          label={val.label}
-        />
+        <React.Fragment>
+          <FormControlLabel
+            key={val.id}
+            control={
+              <Checkbox
+                name={val.label}
+                checked={val.value}
+                style={{ padding: "1px", paddingLeft: "9px" }}
+                onChange={onChange(val.id)}
+              />
+            }
+            label={val.label}
+          />
+          <br />
+        </React.Fragment>
       )
   );
 };
@@ -205,7 +212,7 @@ const Content = ({
   onChange,
   handleKeyPress,
   onChangeCheckList,
-  autoFocus
+  autoFocus,
 }) => {
   let readOnlyScreen = ["checklist", "markdown"].find(
     (v) => v === interpretorVariant
@@ -282,6 +289,7 @@ const OpenButton = ({
 
 const EditableText = ({
   title,
+  details,
   variant,
   interpretorVariant,
   readOnly,
@@ -316,6 +324,7 @@ const EditableText = ({
           />
           <TextDialog
             title={title}
+            details={details}
             updateDate={strLastEdited}
             readOnly={readOnly}
             interpretorVariant={interpretorVariant}
@@ -346,7 +355,7 @@ const EditableText = ({
           />
         </React.Fragment>
       );
-    default:
+    case "extensible":
       return (
         <Box style={{ margin: "1px", padding: "2px" }}>
           <TextExpansionPanel
@@ -380,12 +389,36 @@ const EditableText = ({
           />
         </Box>
       );
+    default:
+      return (
+        <React.Fragment>
+          <Content
+            interpretorVariant={interpretorVariant}
+            readOnly={readOnly}
+            text={text}
+            onChange={onChangeText}
+            handleKeyPress={handleKeyPress}
+            onChangeCheckList={onChangeCheckList}
+            autoFocus={autoFocus}
+          />
+          <br />
+          <TextActions
+            onCancel={cancelEditDial}
+            onSubmit={onSubmitText}
+            loading={loadingUpdateText}
+            variant="cancel"
+            changeCheck={changeCheck}
+            classes={classes}
+          />
+        </React.Fragment>
+      );
   }
 };
 
 EditableText.propTypes = {
   title: PropTypes.string,
-  variant: PropTypes.oneOf(["extensible", "dial"]),
+  details: PropTypes.string,
+  variant: PropTypes.oneOf(["extensible", "dial", ""]),
   interpretorVariant: PropTypes.oneOf(["markdown", "checklist", "none"]),
   readOnly: PropTypes.bool,
   strLastEdited: PropTypes.string,
@@ -406,7 +439,7 @@ EditableText.propTypes = {
 };
 
 EditableText.defaultProps = {
-  variant: "extensible",
+  variant: "",
   interpretorVariant: "none",
   readOnly: false,
   strLastEdited: "",
