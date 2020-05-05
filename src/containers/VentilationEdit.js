@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Redirect } from "react-router-dom";
 import axios from "axios";
-import Form from "../components/Form";
+import { SimpleForm } from "../components/Form";
 import { getFieldsFromType } from "../shared/utils/table";
 import { initSchema, cloneSchema } from "../shared/utils/schema";
 import config, { global } from "../config";
@@ -55,7 +55,7 @@ function VentilationEdit({ id, patient, data = {} }) {
   return page ? (
     <Redirect push to={page} />
   ) : (
-    <Form
+    <SimpleForm
       schema={schema}
       uiSchema={uiSchema}
       onSubmit={(form) => onSubmit(form.formData)}

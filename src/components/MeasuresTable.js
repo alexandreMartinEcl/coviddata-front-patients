@@ -12,7 +12,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 
-import { getFormatDateFromFirst, setToMidnight } from "../shared/utils/date";
+import { getFormatDateFromFirst, nbDaysBetween } from "../shared/utils/date";
 import {
   Typography,
   Tooltip,
@@ -28,8 +28,6 @@ import SaveIcon from "@material-ui/icons/Save";
 import CancelIcon from "@material-ui/icons/Cancel";
 import statusMeasuresInterface from "../json/statusMeasures.json";
 
-import Snackbar from "@material-ui/core/Snackbar";
-import MuiAlert from "@material-ui/lab/Alert";
 import { manageError } from "../shared/utils/tools";
 
 import {
@@ -52,8 +50,8 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.primary.dark,
     color: theme.palette.common.white,
     minWidth: "150px",
-    [theme.breakpoints.down("ms")]: {
-      fontSize: 6,
+    [theme.breakpoints.down("sm")]: {
+      fontSize: 9,
       minWidth: "10px",
     },
   },
@@ -61,16 +59,16 @@ const useStyles = makeStyles((theme) => ({
     minWidth: "50px",
     width: "80px",
     maxWidth: "80px",
-    [theme.breakpoints.down("ms")]: {
-      minWidth: "10px",
-      width: "10px",
-      maxWidth: "10px",
+    [theme.breakpoints.down("sm")]: {
+      minWidth: "25px",
+      width: "25px",
+      maxWidth: "50px",
     },
   },
   tableCell: {
     fontSize: 14,
-    [theme.breakpoints.down("ms")]: {
-      fontSize: 5,
+    [theme.breakpoints.down("sm")]: {
+      fontSize: 8,
     },
   },
   tableTitleCell: {
@@ -84,9 +82,9 @@ const useStyles = makeStyles((theme) => ({
   rowIcon: {
     width: "50px",
     height: "50px",
-    [theme.breakpoints.down("ms")]: {
-      width: "5px",
-      height: "5px",
+    [theme.breakpoints.down("sm")]: {
+      width: "25px",
+      height: "25px",
     },
   },
 }));
@@ -163,8 +161,8 @@ const EditableCell = ({ statusType, ...props }) => {
       ))}
     </Select>
   ) : (
-    <TextField type={statusType.valueType} {...props} />
-  );
+      <TextField type={statusType.valueType} {...props} />
+    );
 };
 
 function MeasuresTable({
@@ -176,6 +174,7 @@ function MeasuresTable({
   forcedTableData,
   updateParentTableData,
   readOnly,
+  parentUiInform,
   ...props
 }) {
   const classes = useStyles();
@@ -193,26 +192,6 @@ function MeasuresTable({
   );
 
   const [loadingUpdate, setLoadingUpdate] = React.useState(false);
-  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const [snackbarSeverity, setSnackbarSeverity] = React.useState(false);
-  const [infoMsg, setInfoMsg] = React.useState("");
-
-  /**
-   * Display information snackbar
-   * @param {string} msg
-   * @param {string} infoType either 'success', 'error', 'info' or 'warning'
-   */
-  const uiInform = (msg, infoType) => {
-    setInfoMsg(msg);
-    setSnackbarSeverity(infoType);
-    setSnackbarOpen(true);
-  };
-
-  const closeSnackBar = (event, reason) => {
-    setSnackbarOpen(false);
-    setInfoMsg("");
-  };
-
   const handleKeyPress = (event) => {
     switch (event.key) {
       case "Enter":
@@ -246,12 +225,10 @@ function MeasuresTable({
     lastMeasureDate = data.hospitalisationEndDate
       ? new Date(data.hospitalisationEndDate)
       : new Date();
-    lastMeasureDate = setToMidnight(lastMeasureDate);
 
     firstMeasureDate = new Date(data.hospitalisationDate);
-    firstMeasureDate = setToMidnight(firstMeasureDate);
 
-    let nbDays = Math.round((lastMeasureDate - firstMeasureDate) / 86400000);
+    let nbDays = nbDaysBetween(firstMeasureDate, lastMeasureDate);
 
     let nbColumns = nbDays + 1;
 
@@ -339,7 +316,7 @@ function MeasuresTable({
         if (Number(data.weight_kg) && Number(measureValue)) {
           return `(${
             Number(measureValue) / Number(data.weight_kg).toFixed(2)
-          } mg/kg/h)`;
+            } mg/kg/h)`;
         } else {
           return "";
         }
@@ -455,6 +432,11 @@ function MeasuresTable({
 
     console.log("Sending to " + url);
     console.log(jsonData);
+
+    // setLoadingUpdate(false);
+    // onMeasureSubmit(newData, tDate, selectedGroup);
+    // setSelectedCol(null);
+
     axios({
       method: "post",
       url,
@@ -469,14 +451,14 @@ function MeasuresTable({
         console.log(res);
         setLoadingUpdate(false);
         updateTableData(res.data);
-        //TODO technically, its better to put res.data in onMeasureSubmit
+        // TODO technically, its better to put res.data in onMeasureSubmit
         onMeasureSubmit(newData, tDate, selectedGroup);
         setSelectedCol(null);
       })
       .catch((err) => {
         console.log(err);
         setLoadingUpdate(false);
-        manageError(err.response, uiInform);
+        manageError(err.response, parentUiInform);
       });
   };
 
@@ -524,44 +506,53 @@ function MeasuresTable({
                 className={`${classes.tableHead} ${classes.firstCol}`}
               ></TableCell>
               <TableCell className={`${classes.tableHead}`}>Type</TableCell>
-              {columnTitles.slice(-getActualNbDaysToDisplay()).map((c, j) => (
-                <TableCell
-                  className={`${classes.tableHead} ${classes.tableTitleCell}`}
-                  key={`${c.sum}`}
-                  align="center"
-                >
-                  {c.sum}
-                  <br />
-                  {c.full}
-                  {selectedCol === j ? (
-                    <React.Fragment>
-                      <br />
-                      <IconButton
-                        aria-label="save"
-                        color="primary"
-                        onClick={cancelEdit}
-                      >
-                        <CancelIcon fontSize="large" />
-                      </IconButton>
-                      <IconButton
-                        aria-label="save"
-                        color="primary"
-                        onClick={submitEdit}
-                      >
-                        <SaveIcon fontSize="large" />
-                      </IconButton>
-                      {loadingUpdate && (
-                        <CircularProgress
-                          size={24}
-                          className={classes.buttonProgress}
-                        />
+              {columnTitles.slice(-getActualNbDaysToDisplay()).map((c, j) => {
+                let actualDataCol =
+                  columnTitles.length - getActualNbDaysToDisplay() + j;
+
+                return (
+                  <TableCell
+                    className={`${classes.tableHead} ${classes.tableTitleCell}`}
+                    key={`${c.sum}`}
+                    align="center"
+                  >
+                    {c.sum}
+                    <br />
+                    {c.full}
+                    {selectedCol === actualDataCol ? (
+                      <React.Fragment>
+                        <br />
+                        <Tooltip title="Annuler (Echap)" arrow>
+                          <IconButton
+                            aria-label="save"
+                            color="primary"
+                            onClick={cancelEdit}
+                          >
+                            <CancelIcon fontSize="large" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Enregistrer (Entrée)" arrow>
+                          <IconButton
+                            aria-label="save"
+                            color="primary"
+                            onClick={submitEdit}
+                          >
+                            <SaveIcon fontSize="large" />
+                          </IconButton>
+                        </Tooltip>
+                        {loadingUpdate && (
+                          <CircularProgress
+                            size={24}
+                            className={classes.buttonProgress}
+                          />
+                        )}
+                      </React.Fragment>
+                    ) : (
+                        <></>
                       )}
-                    </React.Fragment>
-                  ) : (
-                    <></>
-                  )}
-                </TableCell>
-              ))}
+                  </TableCell>
+                );
+              })}
             </TableRow>
           </TableHead>
 
@@ -611,28 +602,28 @@ function MeasuresTable({
                                   }
                                 >
                                   {selectedCol === actualDataCol &&
-                                  group === selectedGroup &&
-                                  !configOrderRows[group].rows[i].readOnly ? (
-                                    <EditableCell
-                                      statusType={
-                                        configOrderRows[group].rows[i]
-                                      }
-                                      autoFocus={i === selectedRow}
-                                      value={`${cell}`}
-                                      onChange={onEditableCellChange(
-                                        group,
-                                        i,
-                                        actualDataCol,
-                                        configOrderRows[group].rows[i].valueType
-                                      )}
-                                      onKeyDown={handleKeyPress}
-                                    />
-                                  ) : (
-                                    `${cell} ${measureAddedInfo(
-                                      configOrderRows[group].rows[i],
-                                      cell
-                                    )}`
-                                  )}
+                                    group === selectedGroup &&
+                                    !configOrderRows[group].rows[i].readOnly ? (
+                                      <EditableCell
+                                        statusType={
+                                          configOrderRows[group].rows[i]
+                                        }
+                                        autoFocus={i === selectedRow}
+                                        value={`${cell}`}
+                                        onChange={onEditableCellChange(
+                                          group,
+                                          i,
+                                          actualDataCol,
+                                          configOrderRows[group].rows[i].valueType
+                                        )}
+                                        onKeyDown={handleKeyPress}
+                                      />
+                                    ) : (
+                                      `${cell} ${measureAddedInfo(
+                                        configOrderRows[group].rows[i],
+                                        cell
+                                      )}`
+                                    )}
                                 </TableCell>
                               </Tooltip>
                             );
@@ -653,21 +644,6 @@ function MeasuresTable({
           <TableBody></TableBody>
         </Table>
       </TableContainer>
-
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={closeSnackBar}
-      >
-        <MuiAlert
-          elevation={6}
-          variant="filled"
-          onClose={closeSnackBar}
-          severity={snackbarSeverity}
-        >
-          {infoMsg}
-        </MuiAlert>
-      </Snackbar>
     </Box>
   );
 }

@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import BuiForm from "@rjsf/core";
@@ -6,6 +7,7 @@ import Button from "@material-ui/core/Button";
 import { translate } from "../config";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import * as _ from "lodash";
+import { Dialog, DialogContent, DialogActions } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   wrapper: {
@@ -22,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Form(props) {
+export const SimpleForm = function SimpleForm(props) {
   const classes = useStyles();
   const { id } = useParams();
   const [loading, setLoading] = React.useState(false);
@@ -43,6 +45,23 @@ function Form(props) {
       </div>
     </BuiForm>
   );
-}
+};
 
-export default Form;
+export const FormDialog = ({ formProps, actions, ...props }) => {
+  return (
+    <Dialog {...props}>
+      <DialogContent>
+        <BuiForm {...formProps}>
+          {/* this is to prevent Submit button */}
+          <div />
+        </BuiForm>
+      </DialogContent>
+      <DialogActions>{actions}</DialogActions>
+    </Dialog>
+  );
+};
+
+FormDialog.propTypes = {
+  formProps: PropTypes.object,
+  actions: PropTypes.element,
+};

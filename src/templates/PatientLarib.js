@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Grid } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 
-export default function PatientTemplate({ changeMode, gardeMode, components }) {
+const PatientLaribTemplate = ({ changeMode, gardeMode, components }) => {
   const {
     PatientInfos,
     SeverityField,
@@ -15,6 +15,7 @@ export default function PatientTemplate({ changeMode, gardeMode, components }) {
     TodoList,
     LatText,
     DayPicture,
+    // Snackbar,
   } = components;
 
   let modeButtonText = gardeMode ? "Mode garde" : "Mode normal";
@@ -103,6 +104,9 @@ export default function PatientTemplate({ changeMode, gardeMode, components }) {
       <Grid item xs={12} sm={12}>
         <DayPicture />
       </Grid>
+      {/* <Snackbar /> */}
     </Grid>
   );
-}
+};
+
+export default PatientLaribTemplate;

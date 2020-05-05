@@ -1,10 +1,15 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import defaultLAT from "../shared/files/defaultLAT";
+import * as _ from "lodash";
+import { connect } from "react-redux";
 
+import { uiInform } from "../store/actions";
+
+import defaultLAT from "../shared/files/defaultLAT";
 import PatientTemplate from "../templates/PatientLarib";
+
 import {
-  PatientHeader,
+  DemographicDisplay,
   ListLabels,
   EditableText,
   CheckList,
@@ -18,9 +23,24 @@ import {
   howManyUnfilledTasksInMarkdown,
   howManyFilledTasksInMarkdown,
 } from "../shared/utils/tools";
-// import { useTheme } from "@material-ui/core";
+import { nbWeeksBetween } from "../shared/utils/date";
+import {
+  submitDetectionChecklist,
+  submitEditableText,
+  submitLabelList,
+  submitSimpleSelect,
+  submitDemographicData,
+  getDemographicData,
+  getSeverity,
+  getDetectionData,
+  getAntecedentsData,
+  getFailuresData,
+  getTextData,
+  getStatusMeasuresData,
+  getAllergiesData,
+} from "../repository/patient.repository";
 
-function PatientLarib({ data = {}, reFetch }) {
+function PatientLarib({ data = {}, reFetch, uiInform }) {
   const { id } = useParams();
 
   const [gardeMode, setGardeMode] = React.useState(
@@ -40,36 +60,14 @@ function PatientLarib({ data = {}, reFetch }) {
       default:
         setGardeMode(false);
     }
+    reFetch();
   };
 
-  const {
-    first_name,
-    family_name,
-    birth_date,
-    weight_kg,
-    size_cm,
-    NIP_id,
-    sex,
-    severity,
-    current_unit_stay,
-    hospitalisation_cause,
-  } = data;
-  const dataPatientInfo = {
-    first_name,
-    family_name,
-    birth_date,
-    weight_kg,
-    size_cm,
-    NIP_id,
-    sex,
-    severity,
-    current_unit_stay,
-    hospitalisation_cause,
-  };
+  // DEMOGRAPHIC
+  let demographicData = getDemographicData(data);
 
-  const severityValues = ["Haute", "Moyenne", "Faible"];
-  const severityDataInterface = { Haute: 0, Moyenne: 1, Faible: 2 };
-
+  // SEVERITY
+  const severityValues = { 0: "Haute", 1: "Moyenne", 2: "Faible" };
   const severityIcons = {
     0: (
       <ToWatchIcon
@@ -109,113 +107,38 @@ function PatientLarib({ data = {}, reFetch }) {
     2: theme.palette.secondary.main,
   };
 
-  const {
-    detection_covid,
-    detection_orlEntree,
-    detection_ERentree,
-    detection_ERpremierMardi,
-    detection_ERsecondMardi,
-  } = data;
-  const dataCheckList = {
-    detection_covid,
-    detection_orlEntree,
-    detection_ERentree,
-    detection_ERpremierMardi,
-    detection_ERsecondMardi,
-  };
-  const depistageInterface = {
-    detection_covid: "Détection Covid",
-    detection_orlEntree: "Détection Orl d'entrée",
-    detection_ERentree: "Détection ER d'entrée",
-    detection_ERpremierMardi: "Détection ER premier mardi",
-    detection_ERsecondMardi: "Détection ER second mardi",
-  };
-  let allergies;
-  const formatAllergies = (rawData) => {
-    if (rawData) {
-      try {
-        return JSON.parse(rawData);
-      } catch (e) {
-        return [];
-      }
-    } else {
-      return [];
-    }
-  };
-  allergies = formatAllergies(data.allergies);
-  let allergiesIsEmpty =
-    allergies.length === 0 ||
-    (allergies.length === 1 && allergies[0] === "Inconnues");
+  // DETECTIONS
+  let { dataCheckList, depistageInterface } = getDetectionData(data);
+  const getDetectionCheckList = (data) => getDetectionData(data).dataCheckList;
 
-  let antecedents;
-  const formatAntecedents = (rawData) => {
-    if (rawData) {
-      try {
-        // rawData is like ' {"type": string} '
-        let temJson = JSON.parse(rawData);
-        return Object.entries(temJson).map((entry) => ({
-          title: entry[0],
-          value: entry[1],
-        }));
-      } catch (e) {
-        return [];
-      }
-    } else {
-      return [];
-    }
-  };
-  antecedents = formatAntecedents(data.antecedents);
-  let antecedentsIsEmpty =
-    Object.keys(antecedents).length === 0 ||
-    (Object.keys(antecedents).length === 1 &&
-      Object.keys(antecedents)[0] === "Inconnus");
-
-  const { recent_disease_history, last_edited_recent_disease_history } = data;
-  const dataRecDisHist = {
-    text: recent_disease_history,
-    lastEdited: last_edited_recent_disease_history,
-  };
-
-  const { evolution, last_edited_evolution } = data;
-  const dataEvo = { text: evolution, lastEdited: last_edited_evolution };
-
-  const { todo_list, last_edited_todo_list } = data;
-  const dataTodo = { text: todo_list, lastEdited: last_edited_todo_list };
-
-  const { treatment_limitations, last_edited_treatment_limitations } = data;
-  const dataLAT = {
-    text: treatment_limitations,
-    lastEdited: last_edited_treatment_limitations,
-  };
-
-  const { unit_stays } = data;
-  if (unit_stays && unit_stays.length) {
-    dataPatientInfo.hospitalisationDate = new Date(
-      Math.min(...unit_stays.map((s) => new Date(s.start_date)))
-    );
-  }
+  const getDayPictureData = (fullData) => ({
+    failuresData: getFailuresData(fullData),
+    dayNoticeData: getTextData("day_notice")(fullData),
+    statusMeasuresData: getStatusMeasuresData(fullData),
+  });
 
   const components = {
     PatientInfos: (props) => (
-      <PatientHeader
-        patientId={id}
-        data={dataPatientInfo}
-        reFetch={reFetch}
+      <DemographicDisplay
+        data={demographicData}
         readOnly={gardeMode}
+        mapResToData={getDemographicData}
+        processSubmit={submitDemographicData(id)}
+        parentUiInform={uiInform}
         {...props}
       />
     ),
     SeverityField: (props) => (
       <SimpleSelect
-        patientId={id}
-        data={data}
-        field="severity"
         title="Gravité"
+        data={getSeverity(data)}
         values={severityValues}
-        dataInterface={severityDataInterface}
         icons={severityIcons}
         colors={severityColors}
         readOnly={gardeMode}
+        mapResToData={getSeverity}
+        processSubmit={submitSimpleSelect("severity", id)}
+        parentUiInform={uiInform}
         {...props}
       />
     ),
@@ -223,127 +146,138 @@ function PatientLarib({ data = {}, reFetch }) {
       ? (props) => <></>
       : (props) => (
           <CheckList
-            patientId={id}
+            labels={depistageInterface}
+            mapResToData={getDetectionCheckList}
+            processSubmit={submitDetectionChecklist(
+              demographicData
+                ? nbWeeksBetween(
+                    demographicData.hospitalisationDate,
+                    new Date()
+                  )
+                : 1,
+              id
+            )}
             title="Dépistages"
-            data={{ checks: dataCheckList }}
-            dataInterface={depistageInterface}
-            readOnly={gardeMode}
+            data={dataCheckList}
+            parentUiInform={uiInform}
             {...props}
           />
         ),
-    Antecedents:
-      gardeMode && antecedentsIsEmpty
-        ? (props) => <></>
-        : (props) => (
-            <ListLabels
-              patientId={id}
-              doubleInfoElseSingle={true}
-              field="antecedents"
-              title="Antécédents"
-              data={{ listItems: antecedents }}
-              formatData={formatAntecedents}
-              reFetch={reFetch}
-              readOnly={gardeMode}
-              {...props}
-            />
-          ),
-    Allergies:
-      gardeMode && allergiesIsEmpty
-        ? (props) => <></>
-        : (props) => (
-            <ListLabels
-              patientId={id}
-              doubleInfoElseSingle={false}
-              field="allergies"
-              title="Allergies"
-              data={{ listItems: allergies }}
-              formatData={formatAllergies}
-              reFetch={reFetch}
-              readOnly={gardeMode}
-              {...props}
-            />
-          ),
+    Antecedents: (props) => (
+      <ListLabels
+        title="Antécédents"
+        labelVariant="double"
+        data={getAntecedentsData(data)}
+        mapResToData={getAntecedentsData}
+        processSubmit={submitLabelList("antecedents", "double", id)}
+        readOnly={gardeMode}
+        parentUiInform={uiInform}
+        {...props}
+      />
+    ),
+    Allergies: (props) => (
+      <ListLabels
+        title="Allergies"
+        labelVariant="single"
+        data={getAllergiesData(data)}
+        mapResToData={getAllergiesData}
+        processSubmit={submitLabelList("allergies", "single", id)}
+        readOnly={gardeMode}
+        parentUiInform={uiInform}
+        {...props}
+      />
+    ),
     RecentDiseaseHistory: (props) => (
       <EditableText
-        patientId={id}
-        label="Evénements récents"
+        details="Evénements récents"
         title="Histoire de la maladie récente"
-        extensibleElseDial={true}
-        data={dataRecDisHist}
-        field="recent_disease_history"
-        reFetch={reFetch}
+        variant="extensible"
+        data={getTextData("recent_disease_history")(data)}
         readOnly={gardeMode}
+        mapResToData={getTextData("recent_disease_history")}
+        processSubmit={submitEditableText("recent_disease_history", id)}
+        parentUiInform={uiInform}
         {...props}
       />
     ),
     Evolution: (props) => (
       <EditableText
-        patientId={id}
-        label="Evolution du patient depuis le début de la réanimation"
+        details="Evolution du patient depuis le début de la réanimation"
         title="Evolution"
-        extensibleElseDial={true}
-        data={dataEvo}
-        field="evolution"
-        reFetch={reFetch}
+        variant="extensible"
+        data={getTextData("evolution")(data)}
         readOnly={gardeMode}
+        mapResToData={getTextData("evolution")}
+        processSubmit={submitEditableText("evolution", id)}
+        parentUiInform={uiInform}
         {...props}
       />
     ),
     TodoList: (props) => (
       <EditableText
-        patientId={id}
-        label="Liste à penser pour le patient"
+        details="Liste à penser pour le patient"
         title="Todo list"
-        extensibleElseDial={false}
-        data={dataTodo}
-        field="todo_list"
-        reFetch={reFetch}
+        variant="dial"
+        data={getTextData("todo_list")(data)}
         readOnly={gardeMode}
-        withMarkdown
+        interpretorVariant="checklist"
         buttonIcon={<TodoListIcon style={{ width: "20px", height: "20px" }} />}
         badgeCounter={howManyUnfilledTasksInMarkdown}
         defaultText={`- [ ] A faire\n- [x] Fait`}
         defaultNewLine={`\n- [ ] `}
+        parentUiInform={uiInform}
+        mapResToData={getTextData("todo_list")}
+        processSubmit={submitEditableText("todo_list", id)}
         {...props}
       />
     ),
     LatText: (props) => (
       <EditableText
-        patientId={id}
-        label="Modalités d'application des LAT"
+        details="Modalités d'application des LAT"
         title="LAT"
-        extensibleElseDial={false}
-        data={dataLAT}
-        field="treatment_limitations"
-        reFetch={reFetch}
+        variant="dial"
+        data={getTextData("treatment_limitations")(data)}
         readOnly={gardeMode}
-        withMarkdown
+        interpretorVariant="markdown"
         badgeCounter={howManyFilledTasksInMarkdown}
         defaultText={defaultLAT}
         buttonIcon={<LatIcon style={{ width: "20px", height: "20px" }} />}
+        mapResToData={getTextData("treatment_limitations")}
+        processSubmit={submitEditableText("treatment_limitations", id)}
+        parentUiInform={uiInform}
         {...props}
       />
     ),
     DayPicture: (props) => (
       <DayPicture
         patientId={id}
-        data={data}
         reFetch={reFetch}
         readOnly={gardeMode}
         {...props}
+        parentUiInform={uiInform}
+        data={getDayPictureData(data)}
+        mapResToData={{
+          failuresData: getFailuresData,
+          dayNoticeData: getTextData("day_notice"),
+          statusMeasuresData: getStatusMeasuresData,
+        }}
       />
     ),
   };
 
   return (
-    <React.Fragment>
-      <PatientTemplate
-        changeMode={updateMode}
-        gardeMode={gardeMode}
-        components={components}
-      />
-    </React.Fragment>
+    <PatientTemplate
+      changeMode={updateMode}
+      gardeMode={gardeMode}
+      components={components}
+    />
   );
 }
 
-export default PatientLarib;
+const mapStateToProps = (state, ownProps) => ({});
+
+const mapDispatchToProps = (dispatch) => ({
+  uiInform: (message, severity) => dispatch(uiInform(message, severity)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(PatientLarib);

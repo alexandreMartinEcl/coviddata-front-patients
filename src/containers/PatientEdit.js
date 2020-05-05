@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Redirect } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
-import Form from "../components/Form";
+import { SimpleForm } from "../components/Form";
 import PatientEditTemplate from "../templates/PatientEdit";
 import { getFieldsFromType } from "../shared/utils/table";
 import { initSchema, cloneSchema, flat } from "../shared/utils/schema";
@@ -56,7 +56,7 @@ function PatientEdit({ id, data = {} }) {
 
   const components = {
     Form: (props) => (
-      <Form
+      <SimpleForm
         schema={schema}
         uiSchema={uiSchema}
         onSubmit={(form) => onSubmit(form.formData)}

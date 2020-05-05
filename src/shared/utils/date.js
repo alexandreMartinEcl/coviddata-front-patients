@@ -35,6 +35,7 @@ export function dateToStr(date) {
 }
 
 export function dateTimeToStr(date) {
+  if (!date) return "";
   const options = {
     weekday: "short",
     month: "2-digit",
@@ -68,6 +69,29 @@ export function isSameDay(date1, date2) {
     date1.getFullYear() === date2.getFullYear() &&
     date1.getMonth() === date2.getMonth()
   );
+}
+
+/**
+ * Return nb of days between two dates, not considering times (only one day between 2020/01/01T00:00 and 2020/01/02T23:59)
+ * @param {Date || string} firstDate
+ * @param {Date || string} secondDate
+ */
+export function nbDaysBetween(firstDate, secondDate) {
+  firstDate = setToMidnight(firstDate);
+  secondDate = setToMidnight(secondDate);
+
+  return Math.round((secondDate - firstDate) / 86400000);
+}
+
+/**
+ * Return nb of full weeks between two dates, not considering times
+ * @param {Date || string} firstDate
+ * @param {Date || string} secondDate
+ */
+export function nbWeeksBetween(firstDate, secondDate) {
+  const nbDays = nbDaysBetween(firstDate, secondDate);
+
+  return Math.floor(nbDays / 7);
 }
 
 export function setToMidnight(date) {

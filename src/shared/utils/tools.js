@@ -39,9 +39,9 @@ export function manageError(errResp, uiInform) {
 }
 
 export function howManyUnfilledTasksInMarkdown(txt) {
-  return txt.split("- [ ]").length - 1;
+  return txt ? txt.split("- [ ]").length - 1 : 0;
 }
 
 export function howManyFilledTasksInMarkdown(txt) {
-  return txt.split("[x]").length - 1;
+  return txt ? txt.split("[x]").length - 1 : 0;
 }

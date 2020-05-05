@@ -6,9 +6,9 @@
   "properties": {
     "NIP_id": {
       "type": "string",
-      "title": "Identifiant NIP",
-      "minLength": 10,
-      "maxLength": 10
+      "title": "Identifiant NIP (10 chiffres)",
+      "maxLength": 10,
+      "pattern": "\\[0-9]*"
     },
     "stay_start_date": {
       "type": "string",
@@ -43,12 +43,12 @@
     },
     "weight_kg": {
       "title": "Poids",
-      "type": "number",
+      "type": "string",
       "python_minimum": 0
     },
     "size_cm": {
       "title": "Taille (cm)",
-      "type": "integer",
+      "type": "string",
       "python_minimum": 0
     }
   }
