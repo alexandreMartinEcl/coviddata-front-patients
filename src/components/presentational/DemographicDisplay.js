@@ -158,7 +158,6 @@ const DataCell = ({ editable, ...props }) => {
 
 const DemographicDisplay = ({
   unitStay,
-  hospitalisationDate,
   isEditable,
   nipId,
   familyName,
@@ -226,9 +225,7 @@ const DemographicDisplay = ({
               label="En réanimation depuis le"
               dataType={{ valueType: "date" }}
               value={unitStay.start_date}
-              // value={hospitalisationDate}
               infoToAdd={`(${dateToDayStep(unitStay.start_date)})`}
-            // infoToAdd={`(${dateToDayStep(hospitalisationDate)})`}
             />
           </Grid>
           <Typography variant="h6">Informations démographiques</Typography>
@@ -295,7 +292,7 @@ const DemographicDisplay = ({
                 <DataCell
                   {...baseProps("weight_kg")}
                   label="Poids (kg)"
-                  dataType={{ valueType: "number" }}
+                  dataType={{ valueType: "string" }}
                   value={weight}
                 />
               </Grid>
@@ -303,7 +300,7 @@ const DemographicDisplay = ({
                 <DataCell
                   {...baseProps("size_cm")}
                   label="Taille (cm)"
-                  dataType={{ valueType: "number" }}
+                  dataType={{ valueType: "string" }}
                   infoToAdd={toAddSize}
                   value={size}
                 />

@@ -10,6 +10,28 @@ import { useTheme } from "@material-ui/styles";
 import { manageError } from "../../shared/utils/tools";
 import * as _ from "lodash";
 
+//TOOD should be automated using jsonSchema but not that simple
+const checkAddPatientForm = (field, value) => {
+  switch (field) {
+    case "NIP_id":
+      return value.match(/^[0-9]*$/g);
+    case "current_unit_stay/start_date":
+      return new Date(value) <= new Date();
+    case "family_name":
+      return value.match(/^[a-zA-Z\-']*$/g);
+    case "first_name":
+      return value.match(/^[a-zA-Z\-']*$/g);
+    case "birth_date":
+      return new Date(value) <= new Date();
+    case "weight_kg":
+      return value.match(/^[0-9]{0,3}(\.[0-9]{0,3})?$/g);
+    case "size_cm":
+      return value.match(/^[0-9]{0,3}(\.[0-9]{0,2})?$/g);
+    default:
+      return true;
+  }
+};
+
 const DemographicDisplay = ({
   readOnly,
   parentUiInform,
@@ -61,13 +83,15 @@ const DemographicDisplay = ({
   };
 
   const onFieldChange = (field) => {
-    return (event) => {
+    return ({target}) => {
+      let { value } = target;
+      if (!checkAddPatientForm(field, value)) return;
       let temEditedData = _.cloneDeep(editedData);
       let keys = field.split("/");
       if (keys.length > 1) {
-        temEditedData[keys[0]][keys[1]] = event.target.value;
+        temEditedData[keys[0]][keys[1]] = value;
       } else {
-        temEditedData[field] = event.target.value;
+        temEditedData[field] = value;
       }
       setEditedData(_.cloneDeep(temEditedData));
     };
