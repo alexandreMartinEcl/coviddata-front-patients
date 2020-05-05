@@ -265,6 +265,39 @@ export const submitDemographicData = (patientId) => {
   };
 };
 
+export const submitTreatmentLimitationsData = (patientId) => {
+  return (latData, thenCb, catchCb) => {
+    let jsonData = _.cloneDeep(latData);
+    delete jsonData.lastEdited;
+
+    const url = `${config.path.patient}${patientId}/`;
+    console.log("Sending to:", url, jsonData);
+
+    if (DEV_MODE) {
+      thenCb({
+        data: {
+          [`last_edited_treatment_limitations`]: new Date(),
+          ...jsonData,
+        },
+      });
+      return;
+    }
+
+    axios({
+      method: "patch",
+      url,
+      data: jsonData,
+      ...config.axios,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+    })
+      .then(thenCb)
+      .catch(catchCb);
+  };
+};
+
 export const submitAddPatient = (bedId) => {
   return (patientData, thenCb, catchCb) => {
     const data = flat(patientData);
@@ -485,4 +518,44 @@ export const getStatusMeasuresData = (fullData) => {
     temData.weight_kg = fullData.weight_kg;
   }
   return temData;
+};
+
+export const getTreatmentLimitations = (fullData) => {
+  const temData = _.pick(fullData, [
+    "no_acr_reanimation",
+    "no_new_failures_or_therap_raise_treatment",
+    "no_catecholamines",
+    "no_intubation",
+    "no_assisted_ventilation",
+    "no_o2",
+    "no_eer",
+    "no_transfusion",
+    "no_surgery",
+    "no_PIC_or_DVE",
+    "no_new_antibiotherapy",
+    "no_sirurgical_reintervetion",
+    "no_new_complementary_exams",
+    "no_biological_results",
+    "pressor_amines_stop",
+    "eer_stop",
+    "fio2_21percent",
+    "oxygenotherapy_stop",
+    "mecanic_ventilation_stop",
+    "extubation",
+    "nutrition_stop",
+    "hydratation_stop",
+    "antibiotic_stop",
+    "dve_ablation",
+    "ecmo_stop",
+    "all_current_therapeutics_stop",
+    "other_stops",
+    "fio2_limit",
+    "no_mecanic_ventilation_markup",
+    "amines_limitation",
+    "no_reanimation_admittance",
+    "treatment_limitations_comments",
+  ]);
+  console.log("PICKUP", temData);
+  temData.lastEdited = fullData.last_edited_treatment_limitations;
+  return _.cloneDeep(temData);
 };

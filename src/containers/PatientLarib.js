@@ -39,7 +39,10 @@ import {
   getTextData,
   getStatusMeasuresData,
   getAllergiesData,
+  submitTreatmentLimitationsData,
+  getTreatmentLimitations,
 } from "../repository/patient.repository";
+import TreatmentLimitations from "../components/containers/TreatmentLimitations";
 
 function PatientLarib({ data = {}, reFetch, uiInform }) {
   const { id } = useParams();
@@ -235,20 +238,13 @@ function PatientLarib({ data = {}, reFetch, uiInform }) {
       />
     ),
     LatText: (props) => (
-      <EditableText
-        details="Modalités d'application des LAT"
-        title="LAT"
-        variant="dial"
-        data={getTextData("treatment_limitations")(data)}
-        readOnly={gardeMode}
-        interpretorVariant="markdown"
-        badgeCounter={howManyFilledTasksInMarkdown}
-        defaultText={defaultLAT}
-        buttonIcon={<LatIcon style={{ width: "20px", height: "20px" }} />}
-        mapResToData={getTextData("treatment_limitations")}
-        processSubmit={submitEditableText("treatment_limitations", id)}
+      <TreatmentLimitations
         parentUiInform={uiInform}
-        {...props}
+        buttonIcon={<LatIcon style={{ width: "20px", height: "20px" }} />}
+        readOnly={gardeMode}
+        processSubmit={submitTreatmentLimitationsData(id)}
+        data={getTreatmentLimitations(data)}
+        mapResToData={getTreatmentLimitations}
       />
     ),
     DayPicture: (props) => (

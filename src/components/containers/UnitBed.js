@@ -19,9 +19,7 @@ import addPatientBasicFormSchema from "../../json/schemaPatientBasic.json";
 import { useMediaQuery } from "@material-ui/core";
 import { useTheme } from "@material-ui/styles";
 
-import {
-  TodoListIcon,
-} from "../../shared/icons/index";
+import { TodoListIcon } from "../../shared/icons/index";
 import { EditableText } from "../../containers/Components";
 import {
   submitEditableText,
@@ -254,16 +252,18 @@ function UnitBed({
         />
       );
 
-      const failures = current_stay && [
-        "heart_failure",
-        "bio_chemical_failure",
-        "brain_failure",
-        "lung_failure",
-        "kidney_failure",
-        "liver_failure",
-        "hematologic_failure",
-      ].filter((k) => current_stay.patient[k])
-    
+  const failures =
+    current_stay &&
+    [
+      "heart_failure",
+      "bio_chemical_failure",
+      "brain_failure",
+      "lung_failure",
+      "kidney_failure",
+      "liver_failure",
+      "hematologic_failure",
+    ].filter((k) => current_stay.patient[k]);
+
   return (
     <React.Fragment>
       <UnitBedPresentational

@@ -48,7 +48,6 @@ const SimpleSelect = ({
       processSubmit(event.target.value, onSubmitSuccess, onSubmitFail);
   };
 
-  console.log("Checking simple:", dataCopy);
   return (
     <React.Fragment>
       <SimpleSelectPresentational

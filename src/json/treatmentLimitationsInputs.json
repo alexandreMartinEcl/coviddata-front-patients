@@ -1,0 +1,187 @@
+[
+  {
+    "title": "Limitation des thérapeutiques",
+    "inputs": [
+      {
+        "label": "Pas de réanimation de l'ACR",
+        "field": "no_acr_reanimation",
+        "isCheckbox": true
+      },
+      {
+        "label": "Pas de traitement de nouvelles défaillances ou escalade thérapeutique",
+        "field": "no_new_failures_or_therap_raise_treatment",
+        "isCheckbox": true
+      },
+      {
+        "label": "Pas de catécholamines",
+        "field": "no_catecholamines",
+        "isCheckbox": true
+      },
+      {
+        "label": "Pas d'intubation",
+        "field": "no_intubation",
+        "isCheckbox": true
+      },
+      {
+        "label": "Pas de VNI",
+        "field": "no_assisted_ventilation",
+        "isCheckbox": true
+      },
+      {
+        "label": "Pas d’O2",
+        "field": "no_o2",
+        "isCheckbox": true
+      },
+      {
+        "label": "Pas d'EER",
+        "field": "no_eer",
+        "isCheckbox": true
+      },
+      {
+        "label": "Pas de transfusion ",
+        "field": "no_transfusion",
+        "isCheckbox": true
+      },
+      {
+        "label": "Pas de chirurgie",
+        "field": "no_surgery",
+        "isCheckbox": true
+      },
+      {
+        "label": "Pas de PIC ou de DVE",
+        "field": "no_PIC_or_DVE",
+        "isCheckbox": true
+      },
+      {
+        "label": "Pas de nouvelle antibiothérapie",
+        "field": "no_new_antibiotherapy",
+        "isCheckbox": true
+      },
+      {
+        "label": "Pas de ré-intervention chirurgicale",
+        "field": "no_sirurgical_reintervetion",
+        "isCheckbox": true
+      },
+      {
+        "label": "Pas de nouveaux examens complémentaires",
+        "field": "no_new_complementary_exams",
+        "isCheckbox": true
+      },
+      {
+        "label": "Pas de bilan biologique",
+        "field": "no_biological_results",
+        "isCheckbox": true
+      }
+    ]
+  },
+  {
+    "title": "Arrêt des thérapeutiques",
+    "inputs": [
+      {
+        "label": "Arrêt des amines vasopressives",
+        "field": "pressor_amines_stop",
+        "isCheckbox": true
+      },
+      {
+        "label": "Arrêt de l’épuration extra-rénale",
+        "field": "eer_stop",
+        "isCheckbox": true
+      },
+      {
+        "label": "Mise en FIO2  = 21%",
+        "field": "fio2_21percent",
+        "isCheckbox": true
+      },
+      {
+        "label": "Arrêt de l’oxygénothérapie",
+        "field": "oxygenotherapy_stop",
+        "isCheckbox": true
+      },
+      {
+        "label": "Arrêt de la ventilation mécanique",
+        "field": "mecanic_ventilation_stop",
+        "isCheckbox": true
+      },
+      {
+        "label": "Extubation ",
+        "field": "extubation",
+        "isCheckbox": true
+      },
+      {
+        "label": "Arrêt de la nutrition ",
+        "field": "nutrition_stop",
+        "isCheckbox": true
+      },
+      {
+        "label": "Arrêt de l’hydratation",
+        "field": "hydratation_stop",
+        "isCheckbox": true
+      },
+      {
+        "label": "Arrêt des antibiotiques",
+        "field": "antibiotic_stop",
+        "isCheckbox": true
+      },
+      {
+        "label": "Ablation de la DVE",
+        "field": "dve_ablation",
+        "isCheckbox": true
+      },
+      {
+        "label": "Arrêt de l’ECMO",
+        "field": "ecmo_stop",
+        "isCheckbox": true
+      },
+      {
+        "label": "Arrêt de toutes les thérapeutiques en cours",
+        "field": "all_current_therapeutics_stop",
+        "isCheckbox": true
+      },
+      {
+        "label": "Autres",
+        "field": "other_stops",
+        "isCheckbox": false
+      }
+    ]
+  },
+  {
+    "title": "Limitation des thérapeutiques en cours",
+    "inputs": [
+      {
+        "label": "FiO2 limitée à (%)",
+        "field": "fio2_limit",
+        "isCheckbox": false
+      },
+      {
+        "label": "Pas de majoration de la VM (NO, DV,…)",
+        "field": "no_mecanic_ventilation_markup",
+        "isCheckbox": true
+      },
+      {
+        "label": "Amines limitées à (ml/h)",
+        "field": "amines_limitation",
+        "isCheckbox": false
+      }
+    ]
+  },
+  {
+    "title": "Admission en réanimation",
+    "inputs": [
+      {
+        "label": "Pas de (ré) admission en réanimation",
+        "field": "no_reanimation_admittance",
+        "isCheckbox": true
+      }
+    ]
+  },
+  {
+    "title": "Autre",
+    "inputs": [
+      {
+        "label": "Commentaires / évolution",
+        "field": "treatment_limitations_comments",
+        "isCheckbox": false
+      }
+    ]
+  }
+]
